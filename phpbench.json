@@ -1,0 +1,30 @@
+{
+    "runner.bootstrap": "vendor/autoload.php",
+    "runner.path": "benchmarks",
+    "runner.php_config": {
+        "memory_limit": "1G"
+    },
+    "core.profiles": {
+        "default": {
+            "runner.iterations": [10],
+            "runner.revs": [100],
+            "runner.warmup": [1]
+        },
+        "ci": {
+            "runner.iterations": [5],
+            "runner.revs": [50],
+            "runner.warmup": [1]
+        }
+    },
+    "report.generators": {
+        "table": {
+            "cols": ["benchmark", "subject", "set", "revs", "its", "mem_peak", "best", "mean", "mode", "worst", "stdev", "rstdev", "diff"],
+            "break": ["benchmark"]
+        },
+        "html": {
+            "file": "build/phpbench-report.html"
+        }
+    },
+    "storage.driver": "dbal",
+    "storage.dbal.url": "sqlite:///.phpbench.sqlite"
+}
