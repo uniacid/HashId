@@ -22,7 +22,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Pgs\\HashIdBundle\\Tests\\": "tests/"
+            "Pgs\\HashIdBundle\\Tests\\": "tests/",
+            "Pgs\\HashIdBundle\\Rector\\": "rector-rules/"
         }
     },
     "minimum-stability": "stable",

@@ -9,3 +9,9 @@ var/
 .php-cs-fixer.cache
 .phpunit.cache/
 junit.xml
+# IDE and Editor configurations
+.cursorindexingignore
+.vscode/
+
+# SpecStory files
+.specstory/

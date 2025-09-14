@@ -13,6 +13,8 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         // Skip test fixtures
         __DIR__ . '/tests/Fixtures',
+        // Skip Rector fixtures
+        __DIR__ . '/tests/Rector/Fixtures',
     ]);
 
     // Import modular configurations
@@ -32,6 +34,23 @@ return static function (RectorConfig $rectorConfig): void {
     
     // Code quality improvements
     // $rectorConfig->import(__DIR__ . '/rector-quality.php');
+    
+    // Register custom HashId-specific rules
+    $rectorConfig->paths([
+        __DIR__ . '/rector-rules',
+    ]);
+    
+    // Auto-discover custom rules in rector-rules directory
+    $customRulesDir = __DIR__ . '/rector-rules';
+    if (is_dir($customRulesDir)) {
+        $customRuleFiles = glob($customRulesDir . '/*Rule.php');
+        foreach ($customRuleFiles as $ruleFile) {
+            $className = 'Pgs\\HashIdBundle\\Rector\\' . basename($ruleFile, '.php');
+            if (file_exists($ruleFile) && class_exists($className)) {
+                $rectorConfig->rule($className);
+            }
+        }
+    }
     
     // Configure parallel processing
     $rectorConfig->parallel();
