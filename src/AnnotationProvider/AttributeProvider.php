@@ -52,6 +52,11 @@ class AttributeProvider implements AnnotationProviderInterface
 
         $reflection = $this->reflectionProvider->getMethodReflectionFromClassString(...$explodedControllerString);
 
+        // Null safety: Check if reflection is available before processing
+        if ($reflection === null) {
+            return null;
+        }
+
         return $this->extractHashFromMethod($reflection, $annotationClassName);
     }
 
@@ -75,19 +80,29 @@ class AttributeProvider implements AnnotationProviderInterface
 
         $reflection = $this->reflectionProvider->getMethodReflectionFromObject($controller, $method);
 
+        // Null safety: Check if reflection is available before processing
+        if ($reflection === null) {
+            return null;
+        }
+
         return $this->extractHashFromMethod($reflection, $annotationClassName);
     }
 
     /**
      * Extract Hash configuration from a method using the compatibility layer.
      *
-     * @param \ReflectionMethod $method The method to extract from
+     * @param \ReflectionMethod|null $method The method to extract from
      * @param string $annotationClassName The annotation/attribute class name
      *
      * @return object|null The Hash configuration object or null if not found
      */
-    private function extractHashFromMethod(\ReflectionMethod $method, string $annotationClassName): ?object
+    private function extractHashFromMethod(?\ReflectionMethod $method, string $annotationClassName): ?object
     {
+        // Null safety check
+        if ($method === null) {
+            return null;
+        }
+        
         // Only handle Hash annotations/attributes
         if ($annotationClassName !== HashAnnotation::class && $annotationClassName !== HashAttribute::class) {
             return null;

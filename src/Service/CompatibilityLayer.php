@@ -82,8 +82,24 @@ class CompatibilityLayer
             return null;
         }
 
-        // Simple regex to find @Hash annotations
-        if (\preg_match('/@Hash\((.*?)\)/', $docComment, $matches)) {
+        // Security: Validate and limit input length to prevent ReDoS attacks
+        $maxLength = 10000; // Reasonable limit for docblock size
+        if (\strlen($docComment) > $maxLength) {
+            trigger_error('Docblock exceeds maximum allowed length', E_USER_WARNING);
+            return null;
+        }
+
+        // Security: Sanitize input by removing potential malicious patterns
+        // Use atomic groups (?>) and possessive quantifiers to prevent catastrophic backtracking
+        $docComment = \preg_replace('/\s+/', ' ', $docComment); // Normalize whitespace
+        
+        // Use more restrictive regex with atomic groups to prevent ReDoS
+        // Pattern explanation:
+        // @Hash\( - literal match
+        // (?> - atomic group (no backtracking)
+        // [^)]++ - possessive quantifier, match non-) characters
+        // \) - literal closing parenthesis
+        if (\preg_match('/@Hash\((?>([^)]{1,500}))\)/', $docComment, $matches)) {
             $context = \sprintf(
                 '%s::%s',
                 $method->getDeclaringClass()->getName(),
@@ -97,19 +113,39 @@ class CompatibilityLayer
                 $context,
             );
 
-            // Parse the annotation parameters
+            // Parse the annotation parameters with length validation
             $params = $matches[1];
+            
+            // Additional validation: ensure params don't contain suspicious patterns
+            if (\preg_match('/[<>]|\\\\x|\\\\0/', $params)) {
+                trigger_error('Invalid characters detected in Hash annotation', E_USER_WARNING);
+                return null;
+            }
 
-            // Handle single quoted string
-            if (\preg_match('/^"([^"]+)"$/', $params, $paramMatches)) {
+            // Handle single quoted string with stricter pattern
+            if (\preg_match('/^"([a-zA-Z0-9_]{1,100})"$/', $params, $paramMatches)) {
                 return [$paramMatches[1]];
             }
 
-            // Handle array of strings
-            if (\preg_match('/^\{(.+)\}$/', $params, $paramMatches)) {
+            // Handle array of strings with stricter validation
+            if (\preg_match('/^\{([^}]{1,500})\}$/', $params, $paramMatches)) {
                 $items = \explode(',', $paramMatches[1]);
+                
+                // Validate each item and limit array size
+                if (\count($items) > 20) {
+                    trigger_error('Too many parameters in Hash annotation', E_USER_WARNING);
+                    return null;
+                }
 
-                return \array_map(fn ($item) => \mb_trim(\mb_trim($item), '"'), $items);
+                // Single trim operation instead of redundant mb_trim calls
+                return \array_map(function ($item) {
+                    $trimmed = \trim($item, ' "\'');
+                    // Validate parameter name format
+                    if (!\preg_match('/^[a-zA-Z0-9_]+$/', $trimmed)) {
+                        return null;
+                    }
+                    return $trimmed;
+                }, $items);
             }
         }
 

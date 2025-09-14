@@ -50,6 +50,11 @@ class HasherFactory
     private ?string $defaultSalt;
     private int $defaultMinLength;
     private string $defaultAlphabet;
+    
+    /**
+     * @var array<string>|null Cached available types to avoid repeated reflection
+     */
+    private static ?array $availableTypesCache = null;
 
     public function __construct(
         ?string $salt = null,
@@ -134,11 +139,18 @@ class HasherFactory
 
     /**
      * Get available hasher types using reflection on constants.
+     * Uses caching to avoid repeated reflection operations for performance.
      *
      * @return array<string> List of available hasher types
      */
     public function getAvailableTypes(): array
     {
+        // Return cached types if available
+        if (self::$availableTypesCache !== null) {
+            return self::$availableTypesCache;
+        }
+        
+        // Perform reflection once and cache the results
         $reflection = new \ReflectionClass(self::class);
         $constants = $reflection->getConstants();
 
@@ -149,7 +161,19 @@ class HasherFactory
             }
         }
 
+        // Cache the results for future calls
+        self::$availableTypesCache = $types;
+        
         return $types;
+    }
+    
+    /**
+     * Clear the available types cache.
+     * Useful for testing or when hasher types are dynamically modified.
+     */
+    public static function clearCache(): void
+    {
+        self::$availableTypesCache = null;
     }
 
     /**
