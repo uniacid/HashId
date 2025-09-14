@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Pgs\HashIdBundle\AnnotationProvider;
+
+use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
+use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
+use Pgs\HashIdBundle\Service\CompatibilityLayer;
+use Pgs\HashIdBundle\Exception\InvalidControllerException;
+use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
+use Pgs\HashIdBundle\Reflection\ReflectionProvider;
+
+/**
+ * Provides Hash configuration from both attributes and annotations.
+ * 
+ * This provider uses the CompatibilityLayer to support both modern PHP 8 attributes
+ * and legacy annotations during the transition period.
+ */
+class AttributeProvider implements AnnotationProviderInterface
+{
+    private CompatibilityLayer $compatibilityLayer;
+    private ReflectionProvider $reflectionProvider;
+    
+    public function __construct(
+        CompatibilityLayer $compatibilityLayer,
+        ReflectionProvider $reflectionProvider
+    ) {
+        $this->compatibilityLayer = $compatibilityLayer;
+        $this->reflectionProvider = $reflectionProvider;
+    }
+    
+    /**
+     * Get Hash configuration from a controller string.
+     * 
+     * @param string $controller Controller string in format "Class::method"
+     * @param string $annotationClassName The annotation/attribute class name to look for
+     * @return object|null The Hash configuration object or null if not found
+     * @throws InvalidControllerException If the controller string is invalid
+     * @throws MissingClassOrMethodException If the class or method doesn't exist
+     */
+    public function getFromString(string $controller, string $annotationClassName)
+    {
+        $explodedControllerString = explode('::', $controller);
+        if (2 !== \count($explodedControllerString)) {
+            $message = sprintf('The "%s" controller is not a valid "class::method" string.', $controller);
+            throw new InvalidControllerException($message);
+        }
+        
+        $reflection = $this->reflectionProvider->getMethodReflectionFromClassString(...$explodedControllerString);
+        
+        return $this->extractHashFromMethod($reflection, $annotationClassName);
+    }
+    
+    /**
+     * Get Hash configuration from a controller object.
+     * 
+     * @param object $controller The controller object
+     * @param string $method The method name
+     * @param string $annotationClassName The annotation/attribute class name to look for
+     * @return object|null The Hash configuration object or null if not found
+     * @throws InvalidControllerException If the controller is not an object
+     * @throws MissingClassOrMethodException If the method doesn't exist
+     */
+    public function getFromObject($controller, string $method, string $annotationClassName)
+    {
+        if (!\is_object($controller)) {
+            throw new InvalidControllerException('Provided controller is not an object');
+        }
+        
+        $reflection = $this->reflectionProvider->getMethodReflectionFromObject($controller, $method);
+        
+        return $this->extractHashFromMethod($reflection, $annotationClassName);
+    }
+    
+    /**
+     * Extract Hash configuration from a method using the compatibility layer.
+     * 
+     * @param \ReflectionMethod $method The method to extract from
+     * @param string $annotationClassName The annotation/attribute class name
+     * @return object|null The Hash configuration object or null if not found
+     */
+    private function extractHashFromMethod(\ReflectionMethod $method, string $annotationClassName): ?object
+    {
+        // Only handle Hash annotations/attributes
+        if ($annotationClassName !== HashAnnotation::class && $annotationClassName !== HashAttribute::class) {
+            return null;
+        }
+        
+        $parameters = $this->compatibilityLayer->extractHashConfiguration($method);
+        
+        if ($parameters === null) {
+            return null;
+        }
+        
+        // Return a Hash-like object that can be used by existing code
+        // This maintains backward compatibility with code expecting getParameters() method
+        return new class($parameters) {
+            private array $parameters;
+            
+            public function __construct(array $parameters)
+            {
+                $this->parameters = $parameters;
+            }
+            
+            public function getParameters(): array
+            {
+                return $this->parameters;
+            }
+        };
+    }
+}

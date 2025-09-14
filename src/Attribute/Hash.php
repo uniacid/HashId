@@ -10,7 +10,7 @@ namespace Pgs\HashIdBundle\Attribute;
  * This is the modern replacement for the @Hash annotation.
  * Both are supported in v4.x for backward compatibility.
  */
-#[\Attribute(\Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Hash
 {
     private array $parameters;

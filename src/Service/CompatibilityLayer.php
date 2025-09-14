@@ -98,13 +98,12 @@ class CompatibilityLayer
                 $method->getName()
             );
             
-            if ($this->deprecationWarningsEnabled) {
-                DeprecationHandler::triggerAnnotationDeprecation(
-                    '@Hash',
-                    '#[Hash]',
-                    $context
-                );
-            }
+            // Always trigger deprecation (it will respect the suppression setting internally)
+            DeprecationHandler::triggerAnnotationDeprecation(
+                '@Hash',
+                '#[Hash]',
+                $context
+            );
             
             // Parse the annotation parameters
             $params = $matches[1];
