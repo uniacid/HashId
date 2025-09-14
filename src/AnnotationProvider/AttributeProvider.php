@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\AnnotationProvider;
 
 use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
+use Pgs\HashIdBundle\AnnotationProvider\Dto\HashConfiguration;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
@@ -129,20 +130,15 @@ class AttributeProvider implements AnnotationProviderInterface
             return null;
         }
 
-        // Return a Hash-like object that can be used by existing code
+        // Return a properly typed HashConfiguration DTO
         // This maintains backward compatibility with code expecting getParameters() method
-        return new class($parameters) {
-            private array $parameters;
-
-            public function __construct(array $parameters)
-            {
-                $this->parameters = $parameters;
-            }
-
-            public function getParameters(): array
-            {
-                return $this->parameters;
-            }
-        };
+        // while providing better type safety and validation
+        try {
+            return new HashConfiguration($parameters);
+        } catch (\InvalidArgumentException $e) {
+            // Log or handle invalid parameter names
+            // For now, return null to maintain backward compatibility
+            return null;
+        }
     }
 }

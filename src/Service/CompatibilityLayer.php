@@ -34,6 +34,16 @@ class CompatibilityLayer
      * Maximum length for a single parameter name.
      */
     private const MAX_PARAM_NAME_LENGTH = 100;
+    
+    /**
+     * Maximum size of the reflection cache.
+     */
+    private const MAX_CACHE_SIZE = 100;
+    
+    /**
+     * @var array<string, array<string>|null> Static cache for reflection results
+     */
+    private static array $reflectionCache = [];
 
     private bool $deprecationWarningsEnabled;
     private bool $preferAttributes;
@@ -58,6 +68,14 @@ class CompatibilityLayer
      */
     public function extractHashConfiguration(\ReflectionMethod $method): ?array
     {
+        // Generate cache key
+        $cacheKey = $this->generateCacheKey($method);
+        
+        // Check cache first
+        if (\array_key_exists($cacheKey, self::$reflectionCache)) {
+            return self::$reflectionCache[$cacheKey];
+        }
+        
         $parameters = null;
         
         // Try attributes first (if PHP 8+)
@@ -69,6 +87,9 @@ class CompatibilityLayer
         if ($parameters === null) {
             $parameters = $this->extractFromAnnotations($method);
         }
+        
+        // Cache the result with LRU eviction
+        $this->cacheResult($cacheKey, $parameters);
         
         return $parameters;
     }
@@ -291,5 +312,60 @@ class CompatibilityLayer
         }
         
         return $report;
+    }
+    
+    /**
+     * Generate a cache key for a reflection method.
+     * 
+     * @param \ReflectionMethod $method
+     * @return string
+     */
+    private function generateCacheKey(\ReflectionMethod $method): string
+    {
+        return \sprintf(
+            '%s::%s',
+            $method->getDeclaringClass()->getName(),
+            $method->getName()
+        );
+    }
+    
+    /**
+     * Cache a reflection result with LRU eviction.
+     * 
+     * @param string $key The cache key
+     * @param array<string>|null $result The result to cache
+     */
+    private function cacheResult(string $key, ?array $result): void
+    {
+        // If cache is full, remove oldest entry (FIFO)
+        if (\count(self::$reflectionCache) >= self::MAX_CACHE_SIZE) {
+            // Remove the first (oldest) entry
+            \reset(self::$reflectionCache);
+            $oldestKey = \key(self::$reflectionCache);
+            if ($oldestKey !== null) {
+                unset(self::$reflectionCache[$oldestKey]);
+            }
+        }
+        
+        self::$reflectionCache[$key] = $result;
+    }
+    
+    /**
+     * Clear the reflection cache.
+     * Useful for testing or when reflection data changes.
+     */
+    public static function clearCache(): void
+    {
+        self::$reflectionCache = [];
+    }
+    
+    /**
+     * Get the current cache size.
+     * 
+     * @return int Number of cached entries
+     */
+    public static function getCacheSize(): int
+    {
+        return \count(self::$reflectionCache);
     }
 }

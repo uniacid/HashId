@@ -12,12 +12,12 @@ class HashidsConverter implements ConverterInterface
     {
     }
 
-    public function encode($value): string
+    public function encode(mixed $value): string
     {
         return $this->hashids->encode($value);
     }
 
-    public function decode($value)
+    public function decode(string $value): mixed
     {
         $result = $this->hashids->decode($value);
 

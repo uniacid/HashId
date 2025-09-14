@@ -20,9 +20,33 @@ class JsonValidator
     private const DEFAULT_MAX_DEPTH = 512;
 
     /**
-     * Maximum allowed JSON string size (10MB).
+     * Default maximum allowed JSON string size (10MB).
      */
-    private const MAX_JSON_SIZE = 10485760; // 10 * 1024 * 1024
+    private const DEFAULT_MAX_JSON_SIZE = 10485760; // 10 * 1024 * 1024
+    
+    /**
+     * Maximum allowed JSON size for this instance.
+     */
+    private int $maxJsonSize;
+    
+    /**
+     * Constructor with configurable limits.
+     * 
+     * @param int|null $maxJsonSize Maximum JSON size in bytes (null for default)
+     */
+    public function __construct(?int $maxJsonSize = null)
+    {
+        // Allow configuration via environment variable or parameter
+        $this->maxJsonSize = $maxJsonSize 
+            ?? (int) ($_ENV['JSON_MAX_SIZE'] ?? $_ENV['PGS_HASHID_JSON_MAX_SIZE'] ?? self::DEFAULT_MAX_JSON_SIZE);
+        
+        // Validate the configured size
+        if ($this->maxJsonSize < 1) {
+            throw new \InvalidArgumentException(
+                \sprintf('Maximum JSON size must be positive, got %d', $this->maxJsonSize)
+            );
+        }
+    }
 
     /**
      * Validate JSON string using PHP 8.3's json_validate() function.
@@ -36,7 +60,7 @@ class JsonValidator
     public function isValid(string $json, int $depth = self::DEFAULT_MAX_DEPTH, int $flags = 0): bool
     {
         // Security: Check size limit to prevent memory exhaustion
-        if (\strlen($json) > self::MAX_JSON_SIZE) {
+        if (\strlen($json) > $this->maxJsonSize) {
             return false;
         }
 
@@ -90,14 +114,15 @@ class JsonValidator
      *
      * @return bool True if valid JSON
      */
-    public function validateRequestBody(string $content, int $maxSize = self::MAX_JSON_SIZE): bool
+    public function validateRequestBody(string $content, ?int $maxSize = null): bool
     {
         if (empty($content)) {
             return false;
         }
 
-        // Security: Enforce size limit
-        if (\strlen($content) > $maxSize) {
+        // Security: Enforce size limit (use provided or instance default)
+        $effectiveMaxSize = $maxSize ?? $this->maxJsonSize;
+        if (\strlen($content) > $effectiveMaxSize) {
             return false;
         }
 
@@ -113,7 +138,7 @@ class JsonValidator
      *
      * @return string|false JSON string or false on failure
      */
-    public function validateForResponse($data, int $flags = JSON_THROW_ON_ERROR, int $maxSize = self::MAX_JSON_SIZE): string|false
+    public function validateForResponse($data, int $flags = JSON_THROW_ON_ERROR, ?int $maxSize = null): string|false
     {
         try {
             $json = \json_encode($data, $flags);
@@ -122,8 +147,9 @@ class JsonValidator
                 return false;
             }
 
-            // Security: Check size limit
-            if (\strlen($json) > $maxSize) {
+            // Security: Check size limit (use provided or instance default)
+            $effectiveMaxSize = $maxSize ?? $this->maxJsonSize;
+            if (\strlen($json) > $effectiveMaxSize) {
                 return false;
             }
 
@@ -188,6 +214,16 @@ class JsonValidator
         return \json_last_error() === JSON_ERROR_NONE;
     }
 
+    /**
+     * Get the configured maximum JSON size.
+     * 
+     * @return int Maximum size in bytes
+     */
+    public function getMaxJsonSize(): int
+    {
+        return $this->maxJsonSize;
+    }
+    
     /**
      * Get human-readable error message for JSON error code.
      *

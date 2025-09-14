@@ -62,18 +62,56 @@ class HasherFactory
     private array $instanceCache = [];
 
     /**
-     * Maximum number of cached hasher instances.
+     * Default maximum number of cached hasher instances.
      */
-    private const MAX_CACHE_SIZE = 10;
+    private const DEFAULT_MAX_CACHE_SIZE = 50;
+    
+    /**
+     * Minimum required alphabet length for security.
+     */
+    private const MIN_ALPHABET_LENGTH = 16;
+    
+    /**
+     * Maximum cache size for this instance.
+     */
+    private int $maxCacheSize;
 
     public function __construct(
         ?string $salt = null,
         int $minLength = HashIdConfigInterface::DEFAULT_MIN_LENGTH,
         string $alphabet = HashIdConfigInterface::DEFAULT_ALPHABET,
+        int $maxCacheSize = self::DEFAULT_MAX_CACHE_SIZE,
     ) {
+        // Validate min_length
+        if ($minLength < 0) {
+            throw new \InvalidArgumentException(
+                \sprintf('Minimum length must be non-negative, got %d', $minLength)
+            );
+        }
+        
+        // Validate alphabet
+        $uniqueChars = \count(\array_unique(\str_split($alphabet)));
+        if ($uniqueChars < self::MIN_ALPHABET_LENGTH) {
+            throw new \InvalidArgumentException(
+                \sprintf(
+                    'Alphabet must contain at least %d unique characters, got %d',
+                    self::MIN_ALPHABET_LENGTH,
+                    $uniqueChars
+                )
+            );
+        }
+        
+        // Validate cache size
+        if ($maxCacheSize < 1) {
+            throw new \InvalidArgumentException(
+                \sprintf('Max cache size must be positive, got %d', $maxCacheSize)
+            );
+        }
+        
         $this->defaultSalt = $salt ?? '';
         $this->defaultMinLength = $minLength;
         $this->defaultAlphabet = $alphabet;
+        $this->maxCacheSize = $maxCacheSize;
     }
 
     /**
@@ -114,6 +152,26 @@ class HasherFactory
             ],
             $config,
         );
+        
+        // Validate merged configuration
+        if (isset($hasherConfig['min_length']) && $hasherConfig['min_length'] < 0) {
+            throw new \InvalidArgumentException(
+                \sprintf('Minimum length must be non-negative, got %d', $hasherConfig['min_length'])
+            );
+        }
+        
+        if (isset($hasherConfig['alphabet'])) {
+            $uniqueChars = \count(\array_unique(\str_split($hasherConfig['alphabet'])));
+            if ($uniqueChars < self::MIN_ALPHABET_LENGTH) {
+                throw new \InvalidArgumentException(
+                    \sprintf(
+                        'Alphabet must contain at least %d unique characters, got %d',
+                        self::MIN_ALPHABET_LENGTH,
+                        $uniqueChars
+                    )
+                );
+            }
+        }
 
         // Special handling for secure hasher
         if ($type === 'secure' && empty($hasherConfig['salt'])) {
@@ -211,8 +269,10 @@ class HasherFactory
      */
     private function generateCacheKey(string $type, array $config): string
     {
-        // Create a deterministic key from type and config
-        return $type . ':' . \md5(\serialize($config));
+        // Use json_encode for better performance than serialize
+        // Sort keys to ensure consistent hashing
+        \ksort($config);
+        return $type . ':' . \md5(\json_encode($config));
     }
 
     /**
@@ -224,7 +284,7 @@ class HasherFactory
     private function cacheInstance(string $key, HasherInterface $hasher): void
     {
         // If cache is full, remove the oldest entry (FIFO)
-        if (\count($this->instanceCache) >= self::MAX_CACHE_SIZE) {
+        if (\count($this->instanceCache) >= $this->maxCacheSize) {
             \array_shift($this->instanceCache);
         }
         
