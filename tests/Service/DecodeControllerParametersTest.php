@@ -100,7 +100,7 @@ class DecodeControllerParametersTest extends TestCase
     {
         $mock = $this->getMockBuilder(DecodeParametersProcessorFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['createControllerDecodeParametersProcessor'])
+            ->onlyMethods(['createControllerDecodeParametersProcessor'])
             ->getMock();
 
         $mock->method('createControllerDecodeParametersProcessor')
@@ -124,7 +124,7 @@ class DecodeControllerParametersTest extends TestCase
     {
         $mock = $this->getMockBuilder(ControllerEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getController', 'getRequest'])
+            ->onlyMethods(['getController', 'getRequest'])
             ->getMock();
 
         $mock->method('getController')
@@ -143,7 +143,7 @@ class DecodeControllerParametersTest extends TestCase
     {
         $mock = $this->getMockBuilder(Request::class)
             ->getMock();
-        $parametersBag = $this->getMockBuilder(ParameterBag::class)->setMethods(['all'])->getMock();
+        $parametersBag = $this->getMockBuilder(ParameterBag::class)->onlyMethods(['all'])->getMock();
         $parametersBag->method('all')->willReturnOnConsecutiveCalls(...$consecutiveCalls);
         $mock->attributes = $parametersBag;
 
@@ -157,7 +157,7 @@ class DecodeControllerParametersTest extends TestCase
     {
         $mock = $this->getMockBuilder(ParamConverterListener::class)
             ->disableOriginalConstructor()
-            ->setMethods(['onKernelController'])
+            ->onlyMethods(['onKernelController'])
             ->getMock();
 
         return $mock;

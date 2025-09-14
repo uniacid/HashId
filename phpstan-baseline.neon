@@ -1,0 +1,381 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Method class@anonymous/AnnotationProvider/AttributeProvider\\.php\\:98\\:\\:__construct\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/AnnotationProvider/AttributeProvider.php
+
+		-
+			message: "#^Method class@anonymous/AnnotationProvider/AttributeProvider\\.php\\:98\\:\\:getParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/AnnotationProvider/AttributeProvider.php
+
+		-
+			message: "#^Parameter \\#1 \\$method of method Pgs\\\\HashIdBundle\\\\AnnotationProvider\\\\AttributeProvider\\:\\:extractHashFromMethod\\(\\) expects ReflectionMethod, ReflectionMethod\\|null given\\.$#"
+			count: 2
+			path: src/AnnotationProvider/AttributeProvider.php
+
+		-
+			message: "#^Property class@anonymous/AnnotationProvider/AttributeProvider\\.php\\:98\\:\\:\\$parameters type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/AnnotationProvider/AttributeProvider.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Attribute\\\\Hash\\:\\:__construct\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Attribute/Hash.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Attribute\\\\Hash\\:\\:getParameters\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Attribute/Hash.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Attribute\\\\Hash\\:\\:\\$parameters type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Attribute/Hash.php
+
+		-
+			message: "#^Cannot access offset mixed on mixed\\.$#"
+			count: 1
+			path: src/Controller/DemoController.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Controller\\\\DemoController\\:\\:getRouteParam\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Controller/DemoController.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Controller\\\\DemoController\\:\\:getRouteParam\\(\\) has parameter \\$param with no type specified\\.$#"
+			count: 1
+			path: src/Controller/DemoController.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:__call\\(\\) has parameter \\$arguments with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:generate\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:getRoute\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:processParameters\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:warmUp\\(\\) should return array\\<string\\> but return statement is missing\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Parameter \\#1 \\$callback of function call_user_func_array expects callable\\(\\)\\: mixed, array\\{mixed, string\\} given\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:\\$object has no type specified\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Decorator\\\\RouterDecorator\\:\\:\\$parametersProcessorFactory has no type specified\\.$#"
+			count: 1
+			path: src/Decorator/RouterDecorator.php
+
+		-
+			message: "#^Cannot call method scalarNode\\(\\) on Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\NodeParentInterface\\|null\\.$#"
+			count: 1
+			path: src/DependencyInjection/Configuration.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\DependencyInjection\\\\Configuration\\:\\:supportsHashids\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/DependencyInjection/Configuration.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\EventSubscriber\\\\DecodeControllerParametersSubscriber\\:\\:\\$decodeControllerParameters has no type specified\\.$#"
+			count: 1
+			path: src/EventSubscriber/DecodeControllerParametersSubscriber.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:__construct\\(\\) has parameter \\$parametersToProcess with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:getParametersToProcess\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:process\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:process\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:processValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:processValue\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:setParametersToProcess\\(\\) has parameter \\$parametersToProcess with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\AbstractParametersProcessor\\:\\:\\$parametersToProcess has no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/AbstractParametersProcessor.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\ConverterInterface\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/ConverterInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\ConverterInterface\\:\\:decode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/ConverterInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\ConverterInterface\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/ConverterInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\HashidsConverter\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/HashidsConverter.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\HashidsConverter\\:\\:decode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/HashidsConverter.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Converter\\\\HashidsConverter\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Converter/HashidsConverter.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Decode\\:\\:processValue\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Decode.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Decode\\:\\:processValue\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Decode.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Encode\\:\\:processValue\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Encode.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\Factory\\\\EncodeParametersProcessorFactory\\:\\:createRouteEncodeParametersProcessor\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Factory/EncodeParametersProcessorFactory.php
+
+		-
+			message: "#^Parameter \\#1 \\$controller of method Pgs\\\\HashIdBundle\\\\AnnotationProvider\\\\AnnotationProviderInterface\\:\\:getFromString\\(\\) expects string, mixed given\\.$#"
+			count: 1
+			path: src/ParametersProcessor/Factory/EncodeParametersProcessorFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\NoOp\\:\\:getParametersToProcess\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/NoOp.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\NoOp\\:\\:process\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/NoOp.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\NoOp\\:\\:process\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/NoOp.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\NoOp\\:\\:setParametersToProcess\\(\\) has parameter \\$parametersToProcess with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/NoOp.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\NoOp\\:\\:\\$parametersToProcess has no type specified\\.$#"
+			count: 1
+			path: src/ParametersProcessor/NoOp.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\ParametersProcessorInterface\\:\\:getParametersToProcess\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/ParametersProcessorInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\ParametersProcessorInterface\\:\\:process\\(\\) has parameter \\$parameters with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/ParametersProcessorInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\ParametersProcessorInterface\\:\\:process\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/ParametersProcessorInterface.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\ParametersProcessor\\\\ParametersProcessorInterface\\:\\:setParametersToProcess\\(\\) has parameter \\$parametersToProcess with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/ParametersProcessor/ParametersProcessorInterface.php
+
+		-
+			message: "#^Parameter \\#1 \\$objectOrMethod of class ReflectionMethod constructor expects object\\|string, mixed given\\.$#"
+			count: 1
+			path: src/Reflection/ReflectionProvider.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CompatibilityLayer\\:\\:extractFromAnnotations\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CompatibilityLayer\\:\\:extractFromAttributes\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CompatibilityLayer\\:\\:extractHashConfiguration\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CompatibilityLayer\\:\\:getCompatibilityReport\\(\\) return type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Parameter \\#1 \\$objectOrClass of class ReflectionClass constructor expects class\\-string\\<T of object\\>\\|T of object, string given\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Service\\\\CompatibilityLayer\\:\\:\\$deprecationWarningsEnabled is never read, only written\\.$#"
+			count: 1
+			path: src/Service/CompatibilityLayer.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Service\\\\DecodeControllerParameters\\:\\:\\$paramConverterListener has no type specified\\.$#"
+			count: 1
+			path: src/Service/DecodeControllerParameters.php
+
+		-
+			message: "#^Property Pgs\\\\HashIdBundle\\\\Service\\\\DecodeControllerParameters\\:\\:\\$parametersProcessorFactory has no type specified\\.$#"
+			count: 1
+			path: src/Service/DecodeControllerParameters.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CustomHasher\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CustomHasher\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\CustomHasher\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\DefaultHasher\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\DefaultHasher\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\DefaultHasher\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\HasherFactory\\:\\:create\\(\\) should return Pgs\\\\HashIdBundle\\\\Service\\\\HasherInterface but returns object\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\HasherInterface\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\HasherInterface\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\HasherInterface\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\SecureHasher\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\SecureHasher\\:\\:decode\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Method Pgs\\\\HashIdBundle\\\\Service\\\\SecureHasher\\:\\:encode\\(\\) has parameter \\$value with no type specified\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Parameter \\#1 \\$salt of class Hashids\\\\Hashids constructor expects string, mixed given\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Parameter \\#2 \\$minHashLength of class Hashids\\\\Hashids constructor expects int, mixed given\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Parameter \\#3 \\$alphabet of class Hashids\\\\Hashids constructor expects string, mixed given\\.$#"
+			count: 1
+			path: src/Service/HasherFactory.php
+
+		-
+			message: "#^Parameter \\#2 \\$depth of function json_validate expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/Service/JsonValidator.php
+
+		-
+			message: "#^Parameter \\#3 \\$depth of function json_decode expects int\\<1, max\\>, int given\\.$#"
+			count: 1
+			path: src/Service/JsonValidator.php

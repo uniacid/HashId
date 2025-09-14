@@ -43,7 +43,7 @@ class DecodeControllerParameters
 
     protected function processRequestParameters(
         ControllerEvent $event,
-        ParametersProcessorInterface $parametersProcessor
+        ParametersProcessorInterface $parametersProcessor,
     ): void {
         if ($parametersProcessor->needToProcess()) {
             $requestParams = $event->getRequest()->attributes->all();

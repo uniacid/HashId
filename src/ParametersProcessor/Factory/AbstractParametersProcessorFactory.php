@@ -21,7 +21,7 @@ abstract class AbstractParametersProcessorFactory
 
     public function __construct(
         AnnotationProviderInterface $annotationProvider,
-        ParametersProcessorInterface $noOpParametersProcessor
+        ParametersProcessorInterface $noOpParametersProcessor,
     ) {
         $this->annotationProvider = $annotationProvider;
         $this->noOpParametersProcessor = $noOpParametersProcessor;

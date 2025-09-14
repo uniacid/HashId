@@ -14,19 +14,17 @@ namespace Pgs\HashIdBundle\Attribute;
 class Hash
 {
     private array $parameters;
-    
+
     /**
      * @param string|array $parameters Parameter name(s) to be encoded/decoded
      */
     public function __construct(string|array $parameters)
     {
-        $this->parameters = is_array($parameters) ? $parameters : [$parameters];
+        $this->parameters = \is_array($parameters) ? $parameters : [$parameters];
     }
-    
+
     /**
      * Get the parameters that should be encoded/decoded.
-     *
-     * @return array
      */
     public function getParameters(): array
     {

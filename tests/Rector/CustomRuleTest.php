@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Tests\Rector;
 
 use PHPUnit\Framework\TestCase;
-use Rector\Testing\PHPUnit\AbstractRectorTestCase;
 
 /**
  * Test for custom Rector rule infrastructure.
@@ -31,7 +30,7 @@ class CustomRuleTest extends TestCase
     {
         self::assertDirectoryExists(
             $this->customRulesDir,
-            'Custom rules directory should exist at rector-rules/'
+            'Custom rules directory should exist at rector-rules/',
         );
     }
 
@@ -42,7 +41,7 @@ class CustomRuleTest extends TestCase
     {
         self::assertDirectoryExists(
             $this->fixturesDir,
-            'Fixtures directory should exist for testing custom rules'
+            'Fixtures directory should exist for testing custom rules',
         );
     }
 
@@ -55,18 +54,18 @@ class CustomRuleTest extends TestCase
         self::assertFileExists($composerJsonPath, 'composer.json should exist');
 
         $composerJson = \json_decode(\file_get_contents($composerJsonPath), true);
-        
+
         // Check if custom rules namespace is registered in autoload-dev
         $hasCustomRulesNamespace = isset($composerJson['autoload-dev']['psr-4']['Pgs\\HashIdBundle\\Rector\\']);
-        
+
         if (!$hasCustomRulesNamespace) {
             self::markTestSkipped('Custom rules namespace not yet configured in composer.json');
         }
 
-        self::assertEquals(
+        self::assertSame(
             'rector-rules/',
             $composerJson['autoload-dev']['psr-4']['Pgs\\HashIdBundle\\Rector\\'],
-            'Custom rules namespace should point to rector-rules/ directory'
+            'Custom rules namespace should point to rector-rules/ directory',
         );
     }
 
@@ -79,18 +78,18 @@ class CustomRuleTest extends TestCase
         self::assertFileExists($rectorConfigPath, 'rector.php configuration should exist');
 
         $configContent = \file_get_contents($rectorConfigPath);
-        
+
         // Check if custom rules are referenced in the configuration
-        $hasCustomRulesReference = \str_contains($configContent, 'rector-rules') || 
+        $hasCustomRulesReference = \str_contains($configContent, 'rector-rules') ||
                                    \str_contains($configContent, 'Pgs\\HashIdBundle\\Rector');
-        
+
         if (!$hasCustomRulesReference) {
             self::markTestSkipped('Custom rules not yet registered in rector.php');
         }
 
         self::assertTrue(
             $hasCustomRulesReference,
-            'rector.php should include reference to custom rules'
+            'rector.php should include reference to custom rules',
         );
     }
 
@@ -100,19 +99,19 @@ class CustomRuleTest extends TestCase
     public function testFixtureBasedValidation(): void
     {
         $fixtureFile = $this->fixturesDir . '/annotation-to-attribute.php.inc';
-        
+
         if (!\file_exists($fixtureFile)) {
             self::markTestSkipped('Fixture file not yet created');
         }
 
         self::assertFileExists($fixtureFile, 'Fixture file should exist');
-        
+
         // Fixture files should contain before and after sections
         $fixtureContent = \file_get_contents($fixtureFile);
         self::assertStringContainsString(
             '-----',
             $fixtureContent,
-            'Fixture should contain separator between before and after code'
+            'Fixture should contain separator between before and after code',
         );
     }
 
@@ -122,18 +121,18 @@ class CustomRuleTest extends TestCase
     public function testHashAnnotationToAttributeRuleExists(): void
     {
         $ruleFile = $this->customRulesDir . '/HashAnnotationToAttributeRule.php';
-        
+
         if (!\file_exists($ruleFile)) {
             self::markTestSkipped('HashAnnotationToAttributeRule not yet created');
         }
 
         self::assertFileExists($ruleFile, 'HashAnnotationToAttributeRule should exist');
-        
+
         // Verify the rule class structure
         require_once $ruleFile;
         self::assertTrue(
             \class_exists('Pgs\\HashIdBundle\\Rector\\HashAnnotationToAttributeRule'),
-            'HashAnnotationToAttributeRule class should be defined'
+            'HashAnnotationToAttributeRule class should be defined',
         );
     }
 
@@ -143,7 +142,7 @@ class CustomRuleTest extends TestCase
     public function testRouteAnnotationModernizationRule(): void
     {
         $ruleFile = $this->customRulesDir . '/RouteAnnotationToAttributeRule.php';
-        
+
         if (!\file_exists($ruleFile)) {
             self::markTestSkipped('RouteAnnotationToAttributeRule not yet created');
         }
@@ -158,7 +157,7 @@ class CustomRuleTest extends TestCase
     {
         // This test validates that our rules maintain backward compatibility
         $compatibilityConfig = \dirname(__DIR__, 2) . '/rector-compatibility.php';
-        
+
         if (!\file_exists($compatibilityConfig)) {
             self::markTestSkipped('Compatibility configuration not yet created');
         }
@@ -172,7 +171,7 @@ class CustomRuleTest extends TestCase
     public function testDeprecationSystemExists(): void
     {
         $deprecationHandlerFile = $this->customRulesDir . '/DeprecationHandler.php';
-        
+
         if (!\file_exists($deprecationHandlerFile)) {
             self::markTestSkipped('DeprecationHandler not yet created');
         }
@@ -186,15 +185,15 @@ class CustomRuleTest extends TestCase
     public function testMigrationDocumentationExists(): void
     {
         $upgradeDoc = \dirname(__DIR__, 2) . '/UPGRADE-4.0.md';
-        
+
         if (!\file_exists($upgradeDoc)) {
             self::markTestSkipped('UPGRADE-4.0.md not yet created');
         }
 
         self::assertFileExists($upgradeDoc, 'UPGRADE-4.0.md should exist');
-        
+
         $content = \file_get_contents($upgradeDoc);
-        
+
         // Verify documentation includes key sections
         self::assertStringContainsString('Breaking Changes', $content);
         self::assertStringContainsString('Migration Path', $content);

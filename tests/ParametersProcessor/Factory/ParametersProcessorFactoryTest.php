@@ -10,23 +10,17 @@ use PHPUnit\Framework\TestCase;
 
 abstract class ParametersProcessorFactoryTest extends TestCase
 {
-    protected $controllerMockProvider;
-
-    protected $controllerAnnotationMockProvider;
-
-    protected $routeMockProvider;
-
-    protected $parametersProcessorMockProvider;
+    use ControllerMockProvider;
+    use ControllerAnnotationProviderMockProvider;
+    use RouteMockProvider;
+    use ParametersProcessorMockProvider;
 
     protected function setUp(): void
     {
-        $this->controllerMockProvider = new ControllerMockProvider();
-        $this->controllerAnnotationMockProvider = new ControllerAnnotationProviderMockProvider();
-        $this->routeMockProvider = new RouteMockProvider();
-        $this->parametersProcessorMockProvider = new ParametersProcessorMockProvider();
+        parent::setUp();
     }
 
-    public function getControllerMockProvider(): ControllerMockProvider
+    public function getControllerMockProvider(): self
     {
         return $this->controllerMockProvider;
     }

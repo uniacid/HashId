@@ -34,7 +34,7 @@ class DecodeTest extends TestCase
      */
     protected function getConverterMock()
     {
-        $mock = $this->getMockBuilder(ConverterInterface::class)->setMethods(['decode'])->getMockForAbstractClass();
+        $mock = $this->getMockBuilder(ConverterInterface::class)->onlyMethods(['decode'])->getMockForAbstractClass();
         $mock
             ->method('decode')
             ->withAnyParameters()

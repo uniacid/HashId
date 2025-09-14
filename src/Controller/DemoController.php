@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Controller;
 
@@ -17,8 +17,6 @@ class DemoController extends AbstractController
 {
     /**
      * @Route("/encode", requirements={"id"="\d+"})
-     *
-     * @param int $id
      */
     public function encode(int $id): Response
     {
@@ -29,9 +27,9 @@ class DemoController extends AbstractController
         $response = <<<EOT
             <html>
                 <body>
-                Provided id: $id, other: $other <br />
-                Url with encoded parameter: <a href="$url1">$url1</a><br />
-                Another url with encoded more parameters: <a href="$url2">$url2</a><br />
+                Provided id: {$id}, other: {$other} <br />
+                Url with encoded parameter: <a href="{$url1}">{$url1}</a><br />
+                Another url with encoded more parameters: <a href="{$url2}">{$url2}</a><br />
                 </body>
             </html>
 EOT;
@@ -41,6 +39,7 @@ EOT;
 
     /**
      * @Route("/decode/{id}/{other}")
+     *
      * @Hash("id")
      */
     public function decode(Request $request, int $id, int $other): Response
@@ -50,6 +49,7 @@ EOT;
 
     /**
      * @Route("/decode_more/{id}/{other}")
+     *
      * @Hash({"id", "other"})
      */
     public function decodeMore(Request $request, int $id, int $other): Response
@@ -70,9 +70,9 @@ EOT;
         $response = <<<EOT
             <html>
                 <body>
-                Provided id: $id<br />
-                Localized url with encoded parameter and locale provided: <a href="$url1">$url1</a><br />
-                Localized url with encoded parameter: <a href="$url2">$url2</a><br />
+                Provided id: {$id}<br />
+                Localized url with encoded parameter and locale provided: <a href="{$url1}">{$url1}</a><br />
+                Localized url with encoded parameter: <a href="{$url2}">{$url2}</a><br />
                 </body>
             </html>
 EOT;
@@ -88,8 +88,8 @@ EOT;
         $response = <<<EOT
             <html>
                 <body>
-                Provided id: <b>$providedId</b>, other: <b>$providedOther</b><br />
-                Decoded id: <b>$id</b>, other: <b>$other</b><br />
+                Provided id: <b>{$providedId}</b>, other: <b>{$providedOther}</b><br />
+                Decoded id: <b>{$id}</b>, other: <b>{$other}</b><br />
                 </body>
             </html>
 EOT;
@@ -101,63 +101,64 @@ EOT;
     {
         return $request->attributes->get('_route_params')[$param];
     }
-    
+
     /**
      * @Route("/api/validate", methods={"POST"})
-     * 
+     *
      * Example API endpoint demonstrating json_validate() usage (PHP 8.3+).
      */
     public function validateJson(Request $request): JsonResponse
     {
         $content = $request->getContent();
         $validator = new JsonValidator();
-        
+
         // Use PHP 8.3's json_validate() through our service
         if (!$validator->validateRequestBody($content)) {
             $errorInfo = $validator->validateWithError($content);
-            
+
             return new JsonResponse([
                 'success' => false,
                 'error' => $errorInfo['error'],
                 'error_code' => $errorInfo['error_code'],
             ], Response::HTTP_BAD_REQUEST);
         }
-        
+
         // Process valid JSON
-        $data = json_decode($content, true);
-        
+        $data = \json_decode($content, true);
+
         return new JsonResponse([
             'success' => true,
             'data' => $data,
             'message' => 'JSON validation successful using PHP 8.3 json_validate()',
         ]);
     }
-    
+
     /**
      * @Route("/api/hash/{id}", methods={"GET"})
+     *
      * @Hash("id")
-     * 
+     *
      * API endpoint returning JSON response with hashed ID.
      */
     public function apiHash(int $id): JsonResponse
     {
         $validator = new JsonValidator();
-        
+
         $responseData = [
             'id' => $id,
             'encoded_url' => $this->generateUrl('pgs_hash_id_demo_api_hash', ['id' => $id], 0),
-            'timestamp' => time(),
+            'timestamp' => \time(),
         ];
-        
+
         // Validate response data before sending
         $json = $validator->validateForResponse($responseData);
-        
+
         if ($json === false) {
             return new JsonResponse([
                 'error' => 'Failed to generate valid JSON response',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-        
+
         return JsonResponse::fromJsonString($json);
     }
 }

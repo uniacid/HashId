@@ -3,15 +3,15 @@
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor;
 
 use PHPUnit\Framework\TestCase;
-
-class ParametersProcessorMockProvider extends TestCase
+use PHPUnit\Framework\MockObject\MockBuilder;
+trait ParametersProcessorMockProvider
 {
     public function getParametersProcessorMock($class)
     {
         $mock = $this
             ->getMockBuilder($class)
             ->disableOriginalConstructor()
-            ->setMethods(['setParametersToProcess', 'process', 'needToProcess'])
+            ->onlyMethods(['setParametersToProcess', 'process', 'needToProcess'])
             ->getMock();
 
         $mock->method('setParametersToProcess')->willReturnSelf();

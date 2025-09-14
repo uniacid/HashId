@@ -3,15 +3,15 @@
 namespace Pgs\HashIdBundle\Tests\Route;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Routing\Route;
+use PHPUnit\Framework\MockObject\MockBuilder;use Symfony\Component\Routing\Route;
 
-class RouteMockProvider extends TestCase
+trait RouteMockProvider
 {
     public function getTestRouteMock()
     {
         $mock = $this->getMockBuilder(Route::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getDefault'])
+            ->onlyMethods(['getDefault'])
             ->getMock();
         $mock->method('getDefault')->with('_controller')->willReturn('TestController::testMethod');
 
@@ -22,7 +22,7 @@ class RouteMockProvider extends TestCase
     {
         $mock = $this->getMockBuilder(Route::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getDefault'])
+            ->onlyMethods(['getDefault'])
             ->getMock();
         $mock->method('getDefault')->with('_controller')->willReturn('bad_controller_string');
 

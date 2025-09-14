@@ -9,6 +9,7 @@ use Pgs\HashIdBundle\Traits\DecoratorTrait;
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
 class RouterDecorator implements RouterInterface, WarmableInterface
@@ -31,7 +32,7 @@ class RouterDecorator implements RouterInterface, WarmableInterface
     public function generate(
         string $name,
         array $parameters = [],
-        int $referenceType = RouterInterface::ABSOLUTE_PATH
+        int $referenceType = RouterInterface::ABSOLUTE_PATH,
     ): string {
         $this->processParameters($this->getRoute($name, $parameters), $parameters);
 
@@ -45,7 +46,7 @@ class RouterDecorator implements RouterInterface, WarmableInterface
 
         if (null === $route) {
             $locale = $parameters['_locale'] ?? $this->getRouter()->getContext()->getParameter('_locale');
-            $route = $routeCollection->get(sprintf('%s.%s', $name, $locale));
+            $route = $routeCollection->get(\sprintf('%s.%s', $name, $locale));
         }
 
         return $route;
@@ -64,7 +65,7 @@ class RouterDecorator implements RouterInterface, WarmableInterface
     /**
      * @codeCoverageIgnore
      */
-    public function setContext(RequestContext $context)
+    public function setContext(RequestContext $context): void
     {
         $this->getRouter()->setContext($context);
     }
@@ -72,7 +73,7 @@ class RouterDecorator implements RouterInterface, WarmableInterface
     /**
      * @codeCoverageIgnore
      */
-    public function getContext()
+    public function getContext(): RequestContext
     {
         return $this->getRouter()->getContext();
     }
@@ -80,15 +81,17 @@ class RouterDecorator implements RouterInterface, WarmableInterface
     /**
      * @codeCoverageIgnore
      */
-    public function getRouteCollection()
+    public function getRouteCollection(): RouteCollection
     {
         return $this->getRouter()->getRouteCollection();
     }
 
     /**
      * @codeCoverageIgnore
+     *
+     * @return array<string, mixed>
      */
-    public function match(string $pathinfo)
+    public function match(string $pathinfo): array
     {
         return $this->getRouter()->match($pathinfo);
     }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Modernization;
 
-use PHPUnit\Framework\TestCase;
-use Pgs\HashIdBundle\Annotation\Hash;
-use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
-use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Hashids\Hashids;
+use Pgs\HashIdBundle\Annotation\Hash;
+use Pgs\HashIdBundle\Exception\InvalidControllerException;
+use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Tests for PHP 8.2 modernization features.
@@ -23,18 +23,18 @@ class Php82FeaturesTest extends TestCase
     public function testHashAnnotationReadonlyClass(): void
     {
         $hash = new Hash(['id', 'userId']);
-        $this->assertEquals(['id', 'userId'], $hash->getParameters());
-        
+        self::assertSame(['id', 'userId'], $hash->getParameters());
+
         // After Rector PHP 8.2 transformation, the class should be readonly
         // This test validates the transformation doesn't break functionality
         $reflection = new \ReflectionClass(Hash::class);
-        
+
         // Check if properties could be made readonly (PHP 8.2+)
         if (PHP_VERSION_ID >= 80200) {
             $property = $reflection->getProperty('parameters');
             // After transformation, this should be readonly
             // For now it's not, but Rector will transform it
-            $this->assertNotNull($property);
+            self::assertNotNull($property);
         }
     }
 
@@ -46,10 +46,10 @@ class Php82FeaturesTest extends TestCase
     {
         // Exception classes should remain immutable after readonly transformation
         $exception = new InvalidControllerException('Test message');
-        $this->assertEquals('Test message', $exception->getMessage());
-        
+        self::assertSame('Test message', $exception->getMessage());
+
         // Test that readonly transformation doesn't break inheritance
-        $this->assertInstanceOf(\Exception::class, $exception);
+        self::assertInstanceOf(\Exception::class, $exception);
     }
 
     /**
@@ -60,25 +60,25 @@ class Php82FeaturesTest extends TestCase
     {
         $hashids = new Hashids('test_salt', 10, 'abcdefghijklmnopqrstuvwxyz');
         $converter = new HashidsConverter($hashids);
-        
+
         // Test encoding
         $encoded = $converter->encode(123);
-        $this->assertIsString($encoded);
-        $this->assertGreaterThanOrEqual(10, strlen($encoded));
-        
+        self::assertIsString($encoded);
+        self::assertGreaterThanOrEqual(10, \mb_strlen($encoded));
+
         // Test decoding
         $decoded = $converter->decode($encoded);
-        $this->assertEquals(123, $decoded);
-        
+        self::assertSame(123, $decoded);
+
         // Verify immutability expectations for readonly transformation
         $reflection = new \ReflectionClass(HashidsConverter::class);
         $properties = $reflection->getProperties();
-        
+
         // After Rector transformation, these should be readonly
         foreach ($properties as $property) {
             // Check that properties are private (good candidate for readonly)
             if ($property->isPrivate()) {
-                $this->assertTrue($property->isPrivate());
+                self::assertTrue($property->isPrivate());
             }
         }
     }
@@ -95,7 +95,7 @@ class Php82FeaturesTest extends TestCase
 
         // Invalid decode returns the original value when it can't be decoded
         $result = $converter->decode('invalid!!!');
-        $this->assertEquals('invalid!!!', $result);
+        self::assertSame('invalid!!!', $result);
 
         // This validates that after Rector transformation,
         // methods can use null, false, true as standalone return types
@@ -110,13 +110,13 @@ class Php82FeaturesTest extends TestCase
         // Test that classes work the same way after readonly transformation
         $hash = new Hash(['param1']);
         $parameters = $hash->getParameters();
-        
+
         // Verify immutability behavior
-        $this->assertSame(['param1'], $parameters);
-        
+        self::assertSame(['param1'], $parameters);
+
         // Modifying returned array shouldn't affect internal state
         $parameters[] = 'param2';
-        $this->assertSame(['param1'], $hash->getParameters());
+        self::assertSame(['param1'], $hash->getParameters());
     }
 
     /**
@@ -127,15 +127,15 @@ class Php82FeaturesTest extends TestCase
     {
         // After Rector transformation, we could have DNF types like:
         // (Countable&ArrayAccess)|Traversable
-        
+
         // For now, test that our code handles various input types correctly
         $hashids = new Hashids('salt', 10, 'abcdefghijklmnopqrstuvwxyz');
         $converter = new HashidsConverter($hashids);
-        
+
         // Test with different integer types
-        $this->assertIsString($converter->encode(42));
-        $this->assertIsString($converter->encode(0));
-        $this->assertIsString($converter->encode(PHP_INT_MAX));
+        self::assertIsString($converter->encode(42));
+        self::assertIsString($converter->encode(0));
+        self::assertIsString($converter->encode(PHP_INT_MAX));
     }
 
     /**
@@ -155,7 +155,7 @@ class Php82FeaturesTest extends TestCase
         $reflection = new \ReflectionClass($converter);
         $hashidsProperty = $reflection->getProperty('hashids');
 
-        $this->assertTrue($hashidsProperty->isPrivate());
+        self::assertTrue($hashidsProperty->isPrivate());
         // After transformation, this should also be readonly
     }
 
@@ -169,27 +169,27 @@ class Php82FeaturesTest extends TestCase
             Hash::class,
             // Add more value objects and immutable classes as identified
         ];
-        
+
         foreach ($candidateClasses as $className) {
             $reflection = new \ReflectionClass($className);
-            
+
             // Verify class exists and can be instantiated
-            $this->assertTrue($reflection->isInstantiable() || $reflection->isAbstract() || $reflection->isInterface());
-            
+            self::assertTrue($reflection->isInstantiable() || $reflection->isAbstract() || $reflection->isInterface());
+
             // Check if the class is readonly (PHP 8.2+)
-            if (PHP_VERSION_ID >= 80200 && method_exists($reflection, 'isReadOnly')) {
+            if (PHP_VERSION_ID >= 80200 && \method_exists($reflection, 'isReadOnly')) {
                 // Hash class should now be readonly after our transformation
                 if ($className === Hash::class) {
-                    $this->assertTrue($reflection->isReadOnly(), "$className should be a readonly class");
+                    self::assertTrue($reflection->isReadOnly(), "{$className} should be a readonly class");
                 }
             }
-            
+
             // Verify properties are good candidates for readonly
             $properties = $reflection->getProperties();
             foreach ($properties as $property) {
                 // Properties that are private are good candidates for readonly
                 if ($property->isPrivate() && !$property->isStatic()) {
-                    $this->assertNotNull($property->getName());
+                    self::assertNotNull($property->getName());
                 }
             }
         }

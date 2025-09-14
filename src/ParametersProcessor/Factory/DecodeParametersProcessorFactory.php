@@ -20,7 +20,7 @@ class DecodeParametersProcessorFactory extends AbstractParametersProcessorFactor
     public function __construct(
         AnnotationProviderInterface $annotationProvider,
         ParametersProcessorInterface $noOpParametersProcessor,
-        ParametersProcessorInterface $decodeParametersProcessor
+        ParametersProcessorInterface $decodeParametersProcessor,
     ) {
         parent::__construct($annotationProvider, $noOpParametersProcessor);
         $this->decodeParametersProcessor = $decodeParametersProcessor;
@@ -41,7 +41,7 @@ class DecodeParametersProcessorFactory extends AbstractParametersProcessorFactor
             $annotation = $this->getAnnotationProvider()->getFromObject(
                 $controller,
                 $method,
-                Hash::class
+                Hash::class,
             );
         } catch (InvalidControllerException | MissingClassOrMethodException $e) {
             $annotation = null;

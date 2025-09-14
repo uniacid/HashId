@@ -21,7 +21,7 @@ class EncodeParametersProcessorFactory extends AbstractParametersProcessorFactor
     public function __construct(
         AnnotationProviderInterface $annotationProvider,
         ParametersProcessorInterface $noOpParametersProcessor,
-        ParametersProcessorInterface $encodeParametersProcessor
+        ParametersProcessorInterface $encodeParametersProcessor,
     ) {
         parent::__construct($annotationProvider, $noOpParametersProcessor);
         $this->encodeParametersProcessor = $encodeParametersProcessor;
@@ -30,6 +30,7 @@ class EncodeParametersProcessorFactory extends AbstractParametersProcessorFactor
     public function createRouteEncodeParametersProcessor(Route $route)
     {
         $controller = $route->getDefault('_controller');
+
         try {
             /** @var Hash $annotation */
             $annotation = $this->getAnnotationProvider()->getFromString($controller, Hash::class);

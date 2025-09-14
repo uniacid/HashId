@@ -23,7 +23,7 @@ abstract class AbstractEventSubscriberTest extends TestCase
     {
         $mock = $this->getMockBuilder(ControllerEvent::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getRequest'])
+            ->onlyMethods(['getRequest'])
             ->getMock();
 
         $mock->method('getRequest')->willReturn($this->getRequestMock());
@@ -38,7 +38,7 @@ abstract class AbstractEventSubscriberTest extends TestCase
     {
         $mock = $this->getMockBuilder(Request::class)
             ->getMock();
-        $parametersBag = $this->getMockBuilder(ParameterBag::class)->setMethods(['all'])->getMock();
+        $parametersBag = $this->getMockBuilder(ParameterBag::class)->onlyMethods(['all'])->getMock();
         $parametersBag->method('all')->willReturnOnConsecutiveCalls(
             [
                 'id' => 'encoded',
