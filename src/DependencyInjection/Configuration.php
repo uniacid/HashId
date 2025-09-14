@@ -3,19 +3,22 @@
 namespace Pgs\HashIdBundle\DependencyInjection;
 
 use Hashids\Hashids;
+use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NAME = 'pgs_hash_id';
+    // Use typed constants from HashIdConfigInterface for PHP 8.3+
+    // Maintaining backward compatibility by referencing interface constants
+    const ROOT_NAME = HashIdConfigInterface::ROOT_NAME;
 
-    const NODE_CONVERTER = 'converter';
-    const NODE_CONVERTER_HASHIDS = 'hashids';
-    const NODE_CONVERTER_HASHIDS_SALT = 'salt';
-    const NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH = 'min_hash_length';
-    const NODE_CONVERTER_HASHIDS_ALPHABET = 'alphabet';
+    const NODE_CONVERTER = HashIdConfigInterface::NODE_CONVERTER;
+    const NODE_CONVERTER_HASHIDS = HashIdConfigInterface::NODE_CONVERTER_HASHIDS;
+    const NODE_CONVERTER_HASHIDS_SALT = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_SALT;
+    const NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH;
+    const NODE_CONVERTER_HASHIDS_ALPHABET = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_ALPHABET;
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -46,14 +49,14 @@ class Configuration implements ConfigurationInterface
             ->addDefaultsIfNotSet()
                 ->children()
                     ->scalarNode(self::NODE_CONVERTER_HASHIDS_SALT)
-                        ->defaultNull()
+                        ->defaultValue(HashIdConfigInterface::DEFAULT_SALT)
                     ->end()
                     /* @scrutinizer ignore-call */
                     ->scalarNode(self::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH)
-                        ->defaultValue(10)
+                        ->defaultValue(HashIdConfigInterface::DEFAULT_MIN_LENGTH)
                     ->end()
                     ->scalarNode(self::NODE_CONVERTER_HASHIDS_ALPHABET)
-                        ->defaultValue('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
+                        ->defaultValue(HashIdConfigInterface::DEFAULT_ALPHABET)
                     ->end()
                 ->end();
     }

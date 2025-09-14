@@ -92,11 +92,11 @@ class Php82FeaturesTest extends TestCase
         // Test methods that might return false or null as standalone types
         $hashids = new Hashids('salt', 5, 'abcdefghijklmnopqrstuvwxyz');
         $converter = new HashidsConverter($hashids);
-        
+
         // Invalid decode returns the original value when it can't be decoded
         $result = $converter->decode('invalid!!!');
         $this->assertEquals('invalid!!!', $result);
-        
+
         // This validates that after Rector transformation,
         // methods can use null, false, true as standalone return types
     }
@@ -146,15 +146,15 @@ class Php82FeaturesTest extends TestCase
     {
         // After Rector transformation, constructor parameters like salt
         // could be marked with #[SensitiveParameter]
-        
+
         // Test that sensitive data (salt) is not exposed
         $hashids = new Hashids('super_secret_salt', 10, 'abcdefghijklmnopqrstuvwxyz');
         $converter = new HashidsConverter($hashids);
-        
+
         // Ensure salt is not accessible directly
         $reflection = new \ReflectionClass($converter);
         $hashidsProperty = $reflection->getProperty('hashids');
-        
+
         $this->assertTrue($hashidsProperty->isPrivate());
         // After transformation, this should also be readonly
     }

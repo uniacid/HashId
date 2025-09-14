@@ -3,7 +3,9 @@
 namespace Pgs\HashIdBundle\Controller;
 
 use Pgs\HashIdBundle\Annotation\Hash;
+use Pgs\HashIdBundle\Service\JsonValidator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -98,5 +100,64 @@ EOT;
     private function getRouteParam(Request $request, $param)
     {
         return $request->attributes->get('_route_params')[$param];
+    }
+    
+    /**
+     * @Route("/api/validate", methods={"POST"})
+     * 
+     * Example API endpoint demonstrating json_validate() usage (PHP 8.3+).
+     */
+    public function validateJson(Request $request): JsonResponse
+    {
+        $content = $request->getContent();
+        $validator = new JsonValidator();
+        
+        // Use PHP 8.3's json_validate() through our service
+        if (!$validator->validateRequestBody($content)) {
+            $errorInfo = $validator->validateWithError($content);
+            
+            return new JsonResponse([
+                'success' => false,
+                'error' => $errorInfo['error'],
+                'error_code' => $errorInfo['error_code'],
+            ], Response::HTTP_BAD_REQUEST);
+        }
+        
+        // Process valid JSON
+        $data = json_decode($content, true);
+        
+        return new JsonResponse([
+            'success' => true,
+            'data' => $data,
+            'message' => 'JSON validation successful using PHP 8.3 json_validate()',
+        ]);
+    }
+    
+    /**
+     * @Route("/api/hash/{id}", methods={"GET"})
+     * @Hash("id")
+     * 
+     * API endpoint returning JSON response with hashed ID.
+     */
+    public function apiHash(int $id): JsonResponse
+    {
+        $validator = new JsonValidator();
+        
+        $responseData = [
+            'id' => $id,
+            'encoded_url' => $this->generateUrl('pgs_hash_id_demo_api_hash', ['id' => $id], 0),
+            'timestamp' => time(),
+        ];
+        
+        // Validate response data before sending
+        $json = $validator->validateForResponse($responseData);
+        
+        if ($json === false) {
+            return new JsonResponse([
+                'error' => 'Failed to generate valid JSON response',
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+        
+        return JsonResponse::fromJsonString($json);
     }
 }
