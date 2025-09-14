@@ -60,7 +60,7 @@ class AnnotationProviderTest extends TestCase
     protected function getReaderMock()
     {
         $readerMock = $this->getMockBuilder(Reader::class)
-            ->setMethods(['getMethodAnnotation'])
+            ->onlyMethods(['getMethodAnnotation'])
             ->getMockForAbstractClass();
         $readerMock
             ->method('getMethodAnnotation')
