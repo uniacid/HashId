@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor;
 
@@ -14,7 +14,7 @@ class NoOpTest extends TestCase
      */
     protected $parametersProcessor;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parametersProcessor = new NoOp($this->getHashidMock(), []);
     }
@@ -29,30 +29,30 @@ class NoOpTest extends TestCase
             ->setParametersToProcess($parametersToProcess)
             ->process($parameters);
 
-        $this->assertSame($expected, $processedParameters);
+        self::assertSame($expected, $processedParameters);
     }
 
     public function testSetParametersToProcess()
     {
         $this->parametersProcessor->setParametersToProcess(['foo', 'bar']);
-        $this->assertSame([], $this->parametersProcessor->getParametersToProcess());
+        self::assertSame([], $this->parametersProcessor->getParametersToProcess());
     }
 
     public function testSetParametersToProcessReturnType()
     {
         $result = $this->parametersProcessor->setParametersToProcess(['foo', 'bar']);
-        $this->assertTrue($result instanceof ParametersProcessorInterface);
+        self::assertTrue($result instanceof ParametersProcessorInterface);
     }
 
     public function testConstructor()
     {
         $parametersProcessor = new NoOp($this->getHashidMock(), ['foo', 'bar']);
-        $this->assertSame([], $parametersProcessor->getParametersToProcess());
+        self::assertSame([], $parametersProcessor->getParametersToProcess());
     }
 
     public function testGetNeedToProcess()
     {
-        $this->assertFalse($this->parametersProcessor->needToProcess());
+        self::assertFalse($this->parametersProcessor->needToProcess());
     }
 
     protected function getHashidMock()

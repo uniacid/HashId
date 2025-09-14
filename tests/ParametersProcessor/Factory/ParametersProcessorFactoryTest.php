@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor\Factory;
 
@@ -18,7 +18,7 @@ abstract class ParametersProcessorFactoryTest extends TestCase
 
     protected $parametersProcessorMockProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->controllerMockProvider = new ControllerMockProvider();
         $this->controllerAnnotationMockProvider = new ControllerAnnotationProviderMockProvider();

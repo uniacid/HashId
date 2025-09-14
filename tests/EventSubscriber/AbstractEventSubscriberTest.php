@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\EventSubscriber;
 
@@ -13,7 +13,7 @@ abstract class AbstractEventSubscriberTest extends TestCase
 {
     protected function subscribedEventsList(string $eventSubscriberClass): void
     {
-        $this->assertTrue(\array_key_exists(KernelEvents::CONTROLLER, $eventSubscriberClass::getSubscribedEvents()));
+        self::assertTrue(\array_key_exists(KernelEvents::CONTROLLER, $eventSubscriberClass::getSubscribedEvents()));
     }
 
     /**
@@ -47,7 +47,7 @@ abstract class AbstractEventSubscriberTest extends TestCase
             [
                 'id' => 10,
                 'name' => 'test',
-            ]
+            ],
         );
         $mock->attributes = $parametersBag;
 

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Traits;
 
@@ -10,7 +10,7 @@ class DecoratorTraitTest extends TestCase
 {
     protected $decorateClass;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $baseClass = new BaseTestClass();
         $this->decorateClass = new DecorateTestClass($baseClass);
@@ -18,7 +18,7 @@ class DecoratorTraitTest extends TestCase
 
     public function testExistingMethodCall()
     {
-        $this->assertTrue($this->decorateClass->existingMethod1());
+        self::assertTrue($this->decorateClass->existingMethod1());
     }
 
     public function testNonExistingMethodCall()

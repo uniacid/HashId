@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Annotation;
 
@@ -11,7 +11,7 @@ class HashTest extends TestCase
     {
         $parameters = ['id'];
         $hash = new Hash($parameters);
-        $this->assertSame(['id'], $hash->getParameters());
+        self::assertSame(['id'], $hash->getParameters());
     }
 
     public function testPassValueIndexedParameters()
@@ -20,6 +20,6 @@ class HashTest extends TestCase
             'value' => ['id', 'second'],
         ];
         $hash = new Hash($parameters);
-        $this->assertSame($parameters['value'], $hash->getParameters());
+        self::assertSame($parameters['value'], $hash->getParameters());
     }
 }

@@ -8,14 +8,8 @@ use Hashids\HashidsInterface;
 
 class HashidsConverter implements ConverterInterface
 {
-    /**
-     * @var HashidsInterface
-     */
-    private $hashids;
-
-    public function __construct(HashidsInterface $hashids)
+    public function __construct(private HashidsInterface $hashids)
     {
-        $this->hashids = $hashids;
     }
 
     public function encode($value): string

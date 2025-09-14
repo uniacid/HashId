@@ -1,0 +1,183 @@
+name: Rector
+
+on:
+  push:
+    branches: [ "dev/modernization-v4", "rector-setup-foundation" ]
+  pull_request:
+    branches: [ "master", "dev/modernization-v4" ]
+    paths:
+      - 'rector*.php'
+      - 'src/**'
+      - 'tests/**'
+      - 'composer.json'
+      - '.github/workflows/rector.yml'
+
+env:
+  COMPOSER_ALLOW_SUPERUSER: 1
+
+jobs:
+  rector-validation:
+    name: "Rector Configuration Validation"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer:v2
+
+      - name: "Cache Composer packages"
+        uses: actions/cache@v3
+        with:
+          path: /tmp/composer-cache
+          key: "rector-php-8.3-${{ hashFiles('**/composer.lock') }}"
+          restore-keys: "rector-php-8.3-"
+
+      - name: "Install dependencies"
+        run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: "Validate main Rector configuration"
+        run: vendor/bin/rector --dry-run --config=rector.php --ansi
+
+      - name: "Validate PHP 8.1 Rector configuration"
+        run: vendor/bin/rector --dry-run --config=rector-php81.php --ansi
+
+      - name: "Validate Symfony Rector configuration"
+        run: vendor/bin/rector --dry-run --config=rector-symfony.php --ansi
+
+      - name: "Validate Quality Rector configuration"
+        run: vendor/bin/rector --dry-run --config=rector-quality.php --ansi
+
+      - name: "Validate PHP 8.2 Rector configuration"
+        run: |
+          if [ -s rector-php82.php ]; then
+            vendor/bin/rector --dry-run --config=rector-php82.php --ansi
+          else
+            echo "rector-php82.php is placeholder - skipping validation"
+          fi
+
+      - name: "Validate PHP 8.3 Rector configuration"
+        run: |
+          if [ -s rector-php83.php ]; then
+            vendor/bin/rector --dry-run --config=rector-php83.php --ansi
+          else
+            echo "rector-php83.php is placeholder - skipping validation"
+          fi
+
+  rector-dry-run:
+    name: "Rector Dry Run Analysis"
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        config: ['rector-php81.php', 'rector-symfony.php', 'rector-quality.php']
+    
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: "Run Rector dry-run with ${{ matrix.config }}"
+        run: |
+          echo "=== Running Rector with ${{ matrix.config }} ==="
+          vendor/bin/rector --dry-run --config=${{ matrix.config }} --ansi
+          echo "=== Dry run completed for ${{ matrix.config }} ==="
+
+      - name: "Generate change diff preview"
+        run: |
+          echo "=== Change preview for ${{ matrix.config }} ==="
+          vendor/bin/rector --dry-run --config=${{ matrix.config }} --ansi || true
+          echo "=== End of preview ==="
+
+  rector-check-regression:
+    name: "Rector Regression Check"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: "Checkout PR HEAD"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: "Check for Rector regressions"
+        run: |
+          # Get base branch rector output
+          git checkout ${{ github.event.pull_request.base.sha }}
+          composer update --no-interaction --optimize-autoloader
+          vendor/bin/rector --dry-run --config=rector.php --ansi > /tmp/base-rector.txt || true
+          
+          # Get PR rector output
+          git checkout ${{ github.event.pull_request.head.sha }}
+          composer update --no-interaction --optimize-autoloader
+          vendor/bin/rector --dry-run --config=rector.php --ansi > /tmp/pr-rector.txt || true
+          
+          # Compare outputs
+          if ! diff -u /tmp/base-rector.txt /tmp/pr-rector.txt > /tmp/rector-diff.txt; then
+            echo "=== Rector output differences detected ==="
+            cat /tmp/rector-diff.txt
+            echo "=== End of differences ==="
+            echo "Note: This may be expected if Rector rules were modified"
+          else
+            echo "No Rector output changes detected"
+          fi
+
+  performance-impact:
+    name: "Performance Impact Assessment"
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup PHP"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          coverage: none
+          tools: composer:v2
+
+      - name: "Install dependencies"
+        run: composer update --prefer-dist --no-interaction --no-progress --optimize-autoloader
+
+      - name: "Run performance benchmark"
+        run: |
+          # Simple performance test for Rector execution time
+          echo "=== Measuring Rector performance ==="
+          
+          # Time the rector dry-run
+          time vendor/bin/rector --dry-run --config=rector.php --no-ansi --quiet
+          
+          # Time individual configs
+          for config in rector-php81.php rector-symfony.php rector-quality.php; do
+            echo "Timing $config..."
+            time vendor/bin/rector --dry-run --config=$config --no-ansi --quiet
+          done
+          
+          echo "=== Performance measurement complete ==="

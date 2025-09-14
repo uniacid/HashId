@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor;
 
@@ -17,7 +17,7 @@ class DecodeTest extends TestCase
     {
         $decodeParametersProcessor = new Decode($this->getConverterMock(), $parametersToDecode);
         $processedParameters = $decodeParametersProcessor->process($routeParameters);
-        $this->assertSame($expected, $processedParameters);
+        self::assertSame($expected, $processedParameters);
     }
 
     public function testSetParametersToProcess()
@@ -25,8 +25,8 @@ class DecodeTest extends TestCase
         $decodeParametersProcessor = new Decode($this->getConverterMock(), []);
         $parametersToProcess = ['param1', 'param2'];
         $result = $decodeParametersProcessor->setParametersToProcess($parametersToProcess);
-        $this->assertTrue($result instanceof ParametersProcessorInterface);
-        $this->assertSame($parametersToProcess, $decodeParametersProcessor->getParametersToProcess());
+        self::assertTrue($result instanceof ParametersProcessorInterface);
+        self::assertSame($parametersToProcess, $decodeParametersProcessor->getParametersToProcess());
     }
 
     /**

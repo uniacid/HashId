@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Reflection;
 
@@ -14,9 +14,9 @@ class ReflectionProviderTest extends TestCase
         $reflectionProvider = new ReflectionProvider();
         $methodReflection = $reflectionProvider->getMethodReflectionFromClassString(
             ExistingClass::class,
-            'existingMethod'
+            'existingMethod',
         );
-        $this->assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
     }
 
     public function testGetReflectionForNonExistingClass(): void
@@ -31,9 +31,9 @@ class ReflectionProviderTest extends TestCase
         $reflectionProvider = new ReflectionProvider();
         $methodReflection = $reflectionProvider->getMethodReflectionFromObject(
             new ExistingClass(),
-            'existingMethod'
+            'existingMethod',
         );
-        $this->assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
     }
 
     public function testGetMethodReflectionForNonExistingMethodFromObject(): void
@@ -42,8 +42,8 @@ class ReflectionProviderTest extends TestCase
         $reflectionProvider = new ReflectionProvider();
         $methodReflection = $reflectionProvider->getMethodReflectionFromObject(
             new ExistingClass(),
-            'nonExistingMethod'
+            'nonExistingMethod',
         );
-        $this->assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
     }
 }

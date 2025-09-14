@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor;
 
@@ -16,8 +16,8 @@ class EncodeTest extends TestCase
     {
         $encodeParametersProcessor = new Encode($this->getConverterMock(), $parametersToEncode);
         $processedParameters = $encodeParametersProcessor->process($routeParameters);
-        $this->assertSame($expected, $processedParameters);
-        $this->assertSame(\count($parametersToEncode) > 0, $encodeParametersProcessor->needToProcess());
+        self::assertSame($expected, $processedParameters);
+        self::assertSame(\count($parametersToEncode) > 0, $encodeParametersProcessor->needToProcess());
     }
 
     /**

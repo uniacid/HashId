@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Service;
 
@@ -20,7 +20,7 @@ class DecodeControllerParametersTest extends TestCase
 
     protected $parametersProcessorMockProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->parametersProcessorMockProvider = new ParametersProcessorMockProvider();
     }
@@ -55,10 +55,10 @@ class DecodeControllerParametersTest extends TestCase
                     'name' => 'test',
                 ],
             ],
-            $controller
+            $controller,
         );
         $decodeControllerParameters->decodeControllerParameters($event);
-        $this->assertSame(10, $event->getRequest()->attributes->all()['id']);
+        self::assertSame(10, $event->getRequest()->attributes->all()['id']);
     }
 
     public function decodeControllerParametersDataProvider()
@@ -70,8 +70,6 @@ class DecodeControllerParametersTest extends TestCase
 
     /**
      * @dataProvider decodeControllerParametersDataProvider
-     *
-     * @param $controller
      */
     public function testDecodeControllerParametersWithParamConverter($controller): void
     {
@@ -89,10 +87,10 @@ class DecodeControllerParametersTest extends TestCase
                     'name' => 'test',
                 ],
             ],
-            $controller
+            $controller,
         );
         $decodeControllerParameters->decodeControllerParameters($event);
-        $this->assertSame(10, $event->getRequest()->attributes->all()['id']);
+        self::assertSame(10, $event->getRequest()->attributes->all()['id']);
     }
 
     /**

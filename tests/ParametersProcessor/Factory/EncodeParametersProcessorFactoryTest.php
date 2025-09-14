@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor\Factory;
 
@@ -21,14 +21,14 @@ class EncodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTes
         $parametersProcessorFactory = new EncodeParametersProcessorFactory(
             $this->getControllerAnnotationMockProvider()->getExistingControllerAnnotationProviderMock(),
             $noOpParametersProcessor,
-            $encodeParametersProcessor
+            $encodeParametersProcessor,
         );
 
         $parametersProcessor = $parametersProcessorFactory
             ->createRouteEncodeParametersProcessor(
-                $this->getRouteMockProvider()->getTestRouteMock()
+                $this->getRouteMockProvider()->getTestRouteMock(),
             );
-        $this->assertInstanceOf(\get_class($encodeParametersProcessor), $parametersProcessor);
+        self::assertInstanceOf(\get_class($encodeParametersProcessor), $parametersProcessor);
     }
 
     public function testCreateRouteNoOpParametersProcessor(): void
@@ -44,22 +44,22 @@ class EncodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTes
         $parametersProcessorFactory = new EncodeParametersProcessorFactory(
             $this->getControllerAnnotationMockProvider()->getNotExistingControllerAnnotationProviderMock(),
             $noOpParametersProcessor,
-            $encodeParametersProcessor
+            $encodeParametersProcessor,
         );
 
         $parametersProcessor = $parametersProcessorFactory->createRouteEncodeParametersProcessor(
-            $this->getRouteMockProvider()->getTestRouteMock()
+            $this->getRouteMockProvider()->getTestRouteMock(),
         );
-        $this->assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
+        self::assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
 
         $parametersProcessorFactory = new EncodeParametersProcessorFactory(
             $this->getControllerAnnotationMockProvider()->getExceptionThrowControllerAnnotationProviderMock(),
             $noOpParametersProcessor,
-            $encodeParametersProcessor
+            $encodeParametersProcessor,
         );
         $parametersProcessor = $parametersProcessorFactory->createRouteEncodeParametersProcessor(
-            $this->getRouteMockProvider()->getInvalidRouteMock()
+            $this->getRouteMockProvider()->getInvalidRouteMock(),
         );
-        $this->assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
+        self::assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
     }
 }
