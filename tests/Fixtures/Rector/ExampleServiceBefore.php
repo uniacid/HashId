@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Tests\Fixtures\Rector;
 
 /**
- * Example service class to test constructor property promotion
+ * Example service class to test constructor property promotion.
  */
 class ExampleServiceBefore
 {
@@ -36,7 +36,7 @@ class ExampleServiceBefore
     }
 
     /**
-     * Example switch statement that could be converted to match expression
+     * Example switch statement that could be converted to match expression.
      */
     public function getStatusMessage(string $status): string
     {

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\AnnotationProvider;
 
@@ -18,17 +18,17 @@ class AnnotationProviderTest extends TestCase
      */
     protected $controllerAnnotationProvider;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->controllerAnnotationProvider = new AnnotationProvider(
             $this->getReaderMock(),
-            $this->getReflectionProviderMock()
+            $this->getReflectionProviderMock(),
         );
     }
 
     public function testCreate(): void
     {
-        $this->assertInstanceOf(AnnotationProvider::class, $this->controllerAnnotationProvider);
+        self::assertInstanceOf(AnnotationProvider::class, $this->controllerAnnotationProvider);
     }
 
     public function testInvalidControllerString(): void
@@ -41,13 +41,13 @@ class AnnotationProviderTest extends TestCase
     {
         $result = $this->controllerAnnotationProvider->getFromString(
             'Pgs\HashIdBundle\Controller\DemoController::demo',
-            'annotationClassName'
+            'annotationClassName',
         );
-        $this->assertTrue(\is_object($result));
+        self::assertTrue(\is_object($result));
 
         $controller = $this->getControllerMock();
         $result = $this->controllerAnnotationProvider->getFromObject($controller, 'demo', 'annotationClassName');
-        $this->assertTrue(\is_object($result));
+        self::assertTrue(\is_object($result));
     }
 
     public function testInvalidControllerObject(): void

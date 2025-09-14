@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace DependencyInjection\Compiler;
 
@@ -30,7 +30,7 @@ class EventSubscriberCompilerPassTest extends TestCase
      */
     private $decodeControllerParametersDefinition;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->pass = new EventSubscriberCompilerPass();
         $this->container = new ContainerBuilder();
@@ -40,13 +40,13 @@ class EventSubscriberCompilerPassTest extends TestCase
         $this->paramConverterListenerDefinition = $paramConverterListenerDefinition;
         $this->container->setDefinition(
             'sensio_framework_extra.converter.listener',
-            $this->paramConverterListenerDefinition
+            $this->paramConverterListenerDefinition,
         );
 
         $this->decodeControllerParametersDefinition = new Definition();
         $this->container->setDefinition(
             'pgs_hash_id.service.decode_controller_parameters',
-            $this->decodeControllerParametersDefinition
+            $this->decodeControllerParametersDefinition,
         );
     }
 
@@ -54,6 +54,6 @@ class EventSubscriberCompilerPassTest extends TestCase
     {
         $this->pass->process($this->container);
         $listenerDefinition = $this->container->getDefinition('sensio_framework_extra.converter.listener');
-        $this->assertFalse($listenerDefinition->hasTag('kernel.event_subscriber'));
+        self::assertFalse($listenerDefinition->hasTag('kernel.event_subscriber'));
     }
 }

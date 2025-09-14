@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor\Factory;
 
@@ -21,15 +21,15 @@ class DecodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTes
         $parametersProcessorFactory = new DecodeParametersProcessorFactory(
             $this->getControllerAnnotationMockProvider()->getExistingControllerAnnotationProviderMock(),
             $noOpParametersProcessor,
-            $decodeParametersProcessor
+            $decodeParametersProcessor,
         );
 
         $parametersProcessor = $parametersProcessorFactory
             ->createControllerDecodeParametersProcessor(
                 $this->getControllerMockProvider()->getTestControllerMock(),
-                'testMethod'
+                'testMethod',
             );
-        $this->assertInstanceOf(\get_class($decodeParametersProcessor), $parametersProcessor);
+        self::assertInstanceOf(\get_class($decodeParametersProcessor), $parametersProcessor);
     }
 
     public function testCreateControllerDecodeParametersProcessorForBadController(): void
@@ -46,13 +46,13 @@ class DecodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTes
                 ->getControllerAnnotationMockProvider()
                 ->getInvalidControllerExceptionControllerAnnotationProviderMock(),
             $noOpParametersProcessor,
-            $decodeParametersProcessor
+            $decodeParametersProcessor,
         );
 
         $parametersProcessor = $parametersProcessorFactory->createControllerDecodeParametersProcessor(
             'test_controller_string',
-            'testMethod'
+            'testMethod',
         );
-        $this->assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
+        self::assertInstanceOf(\get_class($noOpParametersProcessor), $parametersProcessor);
     }
 }

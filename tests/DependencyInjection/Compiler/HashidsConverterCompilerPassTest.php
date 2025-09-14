@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\DependencyInjection\Compiler;
 
@@ -20,7 +20,7 @@ class HashidsConverterCompilerPassTest extends TestCase
      */
     private $container;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->compilerPass = new HashidsConverterCompilerPass();
 
@@ -38,14 +38,14 @@ class HashidsConverterCompilerPassTest extends TestCase
         $this->compilerPass->process($this->container);
 
         if ($this->doesHashidsExist()) {
-            $this->assertTrue($this->container->hasDefinition('pgs_hash_id.hashids'));
-            $this->assertTrue($this->container->hasDefinition('pgs_hash_id.converter.hashids'));
-            $this->assertTrue($this->container->hasAlias('pgs_hash_id.converter'));
+            self::assertTrue($this->container->hasDefinition('pgs_hash_id.hashids'));
+            self::assertTrue($this->container->hasDefinition('pgs_hash_id.converter.hashids'));
+            self::assertTrue($this->container->hasAlias('pgs_hash_id.converter'));
         }
     }
 
     private function doesHashidsExist()
     {
-        return class_exists(Hashids::class);
+        return \class_exists(Hashids::class);
     }
 }

@@ -2,3 +2,10 @@
 vendor
 composer.lock
 tests/coverage.xml
+.cursor
+.agent-os
+.claude
+var/
+.php-cs-fixer.cache
+.phpunit.cache/
+junit.xml

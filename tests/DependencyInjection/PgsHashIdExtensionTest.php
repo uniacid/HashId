@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\DependencyInjection;
 
@@ -15,10 +15,10 @@ class PgsHashIdExtensionTest extends TestCase
 
         $extension = new PgsHashIdExtension();
         $extension->load([], $container);
-        if (class_exists(Hashids::class)) {
-            $this->assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.salt'));
-            $this->assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.min_hash_length'));
-            $this->assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.alphabet'));
+        if (\class_exists(Hashids::class)) {
+            self::assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.salt'));
+            self::assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.min_hash_length'));
+            self::assertTrue($container->hasParameter('pgs_hash_id.converter.hashids.alphabet'));
         }
     }
 }

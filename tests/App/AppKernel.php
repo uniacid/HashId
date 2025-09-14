@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\App;
 
@@ -27,11 +27,11 @@ class AppKernel extends Kernel
 
     public function getLogDir()
     {
-        return sys_get_temp_dir().'/logs';
+        return \sys_get_temp_dir().'/logs';
     }
 
     public function getCacheDir()
     {
-        return sys_get_temp_dir().'/cache/'.$this->environment;
+        return \sys_get_temp_dir().'/cache/'.$this->environment;
     }
 }

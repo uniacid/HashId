@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\DependencyInjection;
 
@@ -14,7 +14,7 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration();
         $treeBuilder = $configuration->getConfigTreeBuilder();
         $tree = $treeBuilder->buildTree();
-        $this->assertSame(Configuration::ROOT_NAME, $tree->getName());
+        self::assertSame(Configuration::ROOT_NAME, $tree->getName());
     }
 
     /**
@@ -22,8 +22,8 @@ class ConfigurationTest extends TestCase
      */
     public function testConfigurationIfHashidsExists(array $inputConfig, array $expectedConfig)
     {
-        if (!class_exists(Hashids::class)) {
-            $this->markTestSkipped();
+        if (!\class_exists(Hashids::class)) {
+            self::markTestSkipped();
         }
 
         $configuration = new Configuration();
@@ -33,7 +33,7 @@ class ConfigurationTest extends TestCase
         $normalizedConfig = $node->normalize($inputConfig);
         $finalizedConfig = $node->finalize($normalizedConfig);
 
-        $this->assertSame($expectedConfig, $finalizedConfig);
+        self::assertSame($expectedConfig, $finalizedConfig);
     }
 
     public function dataTestConfiguration()
@@ -116,7 +116,7 @@ class ConfigurationTest extends TestCase
         $normalizedConfig = $node->normalize($inputConfig);
         $finalizedConfig = $node->finalize($normalizedConfig);
 
-        $this->assertSame($expectedConfig, $finalizedConfig);
+        self::assertSame($expectedConfig, $finalizedConfig);
     }
 
     public function dataTestConfigurationIfHashidsMissing()

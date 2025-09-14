@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\AnnotationProvider;
 
@@ -29,7 +29,7 @@ class ControllerAnnotationProviderMockProvider extends TestCase
         $mock->method('getFromObject')->with(
             $this->getControllerMockProvider()->getTestControllerMock(),
             'testMethod',
-            Hash::class
+            Hash::class,
         )->willReturn(new Hash([]));
 
         return $mock;

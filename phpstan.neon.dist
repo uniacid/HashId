@@ -1,0 +1,48 @@
+parameters:
+    level: 9
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - tests/App/cache
+        - tests/App/logs
+    
+    # PHP 8.3 and modern features
+    phpVersion: 80300
+    
+    # Strict type checking
+    checkMissingIterableValueType: true
+    checkGenericClassInNonGenericObjectType: true
+    checkMissingCallableSignature: true
+    checkMissingVarTagTypehint: true
+    treatPhpDocTypesAsCertain: false
+    
+    # Report unused variables and parameters
+    reportUnmatchedIgnoredErrors: true
+    checkUninitializedProperties: true
+    checkBenevolentUnionTypes: true
+    checkTooWideReturnTypesInProtectedAndPublicMethods: true
+    checkImplicitMixed: true
+    
+    # Symfony-specific rules (commented out for basic analysis)
+    # symfony:
+    #     consoleApplicationLoader: tests/App/console-loader.php
+    #     containerXmlPath: '%rootDir%/../../../tests/App/cache/test/appTestDebugProjectContainer.xml'
+    #     constantHassers: false
+    
+    # Rule-specific configuration
+    exceptions:
+        uncheckedExceptionClasses:
+            - 'LogicException'
+            - 'InvalidArgumentException'
+        
+    ignoreErrors:
+        # Symfony Configuration Builder API has complex return types
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeDefinition::children\(\)\.#'
+        - '#Call to an undefined method Symfony\\Component\\Config\\Definition\\Builder\\NodeParentInterface::scalarNode\(\)\.#'
+        
+        # Test-specific ignores for mock objects
+        - '#Parameter .* of method .*Test::.*\(\) has invalid type PHPUnit\\Framework\\MockObject\\MockObject.*#'
+        
+        # Legacy annotation compatibility during transition period
+        - '#Class Doctrine\\Common\\Annotations\\Annotation not found\.#'

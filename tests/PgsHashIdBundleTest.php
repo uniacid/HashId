@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests;
 
@@ -13,7 +13,7 @@ class PgsHashIdBundleTest extends TestCase
     public function testGetContainerExtension(): void
     {
         $bundle = new PgsHashIdBundle();
-        $this->assertInstanceOf(PgsHashIdExtension::class, $bundle->getContainerExtension());
+        self::assertInstanceOf(PgsHashIdExtension::class, $bundle->getContainerExtension());
     }
 
     public function testRegisterCompilerPass(): void
@@ -22,15 +22,13 @@ class PgsHashIdBundleTest extends TestCase
         $bundle = new PgsHashIdBundle();
         $bundle->build($container);
 
-        $this->assertTrue(\in_array(EventSubscriberCompilerPass::class, $this->getPassesClasses($container), true));
+        self::assertTrue(\in_array(EventSubscriberCompilerPass::class, $this->getPassesClasses($container), true));
     }
 
     private function getPassesClasses(ContainerBuilder $container): array
     {
         $passes = $container->getCompilerPassConfig()->getPasses();
 
-        return array_map(function ($item) {
-            return \get_class($item);
-        }, $passes);
+        return \array_map(fn ($item) => \get_class($item), $passes);
     }
 }

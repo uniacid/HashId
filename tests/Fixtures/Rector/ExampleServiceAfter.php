@@ -6,14 +6,14 @@ namespace Pgs\HashIdBundle\Tests\Fixtures\Rector;
 
 /**
  * Example service class after Rector PHP 8.1 transformations
- * This shows the expected result after applying constructor property promotion and match expressions
+ * This shows the expected result after applying constructor property promotion and match expressions.
  */
 class ExampleServiceAfter
 {
     public function __construct(
         private string $name,
         private int $value,
-        private ?array $options = null
+        private ?array $options = null,
     ) {
     }
 
@@ -33,7 +33,7 @@ class ExampleServiceAfter
     }
 
     /**
-     * Example match expression (converted from switch statement)
+     * Example match expression (converted from switch statement).
      */
     public function getStatusMessage(string $status): string
     {
