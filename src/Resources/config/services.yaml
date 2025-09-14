@@ -1,0 +1,78 @@
+services:
+    # Default configuration for services
+    _defaults:
+        autowire: false  # Bundle services shouldn't autowire by default
+        autoconfigure: false  # Bundle services shouldn't autoconfigure by default
+        public: false
+
+    # Router Decorator
+    pgs_hash_id.decorator.router:
+        class: Pgs\HashIdBundle\Decorator\RouterDecorator
+        decorates: router
+        arguments:
+            - '@router.default'
+            - '@pgs_hash_id.parameters_processor.factory.encode'
+
+    # Core Services
+    pgs_hash_id.reflection_provider:
+        class: Pgs\HashIdBundle\Reflection\ReflectionProvider
+
+    pgs_hash_id.annotation_provider:
+        class: Pgs\HashIdBundle\AnnotationProvider\AnnotationProvider
+        arguments:
+            - '@annotation_reader'
+            - '@pgs_hash_id.reflection_provider'
+
+    # Abstract Parameter Processor
+    pgs_hash_id.parameters_processor.abstract:
+        class: Pgs\HashIdBundle\ParametersProcessor\AbstractParametersProcessor
+        abstract: true
+        arguments:
+            - '@pgs_hash_id.converter'
+
+    # Concrete Parameter Processors
+    pgs_hash_id.parameters_processor.encode:
+        class: Pgs\HashIdBundle\ParametersProcessor\Encode
+        parent: pgs_hash_id.parameters_processor.abstract
+
+    pgs_hash_id.parameters_processor.decode:
+        class: Pgs\HashIdBundle\ParametersProcessor\Decode
+        parent: pgs_hash_id.parameters_processor.abstract
+
+    pgs_hash_id.parameters_processor.no_op:
+        class: Pgs\HashIdBundle\ParametersProcessor\NoOp
+
+    # Abstract Factory
+    pgs_hash_id.parameters_processor.factory.abstract:
+        class: Pgs\HashIdBundle\ParametersProcessor\Factory\AbstractParametersProcessorFactory
+        abstract: true
+        arguments:
+            - '@pgs_hash_id.annotation_provider'
+            - '@pgs_hash_id.parameters_processor.no_op'
+
+    # Concrete Factories
+    pgs_hash_id.parameters_processor.factory.encode:
+        class: Pgs\HashIdBundle\ParametersProcessor\Factory\EncodeParametersProcessorFactory
+        parent: pgs_hash_id.parameters_processor.factory.abstract
+        arguments:
+            - '@pgs_hash_id.parameters_processor.encode'
+
+    pgs_hash_id.parameters_processor.factory.decode:
+        class: Pgs\HashIdBundle\ParametersProcessor\Factory\DecodeParametersProcessorFactory
+        parent: pgs_hash_id.parameters_processor.factory.abstract
+        arguments:
+            - '@pgs_hash_id.parameters_processor.decode'
+
+    # Services
+    pgs_hash_id.service.decode_controller_parameters:
+        class: Pgs\HashIdBundle\Service\DecodeControllerParameters
+        arguments:
+            - '@pgs_hash_id.parameters_processor.factory.decode'
+
+    # Event Subscribers
+    pgs_hash_id.event_subscriber.decode_controller_parameters:
+        class: Pgs\HashIdBundle\EventSubscriber\DecodeControllerParametersSubscriber
+        arguments:
+            - '@pgs_hash_id.service.decode_controller_parameters'
+        tags:
+            - { name: kernel.event_subscriber }

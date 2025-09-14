@@ -20,7 +20,7 @@ class DemoController extends AbstractController
      *
      * @param int $id
      */
-    public function encode($id): Response
+    public function encode(int $id): Response
     {
         $other = 30;
         $url1 = $this->generateUrl('pgs_hash_id_demo_decode', ['id' => $id, 'other' => $other]);
