@@ -56,6 +56,16 @@ class HasherFactory
      */
     private static ?array $availableTypesCache = null;
 
+    /**
+     * @var array<string, HasherInterface> Cached hasher instances
+     */
+    private array $instanceCache = [];
+
+    /**
+     * Maximum number of cached hasher instances.
+     */
+    private const MAX_CACHE_SIZE = 10;
+
     public function __construct(
         ?string $salt = null,
         int $minLength = HashIdConfigInterface::DEFAULT_MIN_LENGTH,
@@ -76,20 +86,23 @@ class HasherFactory
      */
     public function create(string $type = 'default', array $config = []): HasherInterface
     {
-        // PHP 8.3 dynamic constant fetch
-        $constantName = 'HASHER_' . \mb_strtoupper($type);
-
-        // Check if constant exists
-        if (!\defined(self::class . '::' . $constantName)) {
+        // Security: Validate type against whitelist to prevent injection
+        $allowedTypes = ['default', 'secure', 'custom'];
+        if (!\in_array($type, $allowedTypes, true)) {
             throw new \InvalidArgumentException(\sprintf(
                 'Unknown hasher type "%s". Available types: %s',
                 $type,
-                \implode(', ', \array_keys(self::HASHER_CONFIGS)),
+                \implode(', ', $allowedTypes),
             ));
         }
 
-        // Dynamic constant fetch using PHP 8.3 syntax
-        $hasherClass = self::{$constantName};
+        // Use switch statement for safe constant access
+        $hasherClass = match($type) {
+            'default' => self::HASHER_DEFAULT,
+            'secure' => self::HASHER_SECURE,
+            'custom' => self::HASHER_CUSTOM,
+            default => throw new \InvalidArgumentException("Invalid hasher type: {$type}")
+        };
 
         // Merge configurations
         $hasherConfig = \array_merge(
@@ -107,7 +120,20 @@ class HasherFactory
             $hasherConfig['salt'] = $this->generateSecureSalt();
         }
 
-        return new $hasherClass($hasherConfig);
+        // Generate cache key for this configuration
+        $cacheKey = $this->generateCacheKey($type, $hasherConfig);
+        
+        // Check instance cache
+        if (isset($this->instanceCache[$cacheKey])) {
+            return $this->instanceCache[$cacheKey];
+        }
+
+        $hasher = new $hasherClass($hasherConfig);
+        
+        // Cache the instance with LRU eviction
+        $this->cacheInstance($cacheKey, $hasher);
+        
+        return $hasher;
     }
 
     /**
@@ -174,6 +200,43 @@ class HasherFactory
     public static function clearCache(): void
     {
         self::$availableTypesCache = null;
+    }
+
+    /**
+     * Generate a cache key for hasher configuration.
+     *
+     * @param string $type The hasher type
+     * @param array<string, mixed> $config The configuration
+     * @return string The cache key
+     */
+    private function generateCacheKey(string $type, array $config): string
+    {
+        // Create a deterministic key from type and config
+        return $type . ':' . \md5(\serialize($config));
+    }
+
+    /**
+     * Cache a hasher instance with LRU eviction.
+     *
+     * @param string $key The cache key
+     * @param HasherInterface $hasher The hasher instance
+     */
+    private function cacheInstance(string $key, HasherInterface $hasher): void
+    {
+        // If cache is full, remove the oldest entry (FIFO)
+        if (\count($this->instanceCache) >= self::MAX_CACHE_SIZE) {
+            \array_shift($this->instanceCache);
+        }
+        
+        $this->instanceCache[$key] = $hasher;
+    }
+
+    /**
+     * Clear the instance cache.
+     */
+    public function clearInstanceCache(): void
+    {
+        $this->instanceCache = [];
     }
 
     /**

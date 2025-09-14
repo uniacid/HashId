@@ -15,6 +15,26 @@ use Pgs\HashIdBundle\Rector\DeprecationHandler;
  */
 class CompatibilityLayer
 {
+    /**
+     * Maximum allowed length for docblock to prevent ReDoS attacks.
+     */
+    private const MAX_DOCBLOCK_LENGTH = 10000;
+
+    /**
+     * Maximum length for parameter string in annotations.
+     */
+    private const MAX_PARAM_STRING_LENGTH = 500;
+
+    /**
+     * Maximum number of parameters allowed in Hash annotation.
+     */
+    private const MAX_PARAMETERS = 20;
+
+    /**
+     * Maximum length for a single parameter name.
+     */
+    private const MAX_PARAM_NAME_LENGTH = 100;
+
     private bool $deprecationWarningsEnabled;
     private bool $preferAttributes;
     
@@ -85,14 +105,19 @@ class CompatibilityLayer
         // For now, we'll parse the docblock manually as a simple implementation
         $docComment = $method->getDocComment();
         
-        if ($docComment === false) {
+        // Early return for empty/false docblocks
+        if ($docComment === false || empty($docComment)) {
             return null;
         }
         
         // Security: Validate and limit input length to prevent ReDoS attacks
-        $maxLength = 10000; // Reasonable limit for docblock size
-        if (\strlen($docComment) > $maxLength) {
+        if (\strlen($docComment) > self::MAX_DOCBLOCK_LENGTH) {
             trigger_error('Docblock exceeds maximum allowed length', E_USER_WARNING);
+            return null;
+        }
+
+        // Quick check if @Hash is even present before processing
+        if (\strpos($docComment, '@Hash') === false) {
             return null;
         }
 
@@ -106,7 +131,8 @@ class CompatibilityLayer
         // Atomic group prevents backtracking
         // [^)]++ - possessive quantifier, match non-parenthesis characters
         // \) - literal closing parenthesis
-        if (\preg_match('/@Hash\((?>([^)]{1,500}))\)/', $docComment, $matches)) {
+        $pattern = '/@Hash\((?>([^)]{1,' . self::MAX_PARAM_STRING_LENGTH . '}))\)/';
+        if (\preg_match($pattern, $docComment, $matches)) {
             $context = sprintf(
                 '%s::%s',
                 $method->getDeclaringClass()->getName(),
@@ -130,16 +156,18 @@ class CompatibilityLayer
             }
 
             // Handle single quoted string with stricter pattern
-            if (\preg_match('/^"([a-zA-Z0-9_]{1,100})"$/', $params, $paramMatches)) {
+            $singleParamPattern = '/^"([a-zA-Z0-9_]{1,' . self::MAX_PARAM_NAME_LENGTH . '})"$/';
+            if (\preg_match($singleParamPattern, $params, $paramMatches)) {
                 return [$paramMatches[1]];
             }
             
             // Handle array of strings with stricter validation
-            if (\preg_match('/^\{([^}]{1,500})\}$/', $params, $paramMatches)) {
+            $arrayPattern = '/^\{([^}]{1,' . self::MAX_PARAM_STRING_LENGTH . '})\}$/';
+            if (\preg_match($arrayPattern, $params, $paramMatches)) {
                 $items = \explode(',', $paramMatches[1]);
                 
                 // Validate each item and limit array size
-                if (\count($items) > 20) {
+                if (\count($items) > self::MAX_PARAMETERS) {
                     trigger_error('Too many parameters in Hash annotation', E_USER_WARNING);
                     return null;
                 }

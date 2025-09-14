@@ -43,6 +43,21 @@ class AttributeProvider implements AnnotationProviderInterface
      */
     public function getFromString(string $controller, string $annotationClassName): ?object
     {
+        // Security: Check for null bytes and other malicious characters
+        if (\strpos($controller, "\x00") !== false || \strpos($controller, "\r") !== false || \strpos($controller, "\n") !== false) {
+            throw new InvalidControllerException(\sprintf(
+                'Invalid controller format: contains illegal characters. Expected format: "ClassName::methodName"'
+            ));
+        }
+
+        // Security: Validate controller format before parsing to prevent injection
+        if (!\preg_match('/^[a-zA-Z_\\\\][a-zA-Z0-9_\\\\]*::[a-zA-Z_][a-zA-Z0-9_]*$/', $controller)) {
+            throw new InvalidControllerException(\sprintf(
+                'Invalid controller format: "%s". Expected format: "ClassName::methodName"',
+                $controller
+            ));
+        }
+
         $explodedControllerString = \explode('::', $controller);
         if (2 !== \count($explodedControllerString)) {
             $message = \sprintf('The "%s" controller is not a valid "class::method" string.', $controller);

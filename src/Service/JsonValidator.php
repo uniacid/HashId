@@ -20,6 +20,11 @@ class JsonValidator
     private const DEFAULT_MAX_DEPTH = 512;
 
     /**
+     * Maximum allowed JSON string size (10MB).
+     */
+    private const MAX_JSON_SIZE = 10485760; // 10 * 1024 * 1024
+
+    /**
      * Validate JSON string using PHP 8.3's json_validate() function.
      *
      * @param string $json The JSON string to validate
@@ -30,6 +35,11 @@ class JsonValidator
      */
     public function isValid(string $json, int $depth = self::DEFAULT_MAX_DEPTH, int $flags = 0): bool
     {
+        // Security: Check size limit to prevent memory exhaustion
+        if (\strlen($json) > self::MAX_JSON_SIZE) {
+            return false;
+        }
+
         // PHP 8.3+ native json_validate() function
         if (\function_exists('json_validate')) {
             // json_validate only accepts depth parameter, not flags
@@ -76,12 +86,18 @@ class JsonValidator
      * Validate JSON request body from API endpoint.
      *
      * @param string $content Request body content
+     * @param int $maxSize Maximum allowed size in bytes (default: MAX_JSON_SIZE)
      *
      * @return bool True if valid JSON
      */
-    public function validateRequestBody(string $content): bool
+    public function validateRequestBody(string $content, int $maxSize = self::MAX_JSON_SIZE): bool
     {
         if (empty($content)) {
+            return false;
+        }
+
+        // Security: Enforce size limit
+        if (\strlen($content) > $maxSize) {
             return false;
         }
 
@@ -93,15 +109,21 @@ class JsonValidator
      *
      * @param mixed $data Data to encode as JSON
      * @param int $flags JSON encode flags
+     * @param int $maxSize Maximum allowed size in bytes (default: MAX_JSON_SIZE)
      *
      * @return string|false JSON string or false on failure
      */
-    public function validateForResponse($data, int $flags = JSON_THROW_ON_ERROR): string|false
+    public function validateForResponse($data, int $flags = JSON_THROW_ON_ERROR, int $maxSize = self::MAX_JSON_SIZE): string|false
     {
         try {
             $json = \json_encode($data, $flags);
 
             if ($json === false) {
+                return false;
+            }
+
+            // Security: Check size limit
+            if (\strlen($json) > $maxSize) {
                 return false;
             }
 
