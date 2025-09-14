@@ -176,7 +176,7 @@ class BenchmarkTest extends TestCase
         // Benchmark creating new instances each time
         $startTime = microtime(true);
         for ($i = 0; $i < 1000; $i++) {
-            $hasher = $factory->createConverter([
+            $hasher = $factory->createConverter('default', [
                 'salt' => 'test-salt-' . $i,
                 'min_length' => 10,
                 'alphabet' => 'abcdefghijklmnopqrstuvwxyz',
@@ -186,7 +186,7 @@ class BenchmarkTest extends TestCase
         $newInstanceTime = microtime(true) - $startTime;
         
         // Benchmark reusing same configuration
-        $hasher = $factory->createConverter([
+        $hasher = $factory->createConverter('default', [
             'salt' => 'test-salt',
             'min_length' => 10,
             'alphabet' => 'abcdefghijklmnopqrstuvwxyz',
@@ -267,10 +267,15 @@ class BenchmarkTest extends TestCase
      */
     private function createMockMethod(): \ReflectionMethod|\PHPUnit\Framework\MockObject\MockObject
     {
-        return $this->getMockBuilder(\ReflectionMethod::class)
+        $method = $this->getMockBuilder(\ReflectionMethod::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName'])
+            ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName', 'getAttributes'])
             ->getMock();
+        
+        // Mock getAttributes to return empty array
+        $method->method('getAttributes')->willReturn([]);
+        
+        return $method;
     }
     
     /**

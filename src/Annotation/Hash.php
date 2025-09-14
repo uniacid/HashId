@@ -21,7 +21,7 @@ readonly class Hash
             $parameters = $parameters['value'];
         }
 
-        $this->parameters = $parameters;
+        $this->parameters = array_values($parameters);
     }
 
     /** @return array<int, string> */

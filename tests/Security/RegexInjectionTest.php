@@ -238,10 +238,15 @@ class RegexInjectionTest extends TestCase
      */
     private function createMockMethod(): \ReflectionMethod|\PHPUnit\Framework\MockObject\MockObject
     {
-        return $this->getMockBuilder(\ReflectionMethod::class)
+        $method = $this->getMockBuilder(\ReflectionMethod::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName'])
+            ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName', 'getAttributes'])
             ->getMock();
+        
+        // Mock getAttributes to return empty array (no attributes for annotation tests)
+        $method->method('getAttributes')->willReturn([]);
+        
+        return $method;
     }
     
     /**

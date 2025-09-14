@@ -4,7 +4,11 @@ namespace Pgs\HashIdBundle\ParametersProcessor;
 
 class Decode extends AbstractParametersProcessor
 {
-    protected function processValue($value)
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    protected function processValue(mixed $value): mixed
     {
         return $this->getConverter()->decode($value);
     }

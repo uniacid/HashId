@@ -21,4 +21,5 @@ trait ControllerMockProvider
         return $this->getMockBuilder(AbstractController::class)
             ->onlyMethods(['__invoke'])
             ->getMockForAbstractClass();
+    }
 }

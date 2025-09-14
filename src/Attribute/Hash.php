@@ -13,10 +13,11 @@ namespace Pgs\HashIdBundle\Attribute;
 #[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
 class Hash
 {
+    /** @var array<string> */
     private array $parameters;
 
     /**
-     * @param string|array $parameters Parameter name(s) to be encoded/decoded
+     * @param string|array<string> $parameters Parameter name(s) to be encoded/decoded
      */
     public function __construct(string|array $parameters)
     {
@@ -25,6 +26,8 @@ class Hash
 
     /**
      * Get the parameters that should be encoded/decoded.
+     * 
+     * @return array<string>
      */
     public function getParameters(): array
     {
