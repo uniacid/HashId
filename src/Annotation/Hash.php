@@ -8,9 +8,9 @@ namespace Pgs\HashIdBundle\Annotation;
  * @Annotation
  * @Target({"METHOD"})
  */
-class Hash
+readonly class Hash
 {
-    private $parameters;
+    private array $parameters;
 
     public function __construct(array $parameters)
     {
