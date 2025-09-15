@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pgs\HashIdBundle\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
@@ -17,7 +19,7 @@ class EventSubscriberCompilerPass implements CompilerPassInterface
             $decodeControllerParameters = $container->getDefinition('pgs_hash_id.service.decode_controller_parameters');
             $decodeControllerParameters->addMethodCall(
                 'setParamConverterListener',
-                [new Reference('sensio_framework_extra.converter.listener')]
+                [new Reference('sensio_framework_extra.converter.listener')],
             );
         }
     }

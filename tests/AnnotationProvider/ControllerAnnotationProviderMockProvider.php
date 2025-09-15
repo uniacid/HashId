@@ -7,27 +7,17 @@ use Pgs\HashIdBundle\AnnotationProvider\AnnotationProvider;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Pgs\HashIdBundle\Tests\Controller\ControllerMockProvider;
 use PHPUnit\Framework\TestCase;
-
-class ControllerAnnotationProviderMockProvider extends TestCase
+use PHPUnit\Framework\MockObject\MockBuilder;
+trait ControllerAnnotationProviderMockProvider
 {
-    protected $controllerMockProvider;
-
-    public function __construct()
-    {
-        $this->controllerMockProvider = new ControllerMockProvider();
-    }
-
-    public function getControllerMockProvider(): ControllerMockProvider
-    {
-        return $this->controllerMockProvider;
-    }
+    use ControllerMockProvider;
 
     public function getExistingControllerAnnotationProviderMock(): AnnotationProvider
     {
         $mock = $this->getControllerAnnotationProviderMock();
         $mock->method('getFromString')->with('TestController::testMethod', Hash::class)->willReturn(new Hash([]));
         $mock->method('getFromObject')->with(
-            $this->getControllerMockProvider()->getTestControllerMock(),
+            $this->getTestControllerMock(),
             'testMethod',
             Hash::class,
         )->willReturn(new Hash([]));
@@ -68,7 +58,7 @@ class ControllerAnnotationProviderMockProvider extends TestCase
     {
         return $this->getMockBuilder(AnnotationProvider::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getFromString', 'getFromObject'])
+            ->onlyMethods(['getFromString', 'getFromObject'])
             ->getMock();
     }
 }

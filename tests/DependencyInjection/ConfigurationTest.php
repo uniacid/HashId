@@ -107,7 +107,7 @@ class ConfigurationTest extends TestCase
         /** @var Configuration|MockObject $configuration */
         $configuration = $this
             ->getMockBuilder(Configuration::class)
-            ->setMethods(['supportsHashids'])
+            ->onlyMethods(['supportsHashids'])
             ->getMock();
         $configuration->method('supportsHashids')->willReturn(false);
 

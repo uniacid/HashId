@@ -1,21 +1,24 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\DependencyInjection;
 
 use Hashids\Hashids;
+use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 class Configuration implements ConfigurationInterface
 {
-    const ROOT_NAME = 'pgs_hash_id';
+    // Use typed constants from HashIdConfigInterface for PHP 8.3+
+    // Maintaining backward compatibility by referencing interface constants
+    public const ROOT_NAME = HashIdConfigInterface::ROOT_NAME;
 
-    const NODE_CONVERTER = 'converter';
-    const NODE_CONVERTER_HASHIDS = 'hashids';
-    const NODE_CONVERTER_HASHIDS_SALT = 'salt';
-    const NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH = 'min_hash_length';
-    const NODE_CONVERTER_HASHIDS_ALPHABET = 'alphabet';
+    public const NODE_CONVERTER = HashIdConfigInterface::NODE_CONVERTER;
+    public const NODE_CONVERTER_HASHIDS = HashIdConfigInterface::NODE_CONVERTER_HASHIDS;
+    public const NODE_CONVERTER_HASHIDS_SALT = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_SALT;
+    public const NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH;
+    public const NODE_CONVERTER_HASHIDS_ALPHABET = HashIdConfigInterface::NODE_CONVERTER_HASHIDS_ALPHABET;
 
     public function getConfigTreeBuilder(): TreeBuilder
     {
@@ -24,11 +27,11 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-                ->arrayNode(self::NODE_CONVERTER)->addDefaultsIfNotSet()->ignoreExtraKeys(false)
-                    ->children()
-                        ->append($this->addHashidsConverterNode())
-                    ->end()
-                ->end()
+            ->arrayNode(self::NODE_CONVERTER)->addDefaultsIfNotSet()->ignoreExtraKeys(false)
+            ->children()
+            ->append($this->addHashidsConverterNode())
+            ->end()
+            ->end()
             ->end();
 
         return $treeBuilder;
@@ -44,22 +47,22 @@ class Configuration implements ConfigurationInterface
 
         return $node
             ->addDefaultsIfNotSet()
-                ->children()
-                    ->scalarNode(self::NODE_CONVERTER_HASHIDS_SALT)
-                        ->defaultNull()
-                    ->end()
+            ->children()
+            ->scalarNode(self::NODE_CONVERTER_HASHIDS_SALT)
+            ->defaultValue(HashIdConfigInterface::DEFAULT_SALT)
+            ->end()
                     /* @scrutinizer ignore-call */
-                    ->scalarNode(self::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH)
-                        ->defaultValue(10)
-                    ->end()
-                    ->scalarNode(self::NODE_CONVERTER_HASHIDS_ALPHABET)
-                        ->defaultValue('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890')
-                    ->end()
-                ->end();
+            ->scalarNode(self::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH)
+            ->defaultValue(HashIdConfigInterface::DEFAULT_MIN_LENGTH)
+            ->end()
+            ->scalarNode(self::NODE_CONVERTER_HASHIDS_ALPHABET)
+            ->defaultValue(HashIdConfigInterface::DEFAULT_ALPHABET)
+            ->end()
+            ->end();
     }
 
     public function supportsHashids()
     {
-        return class_exists(Hashids::class);
+        return \class_exists(Hashids::class);
     }
 }

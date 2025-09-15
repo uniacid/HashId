@@ -72,7 +72,7 @@ class AnnotationProviderTest extends TestCase
     protected function getReflectionProviderMock()
     {
         $reflectionProviderMock = $this->getMockBuilder(ReflectionProvider::class)
-            ->setMethods([
+            ->onlyMethods([
                 'getMethodReflectionFromClassString',
                 'getMethodReflectionFromObject',
             ])
@@ -90,7 +90,7 @@ class AnnotationProviderTest extends TestCase
 
     protected function getControllerMock()
     {
-        $mock = $this->getMockBuilder(Controller::class)->setMethods(['demo'])->getMockForAbstractClass();
+        $mock = $this->getMockBuilder(Controller::class)->onlyMethods(['demo'])->getMockForAbstractClass();
 
         return $mock;
     }

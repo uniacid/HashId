@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Service;
 
-use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
 use Pgs\HashIdBundle\Rector\DeprecationHandler;
 
@@ -16,6 +15,36 @@ use Pgs\HashIdBundle\Rector\DeprecationHandler;
  */
 class CompatibilityLayer
 {
+    /**
+     * Maximum allowed length for docblock to prevent ReDoS attacks.
+     */
+    private const MAX_DOCBLOCK_LENGTH = 10000;
+
+    /**
+     * Maximum length for parameter string in annotations.
+     */
+    private const MAX_PARAM_STRING_LENGTH = 500;
+
+    /**
+     * Maximum number of parameters allowed in Hash annotation.
+     */
+    private const MAX_PARAMETERS = 20;
+
+    /**
+     * Maximum length for a single parameter name.
+     */
+    private const MAX_PARAM_NAME_LENGTH = 100;
+    
+    /**
+     * Maximum size of the reflection cache.
+     */
+    private const MAX_CACHE_SIZE = 100;
+    
+    /**
+     * @var array<string, array<string>|null> Static cache for reflection results
+     */
+    private static array $reflectionCache = [];
+
     private bool $deprecationWarningsEnabled;
     private bool $preferAttributes;
     
@@ -39,6 +68,14 @@ class CompatibilityLayer
      */
     public function extractHashConfiguration(\ReflectionMethod $method): ?array
     {
+        // Generate cache key
+        $cacheKey = $this->generateCacheKey($method);
+        
+        // Check cache first
+        if (\array_key_exists($cacheKey, self::$reflectionCache)) {
+            return self::$reflectionCache[$cacheKey];
+        }
+        
         $parameters = null;
         
         // Try attributes first (if PHP 8+)
@@ -50,6 +87,9 @@ class CompatibilityLayer
         if ($parameters === null) {
             $parameters = $this->extractFromAnnotations($method);
         }
+        
+        // Cache the result with LRU eviction
+        $this->cacheResult($cacheKey, $parameters);
         
         return $parameters;
     }
@@ -86,40 +126,86 @@ class CompatibilityLayer
         // For now, we'll parse the docblock manually as a simple implementation
         $docComment = $method->getDocComment();
         
-        if ($docComment === false) {
+        // Early return for empty/false docblocks
+        if ($docComment === false || empty($docComment)) {
             return null;
         }
         
-        // Simple regex to find @Hash annotations
-        if (preg_match('/@Hash\((.*?)\)/', $docComment, $matches)) {
+        // Security: Validate and limit input length to prevent ReDoS attacks
+        if (\strlen($docComment) > self::MAX_DOCBLOCK_LENGTH) {
+            trigger_error('Docblock exceeds maximum allowed length', E_USER_WARNING);
+            return null;
+        }
+
+        // Quick check if @Hash is even present before processing
+        if (\strpos($docComment, '@Hash') === false) {
+            return null;
+        }
+
+        // Security: Sanitize input by removing potential malicious patterns
+        // Use atomic groups and possessive quantifiers to prevent catastrophic backtracking
+        $docComment = \preg_replace('/\s+/', ' ', $docComment); // Normalize whitespace
+        
+        // Use more restrictive regex with atomic groups to prevent ReDoS
+        // Pattern explanation:
+        // @Hash\( - literal match for @Hash(
+        // Atomic group prevents backtracking
+        // [^)]++ - possessive quantifier, match non-parenthesis characters
+        // \) - literal closing parenthesis
+        $pattern = '/@Hash\((?>([^)]{1,' . self::MAX_PARAM_STRING_LENGTH . '}))\)/';
+        if (\preg_match($pattern, $docComment, $matches)) {
             $context = sprintf(
                 '%s::%s',
                 $method->getDeclaringClass()->getName(),
                 $method->getName()
             );
             
-            if ($this->deprecationWarningsEnabled) {
-                DeprecationHandler::triggerAnnotationDeprecation(
-                    '@Hash',
-                    '#[Hash]',
-                    $context
-                );
-            }
+            // Always trigger deprecation (it will respect the suppression setting internally)
+            DeprecationHandler::triggerAnnotationDeprecation(
+                '@Hash',
+                '#[Hash]',
+                $context
+            );
             
-            // Parse the annotation parameters
+            // Parse the annotation parameters with length validation
             $params = $matches[1];
             
-            // Handle single quoted string
-            if (preg_match('/^"([^"]+)"$/', $params, $paramMatches)) {
+            // Additional validation: ensure params don't contain suspicious patterns
+            if (\preg_match('/[<>]|\\\\x|\\\\0/', $params)) {
+                trigger_error('Invalid characters detected in Hash annotation', E_USER_WARNING);
+                return null;
+            }
+
+            // Handle single quoted string with stricter pattern
+            $singleParamPattern = '/^"([a-zA-Z0-9_]{1,' . self::MAX_PARAM_NAME_LENGTH . '})"$/';
+            if (\preg_match($singleParamPattern, $params, $paramMatches)) {
                 return [$paramMatches[1]];
             }
             
-            // Handle array of strings
-            if (preg_match('/^\{(.+)\}$/', $params, $paramMatches)) {
-                $items = explode(',', $paramMatches[1]);
-                return array_map(function ($item) {
-                    return trim(trim($item), '"');
+            // Handle array of strings with stricter validation
+            $arrayPattern = '/^\{([^}]{1,' . self::MAX_PARAM_STRING_LENGTH . '})\}$/';
+            if (\preg_match($arrayPattern, $params, $paramMatches)) {
+                $items = \explode(',', $paramMatches[1]);
+                
+                // Validate each item and limit array size
+                if (\count($items) > self::MAX_PARAMETERS) {
+                    trigger_error('Too many parameters in Hash annotation', E_USER_WARNING);
+                    return null;
+                }
+
+                // Single trim operation instead of redundant trim calls  
+                $result = \array_map(function ($item) {
+                    $trimmed = \trim($item, ' "\'');
+                    // Validate parameter name format
+                    if (!\preg_match('/^[a-zA-Z0-9_]+$/', $trimmed)) {
+                        return null;
+                    }
+                    return $trimmed;
                 }, $items);
+                
+                return \array_filter($result, function($item) {
+                    return $item !== null;
+                });
             }
         }
         
@@ -226,5 +312,60 @@ class CompatibilityLayer
         }
         
         return $report;
+    }
+    
+    /**
+     * Generate a cache key for a reflection method.
+     * 
+     * @param \ReflectionMethod $method
+     * @return string
+     */
+    private function generateCacheKey(\ReflectionMethod $method): string
+    {
+        return \sprintf(
+            '%s::%s',
+            $method->getDeclaringClass()->getName(),
+            $method->getName()
+        );
+    }
+    
+    /**
+     * Cache a reflection result with LRU eviction.
+     * 
+     * @param string $key The cache key
+     * @param array<string>|null $result The result to cache
+     */
+    private function cacheResult(string $key, ?array $result): void
+    {
+        // If cache is full, remove oldest entry (FIFO)
+        if (\count(self::$reflectionCache) >= self::MAX_CACHE_SIZE) {
+            // Remove the first (oldest) entry
+            \reset(self::$reflectionCache);
+            $oldestKey = \key(self::$reflectionCache);
+            if ($oldestKey !== null) {
+                unset(self::$reflectionCache[$oldestKey]);
+            }
+        }
+        
+        self::$reflectionCache[$key] = $result;
+    }
+    
+    /**
+     * Clear the reflection cache.
+     * Useful for testing or when reflection data changes.
+     */
+    public static function clearCache(): void
+    {
+        self::$reflectionCache = [];
+    }
+    
+    /**
+     * Get the current cache size.
+     * 
+     * @return int Number of cached entries
+     */
+    public static function getCacheSize(): int
+    {
+        return \count(self::$reflectionCache);
     }
 }

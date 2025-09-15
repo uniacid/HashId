@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\ParametersProcessor\Factory;
 
 use Pgs\HashIdBundle\Annotation\Hash;
-use Pgs\HashIdBundle\AnnotationProvider\AnnotationProvider;
+use Pgs\HashIdBundle\AnnotationProvider\AnnotationProviderInterface;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
 use Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface;
@@ -18,9 +18,9 @@ class DecodeParametersProcessorFactory extends AbstractParametersProcessorFactor
     protected $decodeParametersProcessor;
 
     public function __construct(
-        AnnotationProvider $annotationProvider,
+        AnnotationProviderInterface $annotationProvider,
         ParametersProcessorInterface $noOpParametersProcessor,
-        ParametersProcessorInterface $decodeParametersProcessor
+        ParametersProcessorInterface $decodeParametersProcessor,
     ) {
         parent::__construct($annotationProvider, $noOpParametersProcessor);
         $this->decodeParametersProcessor = $decodeParametersProcessor;
@@ -41,7 +41,7 @@ class DecodeParametersProcessorFactory extends AbstractParametersProcessorFactor
             $annotation = $this->getAnnotationProvider()->getFromObject(
                 $controller,
                 $method,
-                Hash::class
+                Hash::class,
             );
         } catch (InvalidControllerException | MissingClassOrMethodException $e) {
             $annotation = null;

@@ -8,19 +8,23 @@ use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
 
 abstract class AbstractParametersProcessor implements ParametersProcessorInterface
 {
-    protected $parametersToProcess = [];
+    /** @var array<string> */
+    protected array $parametersToProcess = [];
+
+    protected ConverterInterface $converter;
 
     /**
-     * @var ConverterInterface
+     * @param array<string> $parametersToProcess
      */
-    protected $converter;
-
     public function __construct(ConverterInterface $converter, array $parametersToProcess = [])
     {
         $this->converter = $converter;
         $this->parametersToProcess = $parametersToProcess;
     }
 
+    /**
+     * @param array<string> $parametersToProcess
+     */
     public function setParametersToProcess(array $parametersToProcess): ParametersProcessorInterface
     {
         $this->parametersToProcess = $parametersToProcess;
@@ -28,6 +32,9 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
         return $this;
     }
 
+    /**
+     * @return array<string>
+     */
     public function getParametersToProcess(): array
     {
         return $this->parametersToProcess;
@@ -38,6 +45,10 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
         return $this->converter;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     * @return array<string, mixed>
+     */
     public function process(array $parameters): array
     {
         foreach ($this->getParametersToProcess() as $parameter) {
@@ -54,5 +65,9 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
         return \count($this->getParametersToProcess()) > 0;
     }
 
-    abstract protected function processValue($value);
+    /**
+     * @param mixed $value
+     * @return mixed
+     */
+    abstract protected function processValue(mixed $value): mixed;
 }

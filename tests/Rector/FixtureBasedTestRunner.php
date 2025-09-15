@@ -15,39 +15,40 @@ use PHPUnit\Framework\TestCase;
 abstract class FixtureBasedTestRunner extends TestCase
 {
     protected string $fixturesDir;
-    
+
     protected function setUp(): void
     {
         $this->fixturesDir = __DIR__ . '/Fixtures';
     }
-    
+
     /**
      * Parse a fixture file into before and after sections.
      *
      * @param string $fixturePath Path to the fixture file
+     *
      * @return array{before: string, after: string}
      */
     protected function parseFixture(string $fixturePath): array
     {
-        if (!file_exists($fixturePath)) {
+        if (!\file_exists($fixturePath)) {
             throw new \RuntimeException("Fixture file not found: {$fixturePath}");
         }
-        
-        $content = file_get_contents($fixturePath);
-        $parts = explode("\n-----\n", $content);
-        
-        if (count($parts) !== 2) {
+
+        $content = \file_get_contents($fixturePath);
+        $parts = \explode("\n-----\n", $content);
+
+        if (\count($parts) !== 2) {
             throw new \RuntimeException(
-                "Invalid fixture format. Expected exactly one '-----' separator in {$fixturePath}"
+                "Invalid fixture format. Expected exactly one '-----' separator in {$fixturePath}",
             );
         }
-        
+
         return [
-            'before' => trim($parts[0]),
-            'after' => trim($parts[1]),
+            'before' => \mb_trim($parts[0]),
+            'after' => \mb_trim($parts[1]),
         ];
     }
-    
+
     /**
      * Test a Rector rule against a fixture file.
      *
@@ -58,23 +59,23 @@ abstract class FixtureBasedTestRunner extends TestCase
     {
         $fixturePath = $this->fixturesDir . '/' . $fixtureName . '.php.inc';
         $fixture = $this->parseFixture($fixturePath);
-        
+
         // This is a simplified test - in a real implementation, you would:
         // 1. Create a Rector configuration with the specific rule
         // 2. Run Rector on the 'before' code
         // 3. Compare the result with the 'after' code
-        
+
         self::assertNotEmpty($fixture['before'], 'Before code should not be empty');
         self::assertNotEmpty($fixture['after'], 'After code should not be empty');
-        
+
         // Verify that the fixture represents a meaningful transformation
-        self::assertNotEquals(
+        self::assertNotSame(
             $fixture['before'],
             $fixture['after'],
-            "Fixture {$fixtureName} should show a transformation"
+            "Fixture {$fixtureName} should show a transformation",
         );
     }
-    
+
     /**
      * Get all fixture files in the fixtures directory.
      *
@@ -83,27 +84,27 @@ abstract class FixtureBasedTestRunner extends TestCase
     protected function getAllFixtures(): array
     {
         $fixtures = [];
-        $files = glob($this->fixturesDir . '/*.php.inc');
-        
+        $files = \glob($this->fixturesDir . '/*.php.inc');
+
         foreach ($files as $file) {
-            $name = basename($file, '.php.inc');
+            $name = \basename($file, '.php.inc');
             $fixtures[$name] = $file;
         }
-        
+
         return $fixtures;
     }
-    
+
     /**
      * Validate that all fixtures have proper format.
      */
     public function testAllFixturesAreValid(): void
     {
         $fixtures = $this->getAllFixtures();
-        
+
         if (empty($fixtures)) {
             self::markTestSkipped('No fixtures found');
         }
-        
+
         foreach ($fixtures as $name => $path) {
             try {
                 $this->parseFixture($path);

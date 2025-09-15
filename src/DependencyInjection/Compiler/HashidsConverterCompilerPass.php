@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Pgs\HashIdBundle\DependencyInjection\Compiler;
 
 use Hashids\Hashids;
@@ -12,9 +14,9 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class HashidsConverterCompilerPass implements CompilerPassInterface
 {
-    public function process(ContainerBuilder $container)
+    public function process(ContainerBuilder $container): void
     {
-        if (!class_exists(Hashids::class)) {
+        if (!\class_exists(Hashids::class)) {
             return;
         }
 
@@ -31,7 +33,7 @@ class HashidsConverterCompilerPass implements CompilerPassInterface
                 $container->getParameter('pgs_hash_id.converter.hashids.salt'),
                 $container->getParameter('pgs_hash_id.converter.hashids.min_hash_length'),
                 $container->getParameter('pgs_hash_id.converter.hashids.alphabet'),
-            ]
+            ],
         );
         $hashidsDefinition->setPublic(false);
 
@@ -44,7 +46,7 @@ class HashidsConverterCompilerPass implements CompilerPassInterface
             HashidsConverter::class,
             [
                 new Reference('pgs_hash_id.hashids'),
-            ]
+            ],
         );
 
         $container->addDefinitions(['pgs_hash_id.converter.hashids' => $hashidsConverterDefinition]);

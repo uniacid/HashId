@@ -25,7 +25,7 @@ class EncodeTest extends TestCase
      */
     protected function getConverterMock()
     {
-        $mock = $this->getMockBuilder(ConverterInterface::class)->setMethods(['encode'])->getMockForAbstractClass();
+        $mock = $this->getMockBuilder(ConverterInterface::class)->onlyMethods(['encode'])->getMockForAbstractClass();
         $mock
             ->method('encode')
             ->withAnyParameters()
