@@ -1,0 +1,191 @@
+name: Migration Issue
+description: Report problems encountered during v3.x to v4.0 migration
+title: "[MIGRATION] "
+labels: ["bug", "migration", "v4.0"]
+assignees:
+  - migration-team
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Report issues encountered during HashId v3.x to v4.0 migration.
+
+  - type: input
+    id: hashid-version
+    attributes:
+      label: HashId Versions
+      description: From which version to which version?
+      placeholder: "v3.2.0 → v4.0.0-beta1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of issue did you encounter?
+      options:
+        - Rector conversion failure
+        - Runtime error after migration
+        - Test failure after migration
+        - Performance regression
+        - Backward compatibility break
+        - Configuration issue
+        - Documentation unclear
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Issue Description
+      description: Describe the issue in detail
+      placeholder: |
+        Clear description of what went wrong...
+    validations:
+      required: true
+
+  - type: textarea
+    id: original-code
+    attributes:
+      label: Original Code (v3.x)
+      description: The code before migration
+      render: php
+      placeholder: |
+        <?php
+        use Pgs\HashIdBundle\Annotation\Hash;
+
+        class UserController
+        {
+            /**
+             * @Hash("id")
+             */
+            public function showAction($id)
+            {
+                // ...
+            }
+        }
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-code
+    attributes:
+      label: Expected Code (v4.0)
+      description: What you expected after migration
+      render: php
+      placeholder: |
+        <?php
+        use Pgs\HashIdBundle\Attribute\Hash;
+
+        class UserController
+        {
+            #[Hash("id")]
+            public function showAction(int $id)
+            {
+                // ...
+            }
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: actual-result
+    attributes:
+      label: Actual Result
+      description: What actually happened
+      render: php
+      placeholder: |
+        The actual code or error message...
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-message
+    attributes:
+      label: Error Message
+      description: If applicable, paste the full error message
+      render: shell
+      placeholder: |
+        Fatal error: ...
+        Stack trace:
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: rector-output
+    attributes:
+      label: Rector Output
+      description: If Rector was involved, paste its output
+      render: shell
+      placeholder: |
+        vendor/bin/rector process --dry-run
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Start with HashId v3.x project
+        2. Run rector with provided config
+        3. Observe error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Workaround
+      description: Have you found a workaround?
+      placeholder: |
+        I was able to fix it by manually...
+    validations:
+      required: false
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment Details
+      description: Please provide your environment information
+      render: yaml
+      placeholder: |
+        PHP: 8.3.0
+        Symfony: 6.4.0
+        Rector: 1.0.0
+        OS: Ubuntu 22.04
+        Composer: 2.6.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severe is this issue?
+      options:
+        - Critical - Blocks migration completely
+        - High - Major functionality broken
+        - Medium - Workaround available
+        - Low - Minor inconvenience
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Please confirm
+      options:
+        - label: I have searched for similar issues
+          required: true
+        - label: I have tested with the latest beta version
+          required: true
+        - label: I have included all relevant code samples
+          required: true

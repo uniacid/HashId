@@ -1,0 +1,47 @@
+FROM php:8.1-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    libicu-dev \
+    && docker-php-ext-install \
+    zip \
+    intl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Install Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash \
+    && mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+
+# Install development tools
+RUN composer global require \
+    phpunit/phpunit:^10.0 \
+    phpstan/phpstan:^1.10 \
+    friendsofphp/php-cs-fixer:^3.40 \
+    rector/rector:^1.0
+
+# Set up environment
+ENV PATH="${PATH}:/root/.composer/vendor/bin"
+
+# Create test project structure
+RUN mkdir -p /test-project
+WORKDIR /test-project
+
+# Copy test project template
+COPY test-project-template/ /test-project/
+
+# Install HashId v3.x for migration testing
+RUN composer require pgs/hashid-bundle:^3.0 --no-interaction
+
+# Copy migration scripts
+COPY scripts/ /scripts/
+RUN chmod +x /scripts/*.sh
+
+# Entry point for beta testing
+ENTRYPOINT ["/scripts/beta-test.sh"]
