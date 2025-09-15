@@ -47,15 +47,17 @@ class ConfigurationTest extends TestCase
                         Configuration::NODE_CONVERTER_HASHIDS => [
                         ],
                     ],
+                    'hashers' => [],
                 ],
                 [
                     Configuration::NODE_CONVERTER => [
                         Configuration::NODE_CONVERTER_HASHIDS => [
-                            Configuration::NODE_CONVERTER_HASHIDS_SALT => null,
+                            Configuration::NODE_CONVERTER_HASHIDS_SALT => '',
                             Configuration::NODE_CONVERTER_HASHIDS_MIN_HASH_LENGTH => 10,
                             Configuration::NODE_CONVERTER_HASHIDS_ALPHABET => $defaultAlphabet,
                         ],
                     ],
+                    'hashers' => [],
                 ],
             ],
             'set salt' => [
@@ -65,6 +67,7 @@ class ConfigurationTest extends TestCase
                             Configuration::NODE_CONVERTER_HASHIDS_SALT => 'test_salt',
                         ],
                     ],
+                    'hashers' => [],
                 ],
                 [
                     Configuration::NODE_CONVERTER => [
@@ -74,6 +77,7 @@ class ConfigurationTest extends TestCase
                             Configuration::NODE_CONVERTER_HASHIDS_ALPHABET => $defaultAlphabet,
                         ],
                     ],
+                    'hashers' => [],
                 ],
             ],
             'set all' => [
@@ -85,6 +89,7 @@ class ConfigurationTest extends TestCase
                             Configuration::NODE_CONVERTER_HASHIDS_ALPHABET => 'abcABC',
                         ],
                     ],
+                    'hashers' => [],
                 ],
                 [
                     Configuration::NODE_CONVERTER => [
@@ -94,6 +99,7 @@ class ConfigurationTest extends TestCase
                             Configuration::NODE_CONVERTER_HASHIDS_ALPHABET => 'abcABC',
                         ],
                     ],
+                    'hashers' => [],
                 ],
             ],
         ];
@@ -130,6 +136,7 @@ class ConfigurationTest extends TestCase
                 [
                     Configuration::NODE_CONVERTER => [
                     ],
+                    'hashers' => [],
                 ],
             ],
             'custom converter' => [
@@ -139,6 +146,7 @@ class ConfigurationTest extends TestCase
                             'key' => 'foo',
                         ],
                     ],
+                    'hashers' => [],
                 ],
                 [
                     Configuration::NODE_CONVERTER => [
@@ -146,6 +154,7 @@ class ConfigurationTest extends TestCase
                             'key' => 'foo',
                         ],
                     ],
+                    'hashers' => [],
                 ],
             ],
         ];

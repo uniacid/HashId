@@ -40,16 +40,31 @@ class PgsHashIdExtension extends Extension
             }
         }
         
-        // New multiple hashers configuration
+        // New multiple hashers configuration with environment variable support
         if (isset($config['hashers'])) {
             foreach ($config['hashers'] as $name => $hasherConfig) {
                 foreach ($hasherConfig as $parameter => $value) {
-                    $container->setParameter(\sprintf('pgs_hash_id.hashers.%s.%s', $name, $parameter), $value);
+                    // Handle environment variables and typed environment variables
+                    if (is_string($value) && str_contains($value, '%env(')) {
+                        // Environment variable - pass as-is for Symfony to resolve
+                        $container->setParameter(\sprintf('pgs_hash_id.hashers.%s.%s', $name, $parameter), $value);
+                    } else {
+                        // Regular value
+                        $container->setParameter(\sprintf('pgs_hash_id.hashers.%s.%s', $name, $parameter), $value);
+                    }
                 }
             }
             
             // Store the list of configured hashers
             $container->setParameter('pgs_hash_id.hashers', array_keys($config['hashers']));
+            
+            // Register hasher configurations as services for validation
+            foreach ($config['hashers'] as $name => $hasherConfig) {
+                $container->setParameter(
+                    \sprintf('pgs_hash_id.hasher_config.%s', $name),
+                    $hasherConfig
+                );
+            }
         } else {
             // If no hashers configured, create default from legacy config
             $container->setParameter('pgs_hash_id.hashers', ['default']);
