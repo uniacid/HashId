@@ -22,17 +22,32 @@ class Hash
      * Pattern for valid parameter names.
      */
     private const PARAM_NAME_PATTERN = '/^[a-zA-Z0-9_]+$/';
+    
+    /**
+     * Pattern for valid hasher names.
+     */
+    private const HASHER_NAME_PATTERN = '/^[a-zA-Z0-9_\-\.]+$/';
+    
+    /**
+     * Maximum hasher name length.
+     */
+    private const MAX_HASHER_NAME_LENGTH = 50;
 
     /** @var array<string> */
     private array $parameters;
+    
+    /** @var string The hasher to use for encoding/decoding */
+    private string $hasher;
 
     /**
      * @param string|array<string> $parameters Parameter name(s) to be encoded/decoded
-     * @throws \InvalidArgumentException If parameters are invalid
+     * @param string $hasher The hasher name to use (default: 'default')
+     * @throws \InvalidArgumentException If parameters or hasher are invalid
      */
-    public function __construct(string|array $parameters)
+    public function __construct(string|array $parameters, string $hasher = 'default')
     {
         $this->parameters = \is_array($parameters) ? $parameters : [$parameters];
+        $this->hasher = $this->validateAndNormalizeHasher($hasher);
 
         // Validate parameter count
         if (\count($this->parameters) > self::MAX_PARAMETERS) {
@@ -70,5 +85,50 @@ class Hash
     public function getParameters(): array
     {
         return $this->parameters;
+    }
+    
+    /**
+     * Get the hasher name to use for encoding/decoding.
+     * 
+     * @return string
+     */
+    public function getHasher(): string
+    {
+        return $this->hasher;
+    }
+    
+    /**
+     * Validate and normalize the hasher name.
+     * 
+     * @param string $hasher
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    private function validateAndNormalizeHasher(string $hasher): string
+    {
+        $hasher = trim($hasher);
+        
+        // Default to 'default' if empty
+        if (empty($hasher)) {
+            return 'default';
+        }
+        
+        // Validate hasher name length
+        if (strlen($hasher) > self::MAX_HASHER_NAME_LENGTH) {
+            throw new \InvalidArgumentException(sprintf(
+                'Hasher name too long (max %d characters)',
+                self::MAX_HASHER_NAME_LENGTH
+            ));
+        }
+        
+        // Validate hasher name pattern
+        if (!preg_match(self::HASHER_NAME_PATTERN, $hasher)) {
+            throw new \InvalidArgumentException(sprintf(
+                'Invalid hasher name "%s". Hasher names can only contain letters, numbers, underscores, hyphens, and dots.',
+                $hasher
+            ));
+        }
+        
+        return $hasher;
     }
 }

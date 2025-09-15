@@ -41,7 +41,7 @@ class Php83TestFixtures
                 return $this->prefix . $value;
             }
 
-            public function decode($value)
+            public function decode(string $value): mixed
             {
                 if (!\is_string($value) || !\str_starts_with($value, $this->prefix)) {
                     return $value;

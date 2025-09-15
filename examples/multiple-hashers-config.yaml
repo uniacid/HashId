@@ -1,0 +1,41 @@
+# config/packages/pgs_hash_id.yaml
+# Example configuration for multiple hashers with different security contexts
+
+pgs_hash_id:
+    # Multiple hashers configuration for different security contexts
+    hashers:
+        # Default hasher for general use
+        default:
+            salt: '%env(HASHID_SALT)%'  # Use environment variable for security
+            min_hash_length: 10
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+        
+        # Secure hasher for sensitive resources (user accounts, payments, etc.)
+        secure:
+            salt: '%env(HASHID_SECURE_SALT)%'  # Different salt for enhanced security
+            min_hash_length: 20  # Longer hashes for harder guessing
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*'
+        
+        # Public hasher for non-sensitive, publicly shared resources
+        public:
+            salt: 'public-salt-2024'  # Can be hardcoded for public resources
+            min_hash_length: 5  # Shorter for better UX in public URLs
+            alphabet: 'abcdefghijklmnopqrstuvwxyz1234567890'  # Simplified alphabet
+        
+        # API hasher for external API resources
+        api:
+            salt: '%env(HASHID_API_SALT)%'
+            min_hash_length: 12
+            alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'  # Uppercase for API consistency
+        
+        # Admin hasher for administrative resources
+        admin:
+            salt: '%env(HASHID_ADMIN_SALT)%'
+            min_hash_length: 25  # Extra long for admin security
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890_-'
+
+# Environment variables to set in .env.local:
+# HASHID_SALT=your-default-salt-here
+# HASHID_SECURE_SALT=your-very-secure-salt-here
+# HASHID_API_SALT=your-api-salt-here
+# HASHID_ADMIN_SALT=your-admin-salt-here

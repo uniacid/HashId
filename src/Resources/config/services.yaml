@@ -14,6 +14,20 @@ services:
             - '@pgs_hash_id.parameters_processor.factory.encode'
 
     # Core Services
+    pgs_hash_id.hasher_registry:
+        class: Pgs\HashIdBundle\Service\HasherRegistry
+        public: true
+
+    # Converter that supports multiple hashers
+    pgs_hash_id.multi_hasher_converter:
+        class: Pgs\HashIdBundle\ParametersProcessor\Converter\MultiHasherConverter
+        arguments:
+            - '@pgs_hash_id.hasher_registry'
+
+    # Legacy converter alias for backward compatibility
+    pgs_hash_id.converter:
+        alias: pgs_hash_id.multi_hasher_converter
+
     pgs_hash_id.reflection_provider:
         class: Pgs\HashIdBundle\Reflection\ReflectionProvider
 

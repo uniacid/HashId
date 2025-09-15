@@ -27,11 +27,30 @@ class Configuration implements ConfigurationInterface
 
         $rootNode
             ->children()
-            ->arrayNode(self::NODE_CONVERTER)->addDefaultsIfNotSet()->ignoreExtraKeys(false)
-            ->children()
-            ->append($this->addHashidsConverterNode())
-            ->end()
-            ->end()
+                // Legacy configuration for backward compatibility
+                ->arrayNode(self::NODE_CONVERTER)->addDefaultsIfNotSet()->ignoreExtraKeys(false)
+                    ->children()
+                        ->append($this->addHashidsConverterNode())
+                    ->end()
+                ->end()
+                // New multiple hashers configuration
+                ->arrayNode('hashers')
+                    ->useAttributeAsKey('name')
+                    ->normalizeKeys(false)  // Allow hyphens and dots in hasher names
+                    ->arrayPrototype()
+                        ->children()
+                            ->scalarNode('salt')
+                                ->defaultValue(HashIdConfigInterface::DEFAULT_SALT)
+                            ->end()
+                            ->scalarNode('min_hash_length')
+                                ->defaultValue(HashIdConfigInterface::DEFAULT_MIN_LENGTH)
+                            ->end()
+                            ->scalarNode('alphabet')
+                                ->defaultValue(HashIdConfigInterface::DEFAULT_ALPHABET)
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
