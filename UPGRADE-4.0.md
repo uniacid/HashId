@@ -2,6 +2,20 @@
 
 This guide covers upgrading from HashId Bundle 3.x to 4.0, which introduces modern PHP 8.1+ features and Symfony 6.4+ compatibility.
 
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Prerequisites Checklist](#prerequisites-checklist)
+- [Breaking Changes](#breaking-changes)
+- [Migration Path](#migration-path)
+- [Rector Automation](#rector-automation)
+- [Manual Migration Steps](#manual-migration-steps)
+- [Configuration Updates](#configuration-updates)
+- [Testing Your Migration](#testing-your-migration)
+- [Troubleshooting](#troubleshooting)
+- [Migration Checklist](#migration-checklist)
+- [Version Compatibility Matrix](#version-compatibility-matrix)
+
 ## Requirements
 
 ### Minimum Requirements
@@ -14,6 +28,25 @@ This guide covers upgrading from HashId Bundle 3.x to 4.0, which introduces mode
 - PHPStan level 9
 - PHP CS Fixer 3.40+
 - Rector 1.0+
+
+## Prerequisites Checklist
+
+Before starting the migration, ensure you have:
+
+- [ ] Backed up your current project
+- [ ] Reviewed all breaking changes
+- [ ] Tested your application with current version
+- [ ] Identified all controllers using HashId annotations
+- [ ] Prepared a test environment for migration
+- [ ] Allocated time for testing (estimated: 2-4 hours for medium projects)
+
+## Version Compatibility Matrix
+
+| HashId Bundle | PHP Version | Symfony Version | Hashids Library |
+|--------------|-------------|-----------------|-----------------|
+| 3.x          | 7.2 - 8.0   | 4.4, 5.x        | ^3.0 \|\| ^4.0  |
+| 4.0          | 8.1 - 8.3   | 6.4 LTS, 7.0    | ^4.0 \|\| ^5.0  |
+| 5.0 (future) | 8.2+        | 7.0+            | ^5.0            |
 
 ## Breaking Changes
 
@@ -64,16 +97,113 @@ class MyController
 }
 ```
 
-#### Option B: Full Migration
+#### Option B: Full Automated Migration
 
-Use Rector to automatically convert all annotations to attributes:
+Use Rector to automatically convert all annotations to attributes (see [Rector Automation](#rector-automation) section).
+
+## Rector Automation
+
+### Installing Rector
 
 ```bash
-# Dry run to preview changes
-vendor/bin/rector process --config=rector.php --dry-run
+# If not already installed
+composer require rector/rector --dev
+```
 
-# Apply transformations
-vendor/bin/rector process --config=rector.php
+### Using Rector for Migration
+
+```bash
+# Step 1: Preview changes (dry run)
+vendor/bin/rector process --config=rector-php81.php --dry-run
+
+# Step 2: Apply transformations
+vendor/bin/rector process --config=rector-php81.php
+
+# Step 3: Apply additional modernizations (optional)
+vendor/bin/rector process --config=rector-quality.php
+```
+
+### Available Rector Configurations
+
+| Configuration File | Purpose | Automation Level |
+|-------------------|---------|------------------|
+| `rector-php81.php` | Converts annotations to attributes | 90% |
+| `rector-php82.php` | Applies PHP 8.2 features | 70% |
+| `rector-php83.php` | Applies PHP 8.3 features | 60% |
+| `rector-symfony.php` | Symfony 6.4/7.0 compatibility | 80% |
+| `rector-quality.php` | Code quality improvements | 75% |
+
+### Custom Rector Rules
+
+The bundle includes custom Rector rules in `rector-rules/` directory:
+- `DeprecationHandler.php` - Manages deprecation notices during migration
+
+## Manual Migration Steps
+
+Some changes require manual intervention:
+
+### 1. Service Configuration
+
+If you have custom service definitions:
+
+```yaml
+# Before (services.yaml)
+services:
+    my_custom_processor:
+        class: App\Service\CustomHashProcessor
+        arguments:
+            - '@pgs_hash_id.parameters_processor'
+
+# After (services.yaml)
+services:
+    my_custom_processor:
+        class: App\Service\CustomHashProcessor
+        arguments:
+            - '@Pgs\HashIdBundle\Service\ParametersProcessor'
+```
+
+### 2. Custom Annotation Readers
+
+If you've extended the annotation system:
+
+```php
+// Before
+use Doctrine\Common\Annotations\Reader;
+
+class CustomReader
+{
+    private Reader $reader;
+    
+    public function __construct(Reader $reader)
+    {
+        $this->reader = $reader;
+    }
+}
+
+// After
+use Pgs\HashIdBundle\Service\AttributeReader;
+
+class CustomReader
+{
+    private AttributeReader $reader;
+    
+    public function __construct(AttributeReader $reader)
+    {
+        $this->reader = $reader;
+    }
+}
+```
+
+### 3. Event Subscribers
+
+Update any custom event subscribers:
+
+```php
+// Check for method signature changes
+public function onKernelController(ControllerEvent $event): void
+{
+    // Implementation remains the same
+}
 ```
 
 ### Step 3: Update Your Code
@@ -128,21 +258,38 @@ class ApiController
 }
 ```
 
-### Step 4: Configuration Updates
+## Configuration Updates
 
-#### Suppress Deprecation Warnings (Optional)
+### Bundle Configuration
 
-If you need more time to migrate, you can suppress deprecation warnings:
+Update your bundle configuration:
 
 ```yaml
 # config/packages/pgs_hash_id.yaml
 pgs_hash_id:
+    # Core settings (unchanged)
+    salt: '%env(HASHID_SALT)%'
+    min_hash_length: 10
+    alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    
+    # New v4.0 compatibility settings
     compatibility:
-        suppress_deprecations: true  # Disables deprecation warnings
+        suppress_deprecations: true  # Disables deprecation warnings during migration
         prefer_attributes: true       # Uses attributes when both are present
+        legacy_mode: false           # Set to true to force annotation-only mode
+
 ```
 
-### Step 5: Update Tests
+### Environment Variables
+
+```bash
+# .env
+HASHID_SALT=your-secret-salt-value-here
+```
+
+## Testing Your Migration
+
+### Step 1: Update Tests
 
 #### PHPUnit Configuration
 
@@ -162,9 +309,31 @@ Update your `phpunit.xml.dist`:
 </phpunit>
 ```
 
-#### Test Updates
+### Step 2: Run Migration Tests
 
-Update your tests to use the new attribute syntax if testing controllers directly.
+```bash
+# Run the migration test suite
+vendor/bin/phpunit tests/Migration/
+
+# Run compatibility tests
+vendor/bin/phpunit tests/Migration/CompatibilityTest.php
+
+# Test Rector transformations
+vendor/bin/phpunit tests/Migration/RectorTransformationTest.php
+```
+
+### Step 3: Verify Functionality
+
+```bash
+# Run full test suite
+vendor/bin/phpunit
+
+# Check code coverage
+vendor/bin/phpunit --coverage-html coverage/
+
+# Run static analysis
+vendor/bin/phpstan analyse --level=9 src/
+```
 
 ## New Features in 4.0
 
