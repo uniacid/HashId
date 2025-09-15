@@ -60,6 +60,11 @@ class HasherFactory
      * @var array<string, HasherInterface> Cached hasher instances
      */
     private array $instanceCache = [];
+    
+    /**
+     * @var array<string, array<string, mixed>> Lazy configuration cache
+     */
+    private array $lazyConfigCache = [];
 
     /**
      * Default maximum number of cached hasher instances.
@@ -181,17 +186,21 @@ class HasherFactory
         // Generate cache key for this configuration
         $cacheKey = $this->generateCacheKey($type, $hasherConfig);
         
-        // Check instance cache
+        // Check instance cache for already created instances
         if (isset($this->instanceCache[$cacheKey])) {
             return $this->instanceCache[$cacheKey];
         }
+        
+        // Check if we have lazy config stored but not instantiated yet
+        if (isset($this->lazyConfigCache[$cacheKey])) {
+            return $this->createLazyInstance($cacheKey, $hasherClass, $this->lazyConfigCache[$cacheKey]);
+        }
 
-        $hasher = new $hasherClass($hasherConfig);
+        // Store configuration for lazy loading
+        $this->lazyConfigCache[$cacheKey] = $hasherConfig;
         
-        // Cache the instance with LRU eviction
-        $this->cacheInstance($cacheKey, $hasher);
-        
-        return $hasher;
+        // Create and cache the instance
+        return $this->createLazyInstance($cacheKey, $hasherClass, $hasherConfig);
     }
 
     /**
@@ -297,6 +306,63 @@ class HasherFactory
     public function clearInstanceCache(): void
     {
         $this->instanceCache = [];
+        $this->lazyConfigCache = [];
+    }
+    
+    /**
+     * Create a lazy instance and cache it.
+     * 
+     * @param string $cacheKey The cache key
+     * @param class-string<HasherInterface> $hasherClass The hasher class
+     * @param array<string, mixed> $config The configuration
+     * @return HasherInterface
+     */
+    private function createLazyInstance(string $cacheKey, string $hasherClass, array $config): HasherInterface
+    {
+        // Create the instance only when needed
+        $hasher = new $hasherClass($config);
+        
+        // Cache the instance with LRU eviction
+        $this->cacheInstance($cacheKey, $hasher);
+        
+        return $hasher;
+    }
+    
+    /**
+     * Pre-configure a hasher type for lazy loading without instantiation.
+     * 
+     * @param string $type The hasher type
+     * @param array<string, mixed> $config Configuration overrides
+     * @return string The cache key for this configuration
+     */
+    public function preloadConfiguration(string $type = 'default', array $config = []): string
+    {
+        // Validate type
+        $allowedTypes = ['default', 'secure', 'custom'];
+        if (!\in_array($type, $allowedTypes, true)) {
+            throw new \InvalidArgumentException(\sprintf(
+                'Unknown hasher type "%s". Available types: %s',
+                $type,
+                \implode(', ', $allowedTypes),
+            ));
+        }
+        
+        // Merge configurations
+        $hasherConfig = \array_merge(
+            self::HASHER_CONFIGS[$type] ?? [],
+            [
+                'salt' => $this->defaultSalt,
+                'min_length' => $this->defaultMinLength,
+                'alphabet' => $this->defaultAlphabet,
+            ],
+            $config,
+        );
+        
+        // Generate and store cache key
+        $cacheKey = $this->generateCacheKey($type, $hasherConfig);
+        $this->lazyConfigCache[$cacheKey] = $hasherConfig;
+        
+        return $cacheKey;
     }
 
     /**

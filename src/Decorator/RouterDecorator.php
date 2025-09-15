@@ -16,7 +16,7 @@ class RouterDecorator implements RouterInterface, WarmableInterface
 {
     use DecoratorTrait;
 
-    protected $parametersProcessorFactory;
+    protected EncodeParametersProcessorFactory $parametersProcessorFactory;
 
     public function __construct(RouterInterface $router, EncodeParametersProcessorFactory $parametersProcessorFactory)
     {
@@ -29,6 +29,9 @@ class RouterDecorator implements RouterInterface, WarmableInterface
         return $this->object;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function generate(
         string $name,
         array $parameters = [],
@@ -39,6 +42,9 @@ class RouterDecorator implements RouterInterface, WarmableInterface
         return $this->getRouter()->generate($name, $parameters, $referenceType);
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function getRoute(string $name, array $parameters): ?Route
     {
         $routeCollection = $this->getRouter()->getRouteCollection();
@@ -52,6 +58,9 @@ class RouterDecorator implements RouterInterface, WarmableInterface
         return $route;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     private function processParameters(?Route $route, array &$parameters): void
     {
         if (null !== $route) {
@@ -98,11 +107,14 @@ class RouterDecorator implements RouterInterface, WarmableInterface
 
     /**
      * @codeCoverageIgnore
+     * @return array<string, mixed>
      */
-    public function warmUp($cacheDir)
+    public function warmUp(string $cacheDir): array
     {
         if ($this->getRouter() instanceof WarmableInterface) {
-            $this->getRouter()->warmUp($cacheDir);
+            return $this->getRouter()->warmUp($cacheDir);
         }
+        
+        return [];
     }
 }

@@ -8,14 +8,18 @@ use BadMethodCallException;
 
 trait DecoratorTrait
 {
-    protected $object;
+    /**
+     * @var object The decorated object
+     */
+    protected object $object;
 
     /**
+     * @param array<mixed> $arguments
      * @throws BadMethodCallException
      *
      * @return mixed
      */
-    public function __call(string $method, array $arguments)
+    public function __call(string $method, array $arguments): mixed
     {
         if (!\method_exists($this->object, $method)) {
             $message = \sprintf('Object %s has no %s() method.', \get_class($this->object), $method);
