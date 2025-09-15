@@ -5,9 +5,31 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Annotation;
 
 /**
- * @Annotation
+ * Legacy annotation for marking route parameters to be hashed.
  *
+ * @deprecated since 4.0.0, use Pgs\HashIdBundle\Attribute\Hash instead
+ *
+ * This annotation is maintained for backward compatibility with v3.x projects.
+ * New projects should use the PHP 8 attribute version. This class will be
+ * removed in v5.0.
+ *
+ * Migration example:
+ * ```php
+ * // Old (v3.x):
+ * use Pgs\HashIdBundle\Annotation\Hash;
+ * ⁣@Hash("id")
+ *
+ * // New (v4.x):
+ * use Pgs\HashIdBundle\Attribute\Hash;
+ * #[Hash('id')]
+ * ```
+ *
+ * @Annotation
  * @Target({"METHOD"})
+ *
+ * @package Pgs\HashIdBundle\Annotation
+ * @since 3.0.0
+ * @see \Pgs\HashIdBundle\Attribute\Hash The modern attribute replacement
  */
 readonly class Hash
 {

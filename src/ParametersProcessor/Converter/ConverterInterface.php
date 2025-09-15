@@ -4,6 +4,16 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\ParametersProcessor\Converter;
 
+/**
+ * Interface for value converters that handle encoding/decoding operations.
+ *
+ * Implementations of this interface provide the actual conversion logic
+ * for transforming values between their original and encoded forms.
+ * The default implementation uses the Hashids library for integer obfuscation.
+ *
+ * @package Pgs\HashIdBundle\ParametersProcessor\Converter
+ * @since 3.0.0
+ */
 interface ConverterInterface
 {
     /**

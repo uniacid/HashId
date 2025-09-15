@@ -11,8 +11,33 @@ use Pgs\HashIdBundle\Exception\HashIdException;
  *
  * This is the modern replacement for the @Hash annotation.
  * Both are supported in v4.x for backward compatibility.
+ *
+ * @since 4.0.0 Introduced as the modern replacement for annotations
+ *
+ * Migration from v3.x:
+ * - Replace `@Hash("param")` annotations with `#[Hash('param')]` attributes
+ * - Multiple parameters: `#[Hash(['id', 'userId'])]` or separate attributes
+ * - Works identically to annotations but with better IDE support and performance
+ *
+ * @example Single parameter:
+ * ```php
+ * #[Hash('id')]
+ * public function show(int $id): Response { }
+ * ```
+ *
+ * @example Multiple parameters:
+ * ```php
+ * #[Hash(['id', 'userId'])]
+ * // or
+ * #[Hash('id')]
+ * #[Hash('userId')]
+ * public function compare(int $id, int $userId): Response { }
+ * ```
+ *
+ * @package Pgs\HashIdBundle\Attribute
+ * @see \Pgs\HashIdBundle\Annotation\Hash Legacy annotation (deprecated)
  */
-#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD)]
+#[\Attribute(\Attribute::TARGET_CLASS | \Attribute::TARGET_METHOD | \Attribute::IS_REPEATABLE)]
 class Hash
 {
     /**
