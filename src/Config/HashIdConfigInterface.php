@@ -71,4 +71,39 @@ interface HashIdConfigInterface
      * Default cache TTL for processed hashes (in seconds).
      */
     public const int DEFAULT_CACHE_TTL = 3600;
+    
+    /**
+     * Performance optimization constants (PHP 8.3).
+     */
+    
+    /**
+     * Maximum cache size for encoded values.
+     */
+    public const int MAX_ENCODE_CACHE_SIZE = 1000;
+    
+    /**
+     * Maximum cache size for decoded values.
+     */
+    public const int MAX_DECODE_CACHE_SIZE = 1000;
+    
+    /**
+     * Batch processing size for bulk operations.
+     */
+    public const int BATCH_SIZE = 100;
+    
+    /**
+     * Memory limit threshold for cache cleanup (in bytes).
+     * When memory usage exceeds this, caches are cleared.
+     */
+    public const int MEMORY_LIMIT_THRESHOLD = 134217728; // 128MB
+    
+    /**
+     * Cache warmup size for frequently used values.
+     */
+    public const int CACHE_WARMUP_SIZE = 50;
+    
+    /**
+     * Performance monitoring interval (in seconds).
+     */
+    public const int PERFORMANCE_MONITOR_INTERVAL = 300; // 5 minutes
 }

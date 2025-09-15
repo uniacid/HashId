@@ -9,14 +9,14 @@ namespace Pgs\HashIdBundle\Exception;
  * 
  * This modern exception class integrates with the HashIdError enum
  * to provide type-safe error handling with consistent error messages
- * and codes.
+ * and codes. Uses PHP 8.3 readonly properties for immutability.
  * 
  * @since 4.0.0
  */
 class HashIdException extends \RuntimeException implements Exception
 {
     private readonly HashIdError $error;
-    private array $context = [];
+    private readonly array $context;
     
     /**
      * Create a new HashIdException.
