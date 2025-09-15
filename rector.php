@@ -36,21 +36,12 @@ return static function (RectorConfig $rectorConfig): void {
     // $rectorConfig->import(__DIR__ . '/rector-quality.php');
     
     // Register custom HashId-specific rules
-    $rectorConfig->paths([
-        __DIR__ . '/rector-rules',
-    ]);
+    require_once __DIR__ . '/rector-rules/HashAnnotationToAttributeRule.php';
+    require_once __DIR__ . '/rector-rules/ConfigurationModernizationRule.php';
+    require_once __DIR__ . '/rector-rules/ServiceDefinitionRule.php';
     
-    // Auto-discover custom rules in rector-rules directory
-    $customRulesDir = __DIR__ . '/rector-rules';
-    if (is_dir($customRulesDir)) {
-        $customRuleFiles = glob($customRulesDir . '/*Rule.php');
-        foreach ($customRuleFiles as $ruleFile) {
-            $className = 'Pgs\\HashIdBundle\\Rector\\' . basename($ruleFile, '.php');
-            if (file_exists($ruleFile) && class_exists($className)) {
-                $rectorConfig->rule($className);
-            }
-        }
-    }
+    // Enable our custom rules
+    $rectorConfig->rule(\Pgs\HashIdBundle\Rector\HashAnnotationToAttributeRule::class);
     
     // Configure parallel processing
     $rectorConfig->parallel();
