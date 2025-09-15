@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  symfony64:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hashid-symfony64
+    working_dir: /app/symfony-6.4
+    ports:
+      - "8064:8000"
+    volumes:
+      - ./symfony-6.4:/app/symfony-6.4
+      - ../:/hashid-bundle:ro
+    environment:
+      - APP_ENV=dev
+      - APP_DEBUG=1
+    command: php -S 0.0.0.0:8000 -t public
+    networks:
+      - hashid-network
+
+  symfony70:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hashid-symfony70
+    working_dir: /app/symfony-7.0
+    ports:
+      - "8070:8000"
+    volumes:
+      - ./symfony-7.0:/app/symfony-7.0
+      - ../:/hashid-bundle:ro
+    environment:
+      - APP_ENV=dev
+      - APP_DEBUG=1
+    command: php -S 0.0.0.0:8000 -t public
+    networks:
+      - hashid-network
+
+  # Optional: Add a database service if needed
+  # database:
+  #   image: mysql:8.0
+  #   container_name: hashid-db
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: hashid_demo
+  #     MYSQL_USER: hashid
+  #     MYSQL_PASSWORD: hashid
+  #   ports:
+  #     - "3306:3306"
+  #   networks:
+  #     - hashid-network
+
+networks:
+  hashid-network:
+    driver: bridge

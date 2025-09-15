@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Order - HashId Demo{% endblock %}
+
+{% block body %}
+    <h2>Create New Order</h2>
+
+    <div class="url-demo">
+        <strong>HashId Feature:</strong> After creating this order, you'll be redirected to a URL with an encoded ID.
+        The HashId Bundle will automatically handle the encoding.
+    </div>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="customer_name">Customer Name:</label>
+            <input type="text" id="customer_name" name="customer_name" required placeholder="Enter customer name">
+        </div>
+
+        <div class="form-group">
+            <label for="total_amount">Total Amount:</label>
+            <input type="number" id="total_amount" name="total_amount" step="0.01" required placeholder="0.00">
+        </div>
+
+        <button type="submit" class="btn btn-success">Create Order</button>
+        <a href="{{ path('order_index') }}" class="btn">Cancel</a>
+    </form>
+{% endblock %}

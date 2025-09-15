@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit Order {{ order.orderNumber }} - HashId Demo{% endblock %}
+
+{% block body %}
+    <h2>Edit Order</h2>
+
+    <div class="url-demo">
+        <strong>Current URL:</strong> <code>{{ app.request.uri }}</code><br>
+        <strong>Notice:</strong> The order ID in the URL is encoded by HashId Bundle
+    </div>
+
+    <form method="post">
+        <div class="form-group">
+            <label for="customer_name">Customer Name:</label>
+            <input type="text" id="customer_name" name="customer_name" value="{{ order.customerName }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="total_amount">Total Amount:</label>
+            <input type="number" id="total_amount" name="total_amount" value="{{ order.totalAmount }}" step="0.01" required>
+        </div>
+
+        <div class="form-group">
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                <option value="processing" {% if order.status == 'processing' %}selected{% endif %}>Processing</option>
+                <option value="shipped" {% if order.status == 'shipped' %}selected{% endif %}>Shipped</option>
+                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-success">Save Changes</button>
+        <a href="{{ path('order_show', {'id': order.id}) }}" class="btn">Cancel</a>
+    </form>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Order {{ order.orderNumber }} - HashId Demo{% endblock %}
+
+{% block body %}
+    <h2>Order Details</h2>
+
+    <div class="url-demo">
+        <strong>Current URL:</strong> <code>{{ app.request.uri }}</code><br>
+        <strong>Actual Order ID:</strong> <code>{{ order.id }}</code><br>
+        <strong>Note:</strong> The HashId Bundle automatically encoded the ID in the URL!
+    </div>
+
+    <table>
+        <tr>
+            <th>Order Number:</th>
+            <td>{{ order.orderNumber }}</td>
+        </tr>
+        <tr>
+            <th>Customer Name:</th>
+            <td>{{ order.customerName }}</td>
+        </tr>
+        <tr>
+            <th>Total Amount:</th>
+            <td>${{ order.totalAmount }}</td>
+        </tr>
+        <tr>
+            <th>Status:</th>
+            <td>{{ order.status }}</td>
+        </tr>
+        <tr>
+            <th>Created At:</th>
+            <td>{{ order.createdAt|date('Y-m-d H:i:s') }}</td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn">Edit Order</a>
+        <a href="{{ path('order_index') }}" class="btn">Back to List</a>
+
+        <form method="post" action="{{ path('order_delete', {'id': order.id}) }}" style="display: inline-block;" onsubmit="return confirm('Are you sure you want to delete this order?');">
+            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ order.id) }}">
+            <button class="btn btn-danger">Delete</button>
+        </form>
+    </div>
+
+    <div class="url-demo" style="margin-top: 30px;">
+        <h3>Generated URLs with HashId:</h3>
+        <p>When using Twig's <code>url()</code> or <code>path()</code> functions with this order:</p>
+        <ul>
+            <li><code>{{ '{{ url("order_show", {"id": order.id}) }}' }}</code> generates: <br><code>{{ url('order_show', {'id': order.id}) }}</code></li>
+            <li><code>{{ '{{ path("order_edit", {"id": order.id}) }}' }}</code> generates: <br><code>{{ path('order_edit', {'id': order.id}) }}</code></li>
+        </ul>
+        <p>The integer ID ({{ order.id }}) is automatically encoded in the URL!</p>
+    </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+*/vendor/
+*/var/cache/
+*/var/log/
+*/var/sessions/
+*/.env.local
+*/.env.*.local
+*/node_modules/
+.git/
+.gitignore
+*.md
