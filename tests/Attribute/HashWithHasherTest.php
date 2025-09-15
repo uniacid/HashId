@@ -88,8 +88,8 @@ class HashWithHasherTest extends TestCase
      */
     public function testInvalidHasherNameThrowsException(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Invalid hasher name');
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
+        $this->expectExceptionMessage('Invalid parameter "hasher"');
         
         new Hash('id', hasher: 'invalid hasher!');
     }
@@ -119,7 +119,7 @@ class HashWithHasherTest extends TestCase
     {
         $longName = str_repeat('a', 51); // 51 characters
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
         $this->expectExceptionMessage('Hasher name too long');
         
         new Hash('id', hasher: $longName);
@@ -131,7 +131,7 @@ class HashWithHasherTest extends TestCase
     public function testParameterValidationWithHasher(): void
     {
         // Too many parameters
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
         $this->expectExceptionMessage('Too many parameters');
         
         $parameters = [];

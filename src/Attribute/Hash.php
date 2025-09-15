@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Attribute;
 
+use Pgs\HashIdBundle\Exception\HashIdException;
+
 /**
  * PHP 8 Attribute for marking route parameters to be encoded/decoded.
  *
@@ -51,28 +53,27 @@ class Hash
 
         // Validate parameter count
         if (\count($this->parameters) > self::MAX_PARAMETERS) {
-            throw new \InvalidArgumentException(\sprintf(
-                'Too many parameters specified (max %d, got %d)',
-                self::MAX_PARAMETERS,
-                \count($this->parameters)
-            ));
+            throw HashIdException::invalidParameter(
+                'parameters',
+                \sprintf('Too many parameters specified (max %d, got %d)', self::MAX_PARAMETERS, \count($this->parameters))
+            );
         }
 
         // Validate parameter names
         foreach ($this->parameters as $param) {
             if (!\preg_match(self::PARAM_NAME_PATTERN, $param)) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Invalid parameter name: "%s". Parameter names must contain only letters, numbers, and underscores.',
-                    $param
-                ));
+                throw HashIdException::invalidParameter(
+                    $param,
+                    'Parameter names must contain only letters, numbers, and underscores'
+                );
             }
 
             // Additional length check for parameter names
             if (\strlen($param) > 100) {
-                throw new \InvalidArgumentException(\sprintf(
-                    'Parameter name too long: "%s" (max 100 characters)',
-                    $param
-                ));
+                throw HashIdException::invalidParameter(
+                    $param,
+                    'Parameter name too long (max 100 characters)'
+                );
             }
         }
     }
@@ -115,18 +116,18 @@ class Hash
         
         // Validate hasher name length
         if (strlen($hasher) > self::MAX_HASHER_NAME_LENGTH) {
-            throw new \InvalidArgumentException(sprintf(
-                'Hasher name too long (max %d characters)',
-                self::MAX_HASHER_NAME_LENGTH
-            ));
+            throw HashIdException::invalidParameter(
+                'hasher',
+                sprintf('Hasher name too long (max %d characters)', self::MAX_HASHER_NAME_LENGTH)
+            );
         }
         
         // Validate hasher name pattern
         if (!preg_match(self::HASHER_NAME_PATTERN, $hasher)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid hasher name "%s". Hasher names can only contain letters, numbers, underscores, hyphens, and dots.',
-                $hasher
-            ));
+            throw HashIdException::invalidParameter(
+                'hasher',
+                sprintf('Invalid hasher name "%s". Hasher names can only contain letters, numbers, underscores, hyphens, and dots.', $hasher)
+            );
         }
         
         return $hasher;

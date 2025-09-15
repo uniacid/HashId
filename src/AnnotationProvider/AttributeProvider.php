@@ -8,6 +8,7 @@ use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
 use Pgs\HashIdBundle\AnnotationProvider\Dto\HashConfiguration;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
+use Pgs\HashIdBundle\Exception\HashIdException;
 use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
 use Pgs\HashIdBundle\Reflection\ReflectionProvider;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
@@ -46,24 +47,25 @@ class AttributeProvider implements AnnotationProviderInterface
     {
         // Security: Check for null bytes and other malicious characters
         if (\strpos($controller, "\x00") !== false || \strpos($controller, "\r") !== false || \strpos($controller, "\n") !== false) {
-            throw new InvalidControllerException(\sprintf(
-                'Invalid controller format: contains illegal characters. Expected format: "ClassName::methodName"'
-            ));
+            throw HashIdException::invalidController(
+                $controller,
+                'Contains illegal characters. Expected format: "ClassName::methodName"'
+            );
         }
 
         // Security: Validate controller format before parsing to prevent injection
         if (!\preg_match('/^[a-zA-Z_\\\\][a-zA-Z0-9_\\\\]*::[a-zA-Z_][a-zA-Z0-9_]*$/', $controller)) {
-            throw new InvalidControllerException(\sprintf(
-                'Invalid controller format: "%s". Expected format: "ClassName::methodName"',
-                $controller
-            ));
+            throw HashIdException::invalidController(
+                $controller,
+                'Expected format: "ClassName::methodName"'
+            );
         }
 
         $explodedControllerString = \explode('::', $controller);
         if (2 !== \count($explodedControllerString)) {
             $message = \sprintf('The "%s" controller is not a valid "class::method" string.', $controller);
 
-            throw new InvalidControllerException($message);
+            throw HashIdException::invalidController($controller, 'Not a valid "class::method" string');
         }
 
         $reflection = $this->reflectionProvider->getMethodReflectionFromClassString(...$explodedControllerString);
@@ -91,7 +93,7 @@ class AttributeProvider implements AnnotationProviderInterface
     public function getFromObject($controller, string $method, string $annotationClassName): ?object
     {
         if (!\is_object($controller)) {
-            throw new InvalidControllerException('Provided controller is not an object');
+            throw HashIdException::invalidController('(object)', 'Provided controller is not an object');
         }
 
         $reflection = $this->reflectionProvider->getMethodReflectionFromObject($controller, $method);

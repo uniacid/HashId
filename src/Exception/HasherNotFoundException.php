@@ -8,8 +8,9 @@ namespace Pgs\HashIdBundle\Exception;
  * Exception thrown when a requested hasher is not found in the registry.
  * 
  * @since 4.0.0
+ * @deprecated since 4.0, use HashIdException::hasherNotFound() instead
  */
-class HasherNotFoundException extends \RuntimeException
+class HasherNotFoundException extends HashIdException
 {
     /**
      * @param string $message
@@ -18,7 +19,11 @@ class HasherNotFoundException extends \RuntimeException
      */
     public function __construct(string $message = '', int $code = 0, ?\Throwable $previous = null)
     {
-        parent::__construct($message, $code, $previous);
+        parent::__construct(
+            HashIdError::HASHER_NOT_FOUND,
+            $message,
+            $previous
+        );
     }
     
     /**

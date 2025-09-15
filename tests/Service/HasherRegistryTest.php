@@ -114,7 +114,7 @@ class HasherRegistryTest extends TestCase
      */
     public function testNonExistentHasherThrowsException(): void
     {
-        $this->expectException(HasherNotFoundException::class);
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
         $this->expectExceptionMessage('Hasher "non_existent" not found');
         
         $this->registry->getConverter('non_existent');
@@ -166,8 +166,8 @@ class HasherRegistryTest extends TestCase
     public function testValidateHasherConfiguration(): void
     {
         // Test invalid min_hash_length
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Minimum hash length must be non-negative');
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
+        $this->expectExceptionMessage('Must be non-negative integer');
         
         $this->registry->registerHasher('invalid', [
             'salt' => 'test',
@@ -181,8 +181,8 @@ class HasherRegistryTest extends TestCase
     public function testValidateAlphabetConfiguration(): void
     {
         // Test alphabet with too few unique characters
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Alphabet must contain at least 16 unique characters');
+        $this->expectException(\Pgs\HashIdBundle\Exception\HashIdException::class);
+        $this->expectExceptionMessage('Must contain at least 16 unique characters');
         
         $this->registry->registerHasher('short_alphabet', [
             'salt' => 'test',

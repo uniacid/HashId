@@ -8,6 +8,8 @@ use Hashids\Hashids;
 use Hashids\HashidsInterface;
 use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Pgs\HashIdBundle\Exception\HasherNotFoundException;
+use Pgs\HashIdBundle\Exception\HashIdException;
+use Pgs\HashIdBundle\Exception\HashIdError;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
 
@@ -117,7 +119,7 @@ class HasherRegistry
     public function getConverter(string $name = 'default'): ConverterInterface
     {
         if (!isset($this->configurations[$name])) {
-            throw new HasherNotFoundException(sprintf('Hasher "%s" not found', $name));
+            throw HashIdException::hasherNotFound($name, array_keys($this->configurations));
         }
         
         // Return cached converter if available
@@ -144,7 +146,7 @@ class HasherRegistry
     public function getHashids(string $name = 'default'): HashidsInterface
     {
         if (!isset($this->configurations[$name])) {
-            throw new HasherNotFoundException(sprintf('Hasher "%s" not found', $name));
+            throw HashIdException::hasherNotFound($name, array_keys($this->configurations));
         }
         
         // Return cached instance if available
@@ -205,21 +207,21 @@ class HasherRegistry
     private function validateHasherName(string $name): void
     {
         if (empty($name)) {
-            throw new \InvalidArgumentException('Hasher name cannot be empty');
+            throw HashIdException::invalidParameter('hasher_name', 'Hasher name cannot be empty');
         }
         
         if (strlen($name) > self::MAX_HASHER_NAME_LENGTH) {
-            throw new \InvalidArgumentException(sprintf(
-                'Hasher name too long (max %d characters)',
-                self::MAX_HASHER_NAME_LENGTH
-            ));
+            throw HashIdException::invalidParameter(
+                'hasher_name',
+                sprintf('Name too long (max %d characters)', self::MAX_HASHER_NAME_LENGTH)
+            );
         }
         
         if (!preg_match(self::HASHER_NAME_PATTERN, $name)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Invalid hasher name "%s". Names can only contain letters, numbers, underscores, hyphens, and dots.',
-                $name
-            ));
+            throw HashIdException::invalidParameter(
+                'hasher_name',
+                sprintf('Invalid name "%s". Names can only contain letters, numbers, underscores, hyphens, and dots.', $name)
+            );
         }
     }
     
@@ -235,15 +237,16 @@ class HasherRegistry
         if (isset($config['min_hash_length'])) {
             $minLength = $config['min_hash_length'];
             if (!is_int($minLength) || $minLength < 0) {
-                throw new \InvalidArgumentException(
-                    'Minimum hash length must be non-negative integer'
+                throw HashIdException::configurationError(
+                    'min_hash_length',
+                    'Must be non-negative integer'
                 );
             }
             if ($minLength > HashIdConfigInterface::MAX_LENGTH) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Minimum hash length cannot exceed %d',
-                    HashIdConfigInterface::MAX_LENGTH
-                ));
+                throw HashIdException::configurationError(
+                    'min_hash_length',
+                    sprintf('Cannot exceed %d', HashIdConfigInterface::MAX_LENGTH)
+                );
             }
         }
         
@@ -251,22 +254,21 @@ class HasherRegistry
         if (isset($config['alphabet'])) {
             $alphabet = $config['alphabet'];
             if (!is_string($alphabet)) {
-                throw new \InvalidArgumentException('Alphabet must be a string');
+                throw HashIdException::configurationError('alphabet', 'Must be a string');
             }
             
             $uniqueChars = count(array_unique(str_split($alphabet)));
             if ($uniqueChars < self::MIN_ALPHABET_LENGTH) {
-                throw new \InvalidArgumentException(sprintf(
-                    'Alphabet must contain at least %d unique characters, got %d',
-                    self::MIN_ALPHABET_LENGTH,
-                    $uniqueChars
-                ));
+                throw HashIdException::configurationError(
+                    'alphabet',
+                    sprintf('Must contain at least %d unique characters, got %d', self::MIN_ALPHABET_LENGTH, $uniqueChars)
+                );
             }
         }
         
         // Validate salt if provided
         if (isset($config['salt']) && !is_string($config['salt'])) {
-            throw new \InvalidArgumentException('Salt must be a string');
+            throw HashIdException::configurationError('salt', 'Must be a string');
         }
     }
     
