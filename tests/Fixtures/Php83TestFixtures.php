@@ -32,7 +32,7 @@ class Php83TestFixtures
             ) {
             }
 
-            public function encode($value): string
+            public function encode(mixed $value): string
             {
                 if (!\is_numeric($value)) {
                     return (string) $value;
@@ -43,7 +43,7 @@ class Php83TestFixtures
 
             public function decode(string $value): mixed
             {
-                if (!\is_string($value) || !\str_starts_with($value, $this->prefix)) {
+                if (!\str_starts_with($value, $this->prefix)) {
                     return $value;
                 }
 

@@ -2,6 +2,9 @@
 vendor
 composer.lock
 tests/coverage.xml
+coverage.xml
+cobertura.xml
+coverage-html/
 .cursor
 .agent-os
 .claude

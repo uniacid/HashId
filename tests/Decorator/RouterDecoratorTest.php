@@ -35,13 +35,13 @@ class RouterDecoratorTest extends WebTestCase
         $generatedPath = $this->router->generate(...$routeArgs);
         self::assertNotSame(\sprintf('/hash-id/demo/decode/%d/%d', $id, $other), $generatedPath);
         $pattern = \sprintf('/\/hash-id\/demo\/decode\/[%s]{%d}\/\d+/', $alphabet, $hashLength);
-        self::assertRegExp($pattern, $generatedPath);
+        self::assertMatchesRegularExpression($pattern, $generatedPath);
 
         $routeArgs = ['pgs_hash_id_demo_encode_localized', ['id' => $id, '_locale' => 'pl']];
         $generatedPath = $this->router->generate(...$routeArgs);
         self::assertNotSame(\sprintf('/hash-id/demo/encode-pl/%d', $id), $generatedPath);
         $pattern = \sprintf('/\/hash-id\/demo\/encode-pl\/[%s]{%d}/', $alphabet, $hashLength);
-        self::assertRegExp($pattern, $generatedPath);
+        self::assertMatchesRegularExpression($pattern, $generatedPath);
 
         $routeArgs = ['pgs_hash_id_demo_decode_more', ['id' => $id, 'other' => $other]];
         $generatedPath = $this->router->generate(...$routeArgs);
@@ -52,6 +52,6 @@ class RouterDecoratorTest extends WebTestCase
             $alphabet,
             $hashLength,
         );
-        self::assertRegExp($pattern, $generatedPath);
+        self::assertMatchesRegularExpression($pattern, $generatedPath);
     }
 }

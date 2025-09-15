@@ -279,7 +279,7 @@ class Php83FeaturesTest extends TestCase
 
         // Create a mock converter using anonymous readonly class
         $mockConverter = new readonly class() implements ConverterInterface {
-            public function encode($value): string
+            public function encode(mixed $value): string
             {
                 return 'encoded_' . $value;
             }

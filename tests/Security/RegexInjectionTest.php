@@ -19,6 +19,11 @@ class RegexInjectionTest extends TestCase
     protected function setUp(): void
     {
         $this->compatibilityLayer = new CompatibilityLayer();
+        // Clear the reflection cache to prevent test interference
+        $reflectionClass = new \ReflectionClass(CompatibilityLayer::class);
+        $cacheProperty = $reflectionClass->getProperty('reflectionCache');
+        $cacheProperty->setAccessible(true);
+        $cacheProperty->setValue([]);
     }
     
     /**
@@ -143,8 +148,8 @@ class RegexInjectionTest extends TestCase
         
         // Create annotation with more than 20 parameters
         $params = array_map(fn($i) => "\"param$i\"", range(1, 25));
-        $paramString = implode(', ', $params);
-        $docblock = "/**\n * @Hash({$paramString})\n */";
+        $paramString = '{' . implode(', ', $params) . '}';
+        $docblock = "/**\n * @Hash($paramString)\n */";
         
         $method->method('getDocComment')->willReturn($docblock);
         
