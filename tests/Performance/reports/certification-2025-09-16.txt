@@ -2,13 +2,13 @@
 === Performance Certification Report ===
 
 HashId Bundle v4.0 Performance Validation
-Date: 2025-09-16 17:21:21
+Date: 2025-09-16 17:38:19
 PHP Version: 8.4.12
 
 Performance Metrics:
-  ✅ encoding: 0.0068 (target: 0.1000)
-  ✅ decoding: 0.0129 (target: 0.1000)
-  ✅ batch_100: 0.5352 (target: 10.0000)
+  ✅ encoding: 0.0091 (target: 0.1000)
+  ✅ decoding: 0.0161 (target: 0.1000)
+  ✅ batch_100: 0.6874 (target: 10.0000)
   ✅ router_overhead: 0.0300 (target: 0.0500)
   ✅ memory_1000_ops: 0.0000 (target: 10.0000)
 
