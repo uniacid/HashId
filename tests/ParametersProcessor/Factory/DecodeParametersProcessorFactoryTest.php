@@ -6,7 +6,7 @@ use Pgs\HashIdBundle\ParametersProcessor\Decode;
 use Pgs\HashIdBundle\ParametersProcessor\Factory\DecodeParametersProcessorFactory;
 use Pgs\HashIdBundle\ParametersProcessor\NoOp;
 
-class DecodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTest
+class DecodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTestCase
 {
     public function testCreateControllerDecodeParametersProcessor(): void
     {

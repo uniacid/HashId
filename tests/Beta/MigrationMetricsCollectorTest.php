@@ -43,8 +43,10 @@ class MigrationMetricsCollectorTest extends TestCase
         $migrationResult = $this->runAutomatedMigration();
         $automatedMigrationTime = microtime(true) - $startTime;
 
-        // Calculate time reduction
-        $timeReduction = (($manualMigrationTime - $automatedMigrationTime) / $manualMigrationTime) * 100;
+        // Calculate time reduction (avoid division by zero)
+        $timeReduction = $manualMigrationTime > 0
+            ? (($manualMigrationTime - $automatedMigrationTime) / $manualMigrationTime) * 100
+            : 0;
 
         $this->assertGreaterThanOrEqual(50.0, $timeReduction,
             'Automated migration should be at least 50% faster than manual migration');

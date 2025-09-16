@@ -60,9 +60,7 @@ class ValidationTest extends TestCase
                 $this->targets['encoding'])
         );
 
-        echo sprintf("✅ Encoding: %.4fms < %.4fms target\n",
-            $result->getMean(),
-            $this->targets['encoding']);
+        // Test passed - encoding performance meets target
     }
 
     /**
@@ -88,9 +86,7 @@ class ValidationTest extends TestCase
                 $this->targets['decoding'])
         );
 
-        echo sprintf("✅ Decoding: %.4fms < %.4fms target\n",
-            $result->getMean(),
-            $this->targets['decoding']);
+        // Test passed - decoding performance meets target
     }
 
     /**
@@ -118,9 +114,7 @@ class ValidationTest extends TestCase
                 $this->targets['batch_100'])
         );
 
-        echo sprintf("✅ Batch (100): %.4fms < %.4fms target\n",
-            $result->getMean(),
-            $this->targets['batch_100']);
+        // Test passed - batch performance meets target
     }
 
     /**
@@ -158,9 +152,7 @@ class ValidationTest extends TestCase
                 $this->targets['router_overhead'] * 100)
         );
 
-        echo sprintf("✅ Router overhead: %.2f%% < %.2f%% target\n",
-            $overhead * 100,
-            $this->targets['router_overhead'] * 100);
+        // Test passed - router overhead meets target
     }
 
     /**
@@ -189,9 +181,7 @@ class ValidationTest extends TestCase
                 $this->targets['memory_1000_ops'])
         );
 
-        echo sprintf("✅ Memory (1000 ops): %.2fMB < %.2fMB target\n",
-            $memoryMB,
-            $this->targets['memory_1000_ops']);
+        // Test passed - memory usage meets target
     }
 
     /**
@@ -220,9 +210,7 @@ class ValidationTest extends TestCase
                 $this->targets['test_suite'])
         );
 
-        echo sprintf("✅ Test suite (estimated): %.2fs < %.2fs target\n",
-            $estimatedFullSuite,
-            $this->targets['test_suite']);
+        // Test passed - test suite execution time meets target
     }
 
     /**
@@ -254,7 +242,7 @@ class ValidationTest extends TestCase
             $this->fail($message);
         }
 
-        echo "\n✅ All performance targets met successfully!\n";
+        // All performance targets met successfully
         $this->generateCertificationReport($results);
     }
 
@@ -351,7 +339,7 @@ class ValidationTest extends TestCase
         $filename = __DIR__ . '/reports/certification-' . date('Y-m-d') . '.txt';
         file_put_contents($filename, $report);
 
-        echo $report;
+        // Report saved to file
     }
 
     /**
@@ -370,7 +358,9 @@ class ValidationTest extends TestCase
     private function createMockProcessor(): object
     {
         $processor = $this->createMock(ParametersProcessorInterface::class);
-        $processor->method('encodeArrayOfParametersForRoute')->willReturnArgument(0);
+        $processor->method('process')->willReturnArgument(0);
+        $processor->method('needToProcess')->willReturn(false);
+        $processor->method('setParametersToProcess')->willReturnSelf();
         return $processor;
     }
 

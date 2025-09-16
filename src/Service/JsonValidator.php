@@ -94,7 +94,7 @@ class JsonValidator
             return [
                 'valid' => true,
                 'error' => null,
-                'error_code' => null,
+                'error_code' => 0,  // JSON_ERROR_NONE
             ];
         }
 

@@ -72,7 +72,7 @@ class PhpVersionComparisonTest extends TestCase
 
         if (!empty($regressions)) {
             $report = $this->comparator->generateReport(true);
-            echo "\n" . $report;
+            // echo "\n" . $report;
         }
 
         $this->assertEmpty($regressions,
@@ -80,7 +80,7 @@ class PhpVersionComparisonTest extends TestCase
 
         // Generate report
         if (getenv('CI') || getenv('VERBOSE')) {
-            echo "\n" . $this->comparator->generateReport(true);
+            // echo "\n" . $this->comparator->generateReport(true);
         }
     }
 
@@ -113,7 +113,7 @@ class PhpVersionComparisonTest extends TestCase
             $this->markTestSkipped('No PHP version improvements to test');
         }
 
-        echo sprintf("\nTesting PHP %s improvements...\n", PHP_VERSION);
+        // echo sprintf("\nTesting PHP %s improvements...\n", PHP_VERSION);
 
         // Run version-specific benchmarks
         $results = $this->runVersionSpecificBenchmarks();
@@ -128,7 +128,7 @@ class PhpVersionComparisonTest extends TestCase
                         $feature, $expectedSpeedup, $speedup)
                 );
 
-                echo sprintf("  %s: %.2fx improvement ✓\n", $feature, $speedup);
+                // echo sprintf("  %s: %.2fx improvement ✓\n", $feature, $speedup);
             }
         }
     }
@@ -158,7 +158,7 @@ class PhpVersionComparisonTest extends TestCase
             $this->assertNotNull($result, "$name failed on PHP " . PHP_VERSION);
         }
 
-        echo sprintf("\n✓ Cross-version compatibility verified for PHP %s\n", PHP_VERSION);
+        // echo sprintf("\n✓ Cross-version compatibility verified for PHP %s\n", PHP_VERSION);
     }
 
     /**
@@ -189,9 +189,9 @@ class PhpVersionComparisonTest extends TestCase
             $features['match_expression'] = $this->benchmarkMatchExpression();
         }
 
-        echo "\nPHP Language Feature Performance:\n";
+        // echo "\nPHP Language Feature Performance:\n";
         foreach ($features as $feature => $time) {
-            echo sprintf("  %s: %.6fms\n", $feature, $time);
+            // echo sprintf("  %s: %.6fms\n", $feature, $time);
         }
 
         // All features should be fast

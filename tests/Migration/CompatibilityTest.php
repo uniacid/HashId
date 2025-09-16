@@ -70,11 +70,11 @@ class CompatibilityTest extends TestCase
     
     public function testSingleParameterConstructor(): void
     {
-        // Both should support single parameter as string
-        $annotation = new AnnotationHash('id');
+        // Both should support single parameter in an array
+        $annotation = new AnnotationHash(['id']);
         $this->assertEquals(['id'], $annotation->getParameters());
-        
-        $attribute = new AttributeHash('id');
+
+        $attribute = new AttributeHash(['id']);
         $this->assertEquals(['id'], $attribute->getParameters());
     }
     

@@ -333,8 +333,9 @@ class RoutingBenchmarkTest extends TestCase
     {
         $processor = $this->createMock(ParametersProcessorInterface::class);
 
-        $processor->method('encodeParameters')
-            ->willReturnCallback(function ($params, $route) use ($willEncode) {
+        // Use the actual interface method 'process'
+        $processor->method('process')
+            ->willReturnCallback(function ($params) use ($willEncode) {
                 if (!$willEncode) {
                     return $params;
                 }
@@ -350,18 +351,10 @@ class RoutingBenchmarkTest extends TestCase
                 return $encoded;
             });
 
-        $processor->method('decodeParameters')
-            ->willReturnCallback(function ($params, $route) {
-                $decoded = [];
-                foreach ($params as $key => $value) {
-                    if (is_string($value) && str_starts_with($value, 'encoded')) {
-                        $decoded[$key] = (int) substr($value, 7);
-                    } else {
-                        $decoded[$key] = $value;
-                    }
-                }
-                return $decoded;
-            });
+        // Set up other interface methods
+        $processor->method('needToProcess')->willReturn($willEncode);
+        $processor->method('setParametersToProcess')->willReturnSelf();
+        $processor->method('getParametersToProcess')->willReturn(['id', 'userId', 'categoryId']);
 
         return $processor;
     }

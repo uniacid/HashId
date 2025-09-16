@@ -415,7 +415,9 @@ class MemoryBenchmarkTest extends TestCase
     private function createMockProcessor(): object
     {
         $processor = $this->createMock(ParametersProcessorInterface::class);
-        $processor->method('encodeParameters')->willReturnArgument(0);
+        $processor->method('process')->willReturnArgument(0);
+        $processor->method('needToProcess')->willReturn(false);
+        $processor->method('setParametersToProcess')->willReturnSelf();
         return $processor;
     }
 
