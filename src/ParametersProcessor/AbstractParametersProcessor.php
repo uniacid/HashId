@@ -6,19 +6,29 @@ namespace Pgs\HashIdBundle\ParametersProcessor;
 
 use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
 
+/**
+ * Abstract parameters processor with PHP 8.3 optimizations.
+ * 
+ * Uses readonly properties where possible for better opcache optimization.
+ * The parametersToProcess array remains mutable due to setParametersToProcess method requirements.
+ * 
+ * @since 4.0.0
+ */
 abstract class AbstractParametersProcessor implements ParametersProcessorInterface
 {
     /** @var array<string> */
-    protected array $parametersToProcess = [];
-
-    protected ConverterInterface $converter;
+    protected array $parametersToProcess;
 
     /**
-     * @param array<string> $parametersToProcess
+     * Constructor with readonly converter for immutability.
+     * 
+     * @param ConverterInterface $converter The converter instance (readonly)
+     * @param array<string> $parametersToProcess Parameters to process
      */
-    public function __construct(ConverterInterface $converter, array $parametersToProcess = [])
-    {
-        $this->converter = $converter;
+    public function __construct(
+        protected readonly ConverterInterface $converter,
+        array $parametersToProcess = []
+    ) {
         $this->parametersToProcess = $parametersToProcess;
     }
 
@@ -46,12 +56,20 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
     }
 
     /**
+     * Process parameters with optimized loop.
+     * 
      * @param array<string, mixed> $parameters
      * @return array<string, mixed>
      */
     public function process(array $parameters): array
     {
-        foreach ($this->getParametersToProcess() as $parameter) {
+        // Early return if nothing to process
+        if (!$this->needToProcess()) {
+            return $parameters;
+        }
+        
+        // Process only existing parameters for better performance
+        foreach ($this->parametersToProcess as $parameter) {
             if (isset($parameters[$parameter])) {
                 $parameters[$parameter] = $this->processValue($parameters[$parameter]);
             }
@@ -60,9 +78,13 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
         return $parameters;
     }
 
+    /**
+     * Check if processing is needed.
+     * Optimized with direct empty check.
+     */
     public function needToProcess(): bool
     {
-        return \count($this->getParametersToProcess()) > 0;
+        return !empty($this->parametersToProcess);
     }
 
     /**

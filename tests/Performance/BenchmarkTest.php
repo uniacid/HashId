@@ -9,6 +9,7 @@ use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
 use Pgs\HashIdBundle\AnnotationProvider\AttributeProvider;
 use Pgs\HashIdBundle\Reflection\ReflectionProvider;
+use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 
 /**
  * Performance benchmark tests for critical operations.
@@ -291,5 +292,363 @@ class BenchmarkTest extends TestCase
         $mock->method('getName')->willReturn('TestClass');
         
         return $mock;
+    }
+    
+    /**
+     * Benchmark readonly property performance vs regular properties.
+     * Tests PHP 8.3 readonly optimization benefits.
+     * 
+     * @group php83
+     */
+    public function testReadonlyPropertyPerformance(): void
+    {
+        // Test with regular class
+        $regularObject = new class(salt: 'test', minLength: 10) {
+            public string $salt;
+            public int $minLength;
+            
+            public function __construct(string $salt, int $minLength)
+            {
+                $this->salt = $salt;
+                $this->minLength = $minLength;
+            }
+            
+            public function getSalt(): string
+            {
+                return $this->salt;
+            }
+            
+            public function getMinLength(): int
+            {
+                return $this->minLength;
+            }
+        };
+        
+        // Test with readonly class
+        $readonlyObject = new readonly class('test', 10) {
+            public function __construct(
+                public readonly string $salt,
+                public readonly int $minLength
+            ) {}
+            
+            public function getSalt(): string
+            {
+                return $this->salt;
+            }
+            
+            public function getMinLength(): int
+            {
+                return $this->minLength;
+            }
+        };
+        
+        $iterations = 1000000;
+        
+        // Benchmark regular property access
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $salt = $regularObject->getSalt();
+            $length = $regularObject->getMinLength();
+        }
+        $regularTime = microtime(true) - $startTime;
+        
+        // Benchmark readonly property access
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $salt = $readonlyObject->getSalt();
+            $length = $readonlyObject->getMinLength();
+        }
+        $readonlyTime = microtime(true) - $startTime;
+        
+        // Readonly should have similar or better performance
+        $this->assertLessThan(
+            $regularTime * 1.1, // Allow 10% variance
+            $readonlyTime,
+            sprintf(
+                'Readonly property access should not be significantly slower. Regular: %.4fs, Readonly: %.4fs',
+                $regularTime,
+                $readonlyTime
+            )
+        );
+        
+        if (getenv('CI')) {
+            echo sprintf(
+                "\nReadonly Property Performance:\n" .
+                "- Regular properties (%d accesses): %.4fs\n" .
+                "- Readonly properties (%d accesses): %.4fs\n" .
+                "- Difference: %.2f%%\n",
+                $iterations * 2,
+                $regularTime,
+                $iterations * 2,
+                $readonlyTime,
+                (($readonlyTime - $regularTime) / $regularTime) * 100
+            );
+        }
+    }
+    
+    /**
+     * Benchmark match expression performance vs if-else chains.
+     * Tests PHP 8.3 match expression optimization.
+     * 
+     * @group php83
+     */
+    public function testMatchExpressionPerformance(): void
+    {
+        $types = ['int', 'bool', 'float', 'string', 'array', 'object', 'null', 'resource'];
+        $iterations = 100000;
+        
+        // Function using if-else chain
+        $ifElseFunction = function($value, string $type) {
+            if ($type === 'int') {
+                return (int) $value;
+            } elseif ($type === 'bool') {
+                return filter_var($value, FILTER_VALIDATE_BOOLEAN);
+            } elseif ($type === 'float') {
+                return (float) $value;
+            } elseif ($type === 'string') {
+                return (string) $value;
+            } elseif ($type === 'array') {
+                return (array) $value;
+            } elseif ($type === 'object') {
+                return (object) $value;
+            } elseif ($type === 'null') {
+                return null;
+            } else {
+                return $value;
+            }
+        };
+        
+        // Function using match expression
+        $matchFunction = function($value, string $type) {
+            return match ($type) {
+                'int' => (int) $value,
+                'bool' => filter_var($value, FILTER_VALIDATE_BOOLEAN),
+                'float' => (float) $value,
+                'string' => (string) $value,
+                'array' => (array) $value,
+                'object' => (object) $value,
+                'null' => null,
+                default => $value,
+            };
+        };
+        
+        // Benchmark if-else chain
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $type = $types[$i % count($types)];
+            $result = $ifElseFunction('123', $type);
+        }
+        $ifElseTime = microtime(true) - $startTime;
+        
+        // Benchmark match expression
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $type = $types[$i % count($types)];
+            $result = $matchFunction('123', $type);
+        }
+        $matchTime = microtime(true) - $startTime;
+        
+        // Match should be faster or comparable
+        $this->assertLessThan(
+            $ifElseTime * 1.2, // Allow 20% variance
+            $matchTime,
+            sprintf(
+                'Match expression should not be significantly slower. If-else: %.4fs, Match: %.4fs',
+                $ifElseTime,
+                $matchTime
+            )
+        );
+        
+        if (getenv('CI')) {
+            echo sprintf(
+                "\nMatch Expression Performance:\n" .
+                "- If-else chain (%d iterations): %.4fs\n" .
+                "- Match expression (%d iterations): %.4fs\n" .
+                "- Improvement: %.2f%%\n",
+                $iterations,
+                $ifElseTime,
+                $iterations,
+                $matchTime,
+                (($ifElseTime - $matchTime) / $ifElseTime) * 100
+            );
+        }
+    }
+    
+    /**
+     * Benchmark typed class constants performance.
+     * Tests PHP 8.3 typed constants optimization.
+     * 
+     * @group php83
+     */
+    public function testTypedConstantsPerformance(): void
+    {
+        // Regular constants (simulated with static properties)
+        $regularClass = new class {
+            public static $MIN_LENGTH = 10;
+            public static $MAX_LENGTH = 255;
+            public static $DEFAULT_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        };
+        
+        // Use the actual HashIdConfigInterface for typed constants
+        // This tests real-world usage rather than a test interface
+        
+        $iterations = 1000000;
+        
+        // Benchmark regular property access
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $min = $regularClass::$MIN_LENGTH;
+            $max = $regularClass::$MAX_LENGTH;
+            $alphabet = $regularClass::$DEFAULT_ALPHABET;
+        }
+        $regularTime = microtime(true) - $startTime;
+        
+        // Benchmark typed constant access
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $min = HashIdConfigInterface::MIN_LENGTH;
+            $max = HashIdConfigInterface::MAX_LENGTH;
+            $alphabet = HashIdConfigInterface::DEFAULT_ALPHABET;
+        }
+        $typedTime = microtime(true) - $startTime;
+        
+        // Typed constants should be faster (direct access vs property lookup)
+        $this->assertLessThan(
+            $regularTime,
+            $typedTime,
+            sprintf(
+                'Typed constants should be faster than static properties. Regular: %.4fs, Typed: %.4fs',
+                $regularTime,
+                $typedTime
+            )
+        );
+        
+        if (getenv('CI')) {
+            echo sprintf(
+                "\nTyped Constants Performance:\n" .
+                "- Static properties (%d accesses): %.4fs\n" .
+                "- Typed constants (%d accesses): %.4fs\n" .
+                "- Improvement: %.2f%%\n",
+                $iterations * 3,
+                $regularTime,
+                $iterations * 3,
+                $typedTime,
+                (($regularTime - $typedTime) / $regularTime) * 100
+            );
+        }
+    }
+    
+    /**
+     * Benchmark json_validate() performance vs json_decode validation.
+     * Tests PHP 8.3 json_validate() optimization.
+     * 
+     * @group php83
+     */
+    public function testJsonValidatePerformance(): void
+    {
+        $validJson = json_encode([
+            'hasher' => 'default',
+            'salt' => 'test-salt-value',
+            'min_length' => 10,
+            'alphabet' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890',
+            'parameters' => ['id', 'userId', 'postId', 'commentId'],
+        ]);
+        
+        $iterations = 100000;
+        
+        // Benchmark json_decode validation
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            $result = json_decode($validJson);
+            $isValid = (json_last_error() === JSON_ERROR_NONE);
+        }
+        $decodeTime = microtime(true) - $startTime;
+        
+        // Benchmark json_validate (PHP 8.3+)
+        if (function_exists('json_validate')) {
+            $startTime = microtime(true);
+            for ($i = 0; $i < $iterations; $i++) {
+                $isValid = json_validate($validJson);
+            }
+            $validateTime = microtime(true) - $startTime;
+            
+            // json_validate should be faster or comparable (no decoding overhead)
+            // Note: For small JSON, the difference may be minimal
+            $this->assertLessThan(
+                $decodeTime * 1.2, // Allow up to 20% slower for small payloads
+                $validateTime,
+                sprintf(
+                    'json_validate() should not be significantly slower. Decode: %.4fs, Validate: %.4fs',
+                    $decodeTime,
+                    $validateTime
+                )
+            );
+            
+            if (getenv('CI')) {
+                echo sprintf(
+                    "\nJSON Validation Performance:\n" .
+                    "- json_decode validation (%d iterations): %.4fs\n" .
+                    "- json_validate (%d iterations): %.4fs\n" .
+                    "- Improvement: %.2fx faster\n",
+                    $iterations,
+                    $decodeTime,
+                    $iterations,
+                    $validateTime,
+                    $decodeTime / $validateTime
+                );
+            }
+        } else {
+            $this->markTestSkipped('json_validate() not available (requires PHP 8.3+)');
+        }
+    }
+    
+    /**
+     * Benchmark cache warmup performance with readonly optimizations.
+     * Tests overall system performance with PHP 8.3 features.
+     * 
+     * @group php83
+     */
+    public function testCacheWarmupPerformance(): void
+    {
+        $factory = new HasherFactory('test-salt', 10);
+        $iterations = 10000;
+        
+        // Simulate cache warmup scenario
+        $startTime = microtime(true);
+        for ($i = 0; $i < $iterations; $i++) {
+            // Clear caches to simulate cold start
+            if ($i % 100 === 0) {
+                HasherFactory::clearCache();
+            }
+            
+            // Typical operations during request
+            $converter = $factory->createConverter('default', [
+                'salt' => 'test-' . ($i % 10),
+                'min_length' => 10,
+            ]);
+            $encoded = $converter->encode($i);
+            $decoded = $converter->decode($encoded);
+        }
+        $totalTime = microtime(true) - $startTime;
+        
+        // Should complete within reasonable time
+        $this->assertLessThan(
+            2.0,
+            $totalTime,
+            sprintf('Cache warmup took too long: %.4fs for %d iterations', $totalTime, $iterations)
+        );
+        
+        if (getenv('CI')) {
+            echo sprintf(
+                "\nCache Warmup Performance:\n" .
+                "- Total time (%d iterations with periodic cache clear): %.4fs\n" .
+                "- Average per iteration: %.6fs\n" .
+                "- Operations per second: %.0f\n",
+                $iterations,
+                $totalTime,
+                $totalTime / $iterations,
+                $iterations / $totalTime
+            );
+        }
     }
 }

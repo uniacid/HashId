@@ -284,7 +284,7 @@ class Php83FeaturesTest extends TestCase
                 return 'encoded_' . $value;
             }
 
-            public function decode($value)
+            public function decode(string $value): mixed
             {
                 return \str_replace('encoded_', '', $value);
             }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Reflection;
 
 use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
+use Pgs\HashIdBundle\Exception\HashIdException;
 use ReflectionException;
 use ReflectionMethod;
 
@@ -15,7 +16,7 @@ class ReflectionProvider
         try {
             return new ReflectionMethod($class, $method);
         } catch (ReflectionException $e) {
-            throw new MissingClassOrMethodException($e->getMessage(), $e->getCode(), $e);
+            throw HashIdException::missingClassOrMethod($class, $method, $e);
         }
     }
 
@@ -27,7 +28,7 @@ class ReflectionProvider
         try {
             return new ReflectionMethod($object, $method);
         } catch (ReflectionException $e) {
-            throw new MissingClassOrMethodException($e->getMessage(), $e->getCode(), $e);
+            throw HashIdException::missingClassOrMethod($class, $method, $e);
         }
     }
 }

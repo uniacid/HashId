@@ -1,0 +1,88 @@
+# Migration Guide: Configuration from v3 to v4
+# This file shows how to migrate your HashId configuration from v3 to v4
+
+# ============================================
+# BEFORE: HashId Bundle v3.x Configuration
+# ============================================
+
+# config/packages/pgs_hash_id.yaml (v3.x)
+# pgs_hash_id:
+#     converter:
+#         hashids:
+#             salt: 'your-salt-here'
+#             min_hash_length: 10
+#             alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+
+# ============================================
+# AFTER: HashId Bundle v4.x Configuration
+# ============================================
+
+# Option 1: Simple Migration (maintains backward compatibility)
+# The old configuration still works in v4.x for easy migration
+# pgs_hash_id:
+#     converter:
+#         hashids:
+#             salt: 'your-salt-here'
+#             min_hash_length: 10
+#             alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+
+# Option 2: Modernized Configuration with Environment Variables
+# Recommended for new projects and when updating existing projects
+# pgs_hash_id:
+#     hashers:
+#         default:
+#             salt: '%env(HASHID_SALT)%'  # Move salt to .env file
+#             min_hash_length: 10
+#             alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+
+# Option 3: Multiple Hashers Configuration
+# Use when you need different security levels for different resources
+pgs_hash_id:
+    hashers:
+        # Default hasher (replaces legacy converter.hashids)
+        default:
+            salt: '%env(HASHID_SALT)%'
+            min_hash_length: 10
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+        
+        # Additional hashers for specific use cases
+        secure:
+            salt: '%env(HASHID_SECURE_SALT)%'
+            min_hash_length: 20
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%'
+        
+        public:
+            salt: '%env(HASHID_PUBLIC_SALT)%'
+            min_hash_length: 5
+            alphabet: 'abcdefghijklmnopqrstuvwxyz1234567890'
+
+# ============================================
+# ENVIRONMENT VARIABLES (.env or .env.local)
+# ============================================
+
+# Add these to your .env or .env.local file:
+# HASHID_SALT=your-salt-here
+# HASHID_SECURE_SALT=your-very-secure-salt-here
+# HASHID_PUBLIC_SALT=your-public-salt-here
+
+# ============================================
+# MIGRATION STEPS
+# ============================================
+
+# 1. Keep your existing v3 configuration initially (it still works)
+# 2. Add environment variables to your .env file
+# 3. Gradually migrate to the new 'hashers' configuration
+# 4. Update your controllers to use specific hashers if needed:
+#    #[Hash('id', hasher: 'secure')]  # For sensitive resources
+#    #[Hash('id')]  # Uses 'default' hasher
+# 5. Remove the old 'converter' configuration once migration is complete
+
+# ============================================
+# BENEFITS OF MIGRATION
+# ============================================
+
+# - Environment variables keep sensitive salts out of version control
+# - Multiple hashers allow different security levels per resource
+# - Typed configuration with validation ensures correctness
+# - Better IDE support with PHP 8.3 typed constants
+# - Improved performance with optimized hasher caching

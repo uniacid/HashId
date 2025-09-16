@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\AnnotationProvider\Dto;
 
+use Pgs\HashIdBundle\Exception\HashIdException;
+
 /**
  * Data Transfer Object for Hash configuration.
  * 
@@ -28,15 +30,17 @@ final class HashConfiguration
         $this->parameters = [];
         foreach ($parameters as $parameter) {
             if (!\is_string($parameter)) {
-                throw new \InvalidArgumentException(
-                    \sprintf('Parameter must be a string, got %s', \gettype($parameter))
+                throw HashIdException::invalidParameter(
+                    'parameter',
+                    \sprintf('Must be a string, got %s', \gettype($parameter))
                 );
             }
             
             // Validate parameter name
             if (!$this->isValidParameterName($parameter)) {
-                throw new \InvalidArgumentException(
-                    \sprintf('Invalid parameter name: "%s"', $parameter)
+                throw HashIdException::invalidParameter(
+                    $parameter,
+                    'Invalid parameter name format'
                 );
             }
             

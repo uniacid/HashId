@@ -1,0 +1,58 @@
+{# examples/twig-usage.html.twig #}
+{# Example Twig template showing how multiple hashers work transparently #}
+
+{# The url() and path() functions automatically use the correct hasher based on route configuration #}
+
+<h1>Multiple Hasher Examples in Twig</h1>
+
+<h2>Public Resources (Short, SEO-friendly hashes)</h2>
+<ul>
+    {# These will generate short hashes like /article/x9aA2 #}
+    <li><a href="{{ url('article_view', {'id': 123}) }}">Article 123</a></li>
+    <li><a href="{{ url('article_view', {'id': 456}) }}">Article 456</a></li>
+</ul>
+
+<h2>Secure Resources (Long, secure hashes)</h2>
+<ul>
+    {# These will generate long secure hashes like /user/profile/4w9aA11avMx2Qp8 #}
+    <li><a href="{{ url('user_profile', {'userId': 789}) }}">User Profile 789</a></li>
+    <li><a href="{{ url('user_profile', {'userId': 101}) }}">User Profile 101</a></li>
+</ul>
+
+<h2>API Resources (Uppercase hashes)</h2>
+<ul>
+    {# These will generate uppercase hashes like /api/resource/X9AA2M7K3P #}
+    <li><a href="{{ url('api_resource', {'resourceId': 222}) }}">API Resource 222</a></li>
+    <li><a href="{{ url('api_resource', {'resourceId': 333}) }}">API Resource 333</a></li>
+</ul>
+
+<h2>Admin Resources (Extra long hashes)</h2>
+<ul>
+    {# These will generate very long hashes for maximum security #}
+    <li><a href="{{ url('admin_user_edit', {'userId': 444}) }}">Edit User 444 (Admin)</a></li>
+    <li><a href="{{ url('admin_user_edit', {'userId': 555}) }}">Edit User 555 (Admin)</a></li>
+</ul>
+
+<h2>Multiple Parameters</h2>
+<ul>
+    {# Both parameters will be encoded with the secure hasher #}
+    <li><a href="{{ url('order_details', {'orderId': 666, 'userId': 777}) }}">Order 666 for User 777</a></li>
+</ul>
+
+<h2>Default Hasher</h2>
+<ul>
+    {# Uses default hasher when none specified #}
+    <li><a href="{{ url('product_view', {'productId': 888}) }}">Product 888</a></li>
+</ul>
+
+{# 
+    Important: The HashId bundle works transparently!
+    - You don't need to manually encode/decode IDs
+    - Just use normal integer IDs in your Twig templates
+    - The bundle automatically handles encoding in URLs
+    - Controllers receive decoded integer values
+#}
+
+{# You can also use the path() function which works the same way #}
+<p>Relative URL: {{ path('article_view', {'id': 999}) }}</p>
+<p>Absolute URL: {{ url('article_view', {'id': 999}) }}</p>

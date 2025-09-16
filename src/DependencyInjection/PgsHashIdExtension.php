@@ -31,9 +31,48 @@ class PgsHashIdExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        foreach ($config[Configuration::NODE_CONVERTER] as $converter => $parameters) {
-            foreach ($parameters as $parameter => $value) {
-                $container->setParameter(\sprintf('pgs_hash_id.converter.%s.%s', $converter, $parameter), $value);
+        // Legacy converter configuration (backward compatibility)
+        if (isset($config[Configuration::NODE_CONVERTER])) {
+            foreach ($config[Configuration::NODE_CONVERTER] as $converter => $parameters) {
+                foreach ($parameters as $parameter => $value) {
+                    $container->setParameter(\sprintf('pgs_hash_id.converter.%s.%s', $converter, $parameter), $value);
+                }
+            }
+        }
+        
+        // New multiple hashers configuration with environment variable support
+        if (isset($config['hashers'])) {
+            foreach ($config['hashers'] as $name => $hasherConfig) {
+                foreach ($hasherConfig as $parameter => $value) {
+                    // Handle environment variables and typed environment variables
+                    if (is_string($value) && str_contains($value, '%env(')) {
+                        // Environment variable - pass as-is for Symfony to resolve
+                        $container->setParameter(\sprintf('pgs_hash_id.hashers.%s.%s', $name, $parameter), $value);
+                    } else {
+                        // Regular value
+                        $container->setParameter(\sprintf('pgs_hash_id.hashers.%s.%s', $name, $parameter), $value);
+                    }
+                }
+            }
+            
+            // Store the list of configured hashers
+            $container->setParameter('pgs_hash_id.hashers', array_keys($config['hashers']));
+            
+            // Register hasher configurations as services for validation
+            foreach ($config['hashers'] as $name => $hasherConfig) {
+                $container->setParameter(
+                    \sprintf('pgs_hash_id.hasher_config.%s', $name),
+                    $hasherConfig
+                );
+            }
+        } else {
+            // If no hashers configured, create default from legacy config
+            $container->setParameter('pgs_hash_id.hashers', ['default']);
+            if (isset($config[Configuration::NODE_CONVERTER]['hashids'])) {
+                $legacyConfig = $config[Configuration::NODE_CONVERTER]['hashids'];
+                $container->setParameter('pgs_hash_id.hashers.default.salt', $legacyConfig['salt']);
+                $container->setParameter('pgs_hash_id.hashers.default.min_hash_length', $legacyConfig['min_hash_length']);
+                $container->setParameter('pgs_hash_id.hashers.default.alphabet', $legacyConfig['alphabet']);
             }
         }
 
