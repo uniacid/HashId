@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use Pgs\HashIdBundle\Config\HashIdConfigInterface;
+use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
-use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
-use Pgs\HashIdBundle\AnnotationProvider\AttributeProvider;
 use Pgs\HashIdBundle\Reflection\ReflectionProvider;
 use Pgs\HashIdBundle\Attribute\Hash;
 
@@ -188,21 +188,16 @@ class ModernizationBenchmarkTest extends TestCase
 
         // Traditional constructor
         $traditionalClass = new class('test', 10) {
-            private string $salt;
-            private int $minLength;
-
-            public function __construct(string $salt, int $minLength)
+            public function __construct(private readonly string $salt, private readonly int $minLength)
             {
-                $this->salt = $salt;
-                $this->minLength = $minLength;
             }
         };
 
         // Promoted constructor
         $promotedClass = new class('test', 10) {
             public function __construct(
-                private string $salt,
-                private int $minLength
+                private readonly string $salt,
+                private readonly int $minLength
             ) {}
         };
 
@@ -210,13 +205,8 @@ class ModernizationBenchmarkTest extends TestCase
             'traditional_constructor',
             function () {
                 new class('test', 10) {
-                    private string $salt;
-                    private int $minLength;
-
-                    public function __construct(string $salt, int $minLength)
+                    public function __construct(private readonly string $salt, private readonly int $minLength)
                     {
-                        $this->salt = $salt;
-                        $this->minLength = $minLength;
                     }
                 };
             },
@@ -224,8 +214,8 @@ class ModernizationBenchmarkTest extends TestCase
             function () {
                 new class('test', 10) {
                     public function __construct(
-                        private string $salt,
-                        private int $minLength
+                        private readonly string $salt,
+                        private readonly int $minLength
                     ) {}
                 };
             }
@@ -304,16 +294,16 @@ class ModernizationBenchmarkTest extends TestCase
             'untyped_constants',
             function () {
                 // Use class with untyped constants
-                $salt = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_SALT;
-                $minLength = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_MIN_LENGTH;
-                $alphabet = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_ALPHABET;
+                $salt = HashIdConfigInterface::DEFAULT_SALT;
+                $minLength = HashIdConfigInterface::DEFAULT_MIN_LENGTH;
+                $alphabet = HashIdConfigInterface::DEFAULT_ALPHABET;
             },
             'typed_constants',
             function () {
                 // Use same interface (PHP 8.3 would have typed constants)
-                $salt = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_SALT;
-                $minLength = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_MIN_LENGTH;
-                $alphabet = \Pgs\HashIdBundle\Config\HashIdConfigInterface::DEFAULT_ALPHABET;
+                $salt = HashIdConfigInterface::DEFAULT_SALT;
+                $minLength = HashIdConfigInterface::DEFAULT_MIN_LENGTH;
+                $alphabet = HashIdConfigInterface::DEFAULT_ALPHABET;
             }
         );
 
@@ -342,8 +332,8 @@ class ModernizationBenchmarkTest extends TestCase
         // Simulate legacy vs modern implementation
         $legacyFactory = function () {
             return new class {
-                private $salt = 'test-salt';
-                private $minLength = 10;
+                private string $salt = 'test-salt';
+                private int $minLength = 10;
 
                 public function create($type, $config)
                 {
@@ -405,7 +395,7 @@ class ModernizationBenchmarkTest extends TestCase
     /**
      * Create a mock method with annotation.
      */
-    private function createAnnotationMethod(): \ReflectionMethod
+    private function createAnnotationMethod(): ReflectionMethod
     {
         $class = new class {
             /**
@@ -414,13 +404,13 @@ class ModernizationBenchmarkTest extends TestCase
             public function testMethod() {}
         };
 
-        return new \ReflectionMethod($class, 'testMethod');
+        return new ReflectionMethod($class, 'testMethod');
     }
 
     /**
      * Create a mock method with attribute.
      */
-    private function createAttributeMethod(): \ReflectionMethod
+    private function createAttributeMethod(): ReflectionMethod
     {
         if (PHP_VERSION_ID < 80000) {
             return $this->createAnnotationMethod();
@@ -431,6 +421,6 @@ class ModernizationBenchmarkTest extends TestCase
             public function testMethod() {}
         };
 
-        return new \ReflectionMethod($class, 'testMethod');
+        return new ReflectionMethod($class, 'testMethod');
     }
 }

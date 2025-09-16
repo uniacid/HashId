@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use Symfony\Component\Routing\RouteCollection;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
 use Pgs\HashIdBundle\Decorator\RouterDecorator;
@@ -317,7 +318,7 @@ class RoutingBenchmarkTest extends TestCase
             ->willReturnSelf();
 
         $router->method('getRouteCollection')
-            ->willReturn(new \Symfony\Component\Routing\RouteCollection());
+            ->willReturn(new RouteCollection());
 
         $router->method('match')
             ->willReturn(['_route' => 'test_route']);
@@ -384,11 +385,8 @@ class RoutingBenchmarkTest extends TestCase
             public function __construct(array $attributes)
             {
                 $this->attributes = new class($attributes) {
-                    private array $data;
-
-                    public function __construct(array $data)
+                    public function __construct(private array $data)
                     {
-                        $this->data = $data;
                     }
 
                     public function all(): array

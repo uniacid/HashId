@@ -123,7 +123,7 @@ class SequentialAttackTest extends TestCase
         ];
 
         foreach ($patterns as $patternName => $ids) {
-            $hashes = array_map([$this->converter, 'encode'], $ids);
+            $hashes = array_map($this->converter->encode(...), $ids);
 
             // Measure pattern unpredictability
             $unpredictability = $this->measureUnpredictability($hashes);
@@ -145,7 +145,7 @@ class SequentialAttackTest extends TestCase
         // Simulate automated scanner trying to find valid resources
         $scanAttempts = 1000;
         $validIds = [42, 123, 456, 789, 999]; // Known valid IDs
-        $validHashes = array_map([$this->converter, 'encode'], $validIds);
+        $validHashes = array_map($this->converter->encode(...), $validIds);
 
         // Scanner tries random/sequential attempts
         $scannerHits = 0;
@@ -272,7 +272,7 @@ class SequentialAttackTest extends TestCase
         ];
 
         $validIds = range(1, 1000);
-        $validHashes = array_map([$this->converter, 'encode'], $validIds);
+        $validHashes = array_map($this->converter->encode(...), $validIds);
 
         $dictionaryHits = 0;
         foreach ($dictionary as $attempt) {
@@ -309,7 +309,7 @@ class SequentialAttackTest extends TestCase
     {
         // Attacker discovers some valid IDs
         $discoveredIds = [10, 20, 30, 40, 50];
-        $discoveredHashes = array_map([$this->converter, 'encode'], $discoveredIds);
+        $discoveredHashes = array_map($this->converter->encode(...), $discoveredIds);
 
         // Try to find pattern in discovered hashes
         $differences = [];
@@ -331,7 +331,7 @@ class SequentialAttackTest extends TestCase
 
         // Try to predict next IDs based on discovered pattern
         $nextIds = [60, 70, 80];
-        $actualNextHashes = array_map([$this->converter, 'encode'], $nextIds);
+        $actualNextHashes = array_map($this->converter->encode(...), $nextIds);
 
         // Predictions based on patterns should fail
         foreach ($actualNextHashes as $actualHash) {

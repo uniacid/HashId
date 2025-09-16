@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Service;
 
+use InvalidArgumentException;
+use ReflectionClass;
 use Hashids\Hashids;
 use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
@@ -47,9 +49,9 @@ class HasherFactory
         ],
     ];
 
-    private ?string $defaultSalt;
-    private int $defaultMinLength;
-    private string $defaultAlphabet;
+    private readonly ?string $defaultSalt;
+    private readonly int $defaultMinLength;
+    private readonly string $defaultAlphabet;
     
     /**
      * @var array<string>|null Cached available types to avoid repeated reflection
@@ -79,7 +81,7 @@ class HasherFactory
     /**
      * Maximum cache size for this instance.
      */
-    private int $maxCacheSize;
+    private readonly int $maxCacheSize;
 
     public function __construct(
         ?string $salt = null,
@@ -89,7 +91,7 @@ class HasherFactory
     ) {
         // Validate min_length
         if ($minLength < 0) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 \sprintf('Minimum length must be non-negative, got %d', $minLength)
             );
         }
@@ -97,7 +99,7 @@ class HasherFactory
         // Validate alphabet
         $uniqueChars = \count(\array_unique(\str_split($alphabet)));
         if ($uniqueChars < self::MIN_ALPHABET_LENGTH) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 \sprintf(
                     'Alphabet must contain at least %d unique characters, got %d',
                     self::MIN_ALPHABET_LENGTH,
@@ -108,7 +110,7 @@ class HasherFactory
         
         // Validate cache size
         if ($maxCacheSize < 1) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 \sprintf('Max cache size must be positive, got %d', $maxCacheSize)
             );
         }
@@ -132,7 +134,7 @@ class HasherFactory
         // Security: Validate type against whitelist to prevent injection
         $allowedTypes = ['default', 'secure', 'custom'];
         if (!\in_array($type, $allowedTypes, true)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'Unknown hasher type "%s". Available types: %s',
                 $type,
                 \implode(', ', $allowedTypes),
@@ -144,7 +146,7 @@ class HasherFactory
             'default' => self::HASHER_DEFAULT,
             'secure' => self::HASHER_SECURE,
             'custom' => self::HASHER_CUSTOM,
-            default => throw new \InvalidArgumentException("Invalid hasher type: {$type}")
+            default => throw new InvalidArgumentException("Invalid hasher type: {$type}")
         };
 
         // Merge configurations
@@ -160,7 +162,7 @@ class HasherFactory
         
         // Validate merged configuration
         if (isset($hasherConfig['min_length']) && $hasherConfig['min_length'] < 0) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 \sprintf('Minimum length must be non-negative, got %d', $hasherConfig['min_length'])
             );
         }
@@ -168,7 +170,7 @@ class HasherFactory
         if (isset($hasherConfig['alphabet'])) {
             $uniqueChars = \count(\array_unique(\str_split($hasherConfig['alphabet'])));
             if ($uniqueChars < self::MIN_ALPHABET_LENGTH) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     \sprintf(
                         'Alphabet must contain at least %d unique characters, got %d',
                         self::MIN_ALPHABET_LENGTH,
@@ -244,7 +246,7 @@ class HasherFactory
         }
         
         // Perform reflection once and cache the results
-        $reflection = new \ReflectionClass(self::class);
+        $reflection = new ReflectionClass(self::class);
         $constants = $reflection->getConstants();
 
         $types = [];
@@ -340,7 +342,7 @@ class HasherFactory
         // Validate type
         $allowedTypes = ['default', 'secure', 'custom'];
         if (!\in_array($type, $allowedTypes, true)) {
-            throw new \InvalidArgumentException(\sprintf(
+            throw new InvalidArgumentException(\sprintf(
                 'Unknown hasher type "%s". Available types: %s',
                 $type,
                 \implode(', ', $allowedTypes),
@@ -391,7 +393,7 @@ interface HasherInterface
  */
 class DefaultHasher implements HasherInterface
 {
-    private Hashids $hashids;
+    private readonly Hashids $hashids;
 
     public function __construct(array $config)
     {
@@ -424,8 +426,8 @@ class DefaultHasher implements HasherInterface
  */
 class SecureHasher implements HasherInterface
 {
-    private Hashids $hashids;
-    private string $salt;
+    private readonly Hashids $hashids;
+    private readonly string $salt;
 
     public function __construct(array $config)
     {
@@ -464,7 +466,7 @@ class SecureHasher implements HasherInterface
  */
 class CustomHasher implements HasherInterface
 {
-    private Hashids $hashids;
+    private readonly Hashids $hashids;
 
     public function __construct(array $config)
     {

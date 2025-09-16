@@ -204,14 +204,12 @@ class CriticalFixValidatorTest extends TestCase
 
 class CriticalFixValidator
 {
-    private string $fixLogDir;
     private array $fixes = [];
 
-    public function __construct(string $fixLogDir)
+    public function __construct(private readonly string $fixLogDir)
     {
-        $this->fixLogDir = $fixLogDir;
-        if (!is_dir($fixLogDir)) {
-            mkdir($fixLogDir, 0777, true);
+        if (!is_dir($this->fixLogDir)) {
+            mkdir($this->fixLogDir, 0777, true);
         }
         $this->loadFixes();
     }

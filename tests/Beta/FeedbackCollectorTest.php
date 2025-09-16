@@ -163,16 +163,13 @@ class FeedbackCollectorTest extends TestCase
 
 class FeedbackCollector
 {
-    private string $feedbackDir;
-
-    public function __construct(string $feedbackDir)
+    public function __construct(private readonly string $feedbackDir)
     {
-        $this->feedbackDir = $feedbackDir;
-        if (!is_dir($feedbackDir)) {
-            mkdir($feedbackDir, 0777, true);
+        if (!is_dir($this->feedbackDir)) {
+            mkdir($this->feedbackDir, 0777, true);
         }
-        if (!is_dir($feedbackDir . '/errors')) {
-            mkdir($feedbackDir . '/errors', 0777, true);
+        if (!is_dir($this->feedbackDir . '/errors')) {
+            mkdir($this->feedbackDir . '/errors', 0777, true);
         }
     }
 

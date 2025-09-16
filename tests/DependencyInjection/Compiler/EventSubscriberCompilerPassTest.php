@@ -4,31 +4,18 @@ namespace DependencyInjection\Compiler;
 
 use Pgs\HashIdBundle\DependencyInjection\Compiler\EventSubscriberCompilerPass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 
 class EventSubscriberCompilerPassTest extends TestCase
 {
-    /**
-     * @var CompilerPassInterface
-     */
-    private $pass;
+    private EventSubscriberCompilerPass $pass;
 
-    /**
-     * @var ContainerBuilder
-     */
-    private $container;
+    private ContainerBuilder $container;
 
-    /**
-     * @var Definition
-     */
-    private $paramConverterListenerDefinition;
+    private Definition $paramConverterListenerDefinition;
 
-    /**
-     * @var Definition
-     */
-    private $decodeControllerParametersDefinition;
+    private Definition $decodeControllerParametersDefinition;
 
     protected function setUp(): void
     {

@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Security;
 
+use InvalidArgumentException;
+use Pgs\HashIdBundle\Service\CompatibilityLayer;
+use Pgs\HashIdBundle\Reflection\ReflectionProvider;
+use ReflectionMethod;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\AnnotationProvider\AttributeProvider;
@@ -46,7 +51,7 @@ class ComprehensiveSecurityTest extends TestCase
             try {
                 $factory->create($type);
                 $this->fail("Should have rejected invalid type: $type");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString('Unknown hasher type', $e->getMessage());
             }
         }
@@ -73,8 +78,8 @@ class ComprehensiveSecurityTest extends TestCase
      */
     public function testAttributeProviderValidatesControllerFormat(): void
     {
-        $compatibilityLayer = $this->createMock(\Pgs\HashIdBundle\Service\CompatibilityLayer::class);
-        $reflectionProvider = $this->createMock(\Pgs\HashIdBundle\Reflection\ReflectionProvider::class);
+        $compatibilityLayer = $this->createMock(CompatibilityLayer::class);
+        $reflectionProvider = $this->createMock(ReflectionProvider::class);
         
         $provider = new AttributeProvider($compatibilityLayer, $reflectionProvider);
         
@@ -118,7 +123,7 @@ class ComprehensiveSecurityTest extends TestCase
         // Create array with too many parameters
         $tooManyParams = array_map(fn($i) => "param$i", range(1, 25));
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Too many parameters specified');
         
         new Hash($tooManyParams);
@@ -146,7 +151,7 @@ class ComprehensiveSecurityTest extends TestCase
             try {
                 new Hash($invalidName);
                 $this->fail("Should have rejected invalid parameter name: $invalidName");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertThat(
                     $e->getMessage(),
                     $this->logicalOr(
@@ -238,7 +243,7 @@ class ComprehensiveSecurityTest extends TestCase
      */
     public function testOptimizedRegexPerformance(): void
     {
-        $compatibilityLayer = new \Pgs\HashIdBundle\Service\CompatibilityLayer();
+        $compatibilityLayer = new CompatibilityLayer();
         
         // Create mock method with docblock that would trigger early return
         $method = $this->createMockMethod();
@@ -281,9 +286,9 @@ class ComprehensiveSecurityTest extends TestCase
     /**
      * Create a mock ReflectionMethod for testing.
      */
-    private function createMockMethod(): \ReflectionMethod|\PHPUnit\Framework\MockObject\MockObject
+    private function createMockMethod(): ReflectionMethod|MockObject
     {
-        $method = $this->getMockBuilder(\ReflectionMethod::class)
+        $method = $this->getMockBuilder(ReflectionMethod::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName', 'getAttributes'])
             ->getMock();

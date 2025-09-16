@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Migration;
 
+use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
 
@@ -139,7 +140,7 @@ class MigrationProcessTest extends TestCase
         );
         
         // Check that attribute class is actually an attribute
-        $reflection = new \ReflectionClass($attributeClass);
+        $reflection = new ReflectionClass($attributeClass);
         $attributes = $reflection->getAttributes();
         
         $hasAttributeAttribute = false;

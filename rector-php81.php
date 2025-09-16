@@ -9,7 +9,6 @@ use Rector\Php80\Rector\Class_\ClassPropertyAssignToConstructorPromotionRector;
 use Rector\Php80\Rector\Switch_\ChangeSwitchToMatchRector;
 use Rector\Php81\Rector\Property\ReadOnlyPropertyRector;
 use Rector\Php81\Rector\Array_\FirstClassCallableRector;
-use Rector\Php81\Rector\ClassConst\FinalizePublicClassConstantRector;
 use Rector\TypeDeclaration\Rector\Property\TypedPropertyFromAssignsRector;
 use Rector\TypeDeclaration\Rector\ClassMethod\ReturnTypeFromReturnNewRector;
 use Rector\CodeQuality\Rector\Assign\CombinedAssignRector;
@@ -46,7 +45,6 @@ return static function (RectorConfig $rectorConfig): void {
     // PHP 8.1 Features
     $rectorConfig->rule(ReadOnlyPropertyRector::class);
     $rectorConfig->rule(FirstClassCallableRector::class);
-    $rectorConfig->rule(FinalizePublicClassConstantRector::class);
 
     // Type Declaration Improvements
     $rectorConfig->rule(TypedPropertyFromAssignsRector::class);

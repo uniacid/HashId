@@ -40,18 +40,15 @@ class RouterDecorator implements RouterInterface, WarmableInterface
 {
     use DecoratorTrait;
 
-    protected EncodeParametersProcessorFactory $parametersProcessorFactory;
-
     /**
      * Constructor.
      *
      * @param RouterInterface $router The original Symfony router to decorate
      * @param EncodeParametersProcessorFactory $parametersProcessorFactory Factory for creating parameter encoders
      */
-    public function __construct(RouterInterface $router, EncodeParametersProcessorFactory $parametersProcessorFactory)
+    public function __construct(RouterInterface $router, protected EncodeParametersProcessorFactory $parametersProcessorFactory)
     {
         $this->object = $router;
-        $this->parametersProcessorFactory = $parametersProcessorFactory;
     }
 
     /**

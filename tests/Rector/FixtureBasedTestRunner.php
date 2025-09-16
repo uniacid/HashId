@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Rector;
 
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -31,14 +32,14 @@ abstract class FixtureBasedTestRunner extends TestCase
     protected function parseFixture(string $fixturePath): array
     {
         if (!\file_exists($fixturePath)) {
-            throw new \RuntimeException("Fixture file not found: {$fixturePath}");
+            throw new RuntimeException("Fixture file not found: {$fixturePath}");
         }
 
         $content = \file_get_contents($fixturePath);
         $parts = \explode("\n-----\n", $content);
 
         if (\count($parts) !== 2) {
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Invalid fixture format. Expected exactly one '-----' separator in {$fixturePath}",
             );
         }
@@ -109,7 +110,7 @@ abstract class FixtureBasedTestRunner extends TestCase
             try {
                 $this->parseFixture($path);
                 self::assertTrue(true, "Fixture {$name} is valid");
-            } catch (\RuntimeException $e) {
+            } catch (RuntimeException $e) {
                 self::fail("Fixture {$name} is invalid: " . $e->getMessage());
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Documentation;
 
+use ReflectionNamedType;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use ReflectionMethod;
@@ -246,7 +247,7 @@ class DocblockValidationTest extends TestCase
         $isVoid = false;
 
         if ($returnType !== null) {
-            if ($returnType instanceof \ReflectionNamedType) {
+            if ($returnType instanceof ReflectionNamedType) {
                 $isVoid = $returnType->getName() === 'void';
             }
         }

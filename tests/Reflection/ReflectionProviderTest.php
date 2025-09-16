@@ -2,6 +2,7 @@
 
 namespace Pgs\HashIdBundle\Tests\Reflection;
 
+use ReflectionMethod;
 use Pgs\HashIdBundle\Exception\MissingClassOrMethodException;
 use Pgs\HashIdBundle\Reflection\ReflectionProvider;
 use Pgs\HashIdBundle\Tests\Reflection\Fixtures\ExistingClass;
@@ -16,7 +17,7 @@ class ReflectionProviderTest extends TestCase
             ExistingClass::class,
             'existingMethod',
         );
-        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(ReflectionMethod::class, $methodReflection);
     }
 
     public function testGetReflectionForNonExistingClass(): void
@@ -33,7 +34,7 @@ class ReflectionProviderTest extends TestCase
             new ExistingClass(),
             'existingMethod',
         );
-        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(ReflectionMethod::class, $methodReflection);
     }
 
     public function testGetMethodReflectionForNonExistingMethodFromObject(): void
@@ -44,6 +45,6 @@ class ReflectionProviderTest extends TestCase
             new ExistingClass(),
             'nonExistingMethod',
         );
-        self::assertInstanceOf(\ReflectionMethod::class, $methodReflection);
+        self::assertInstanceOf(ReflectionMethod::class, $methodReflection);
     }
 }

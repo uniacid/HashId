@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Service;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Service\HasherFactory;
 
@@ -19,7 +20,7 @@ class HasherFactoryValidationTest extends TestCase
      */
     public function testRejectsNegativeMinLength(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Minimum length must be non-negative');
         
         new HasherFactory(null, -1);
@@ -30,9 +31,9 @@ class HasherFactoryValidationTest extends TestCase
      */
     public function testRejectsShortAlphabet(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Alphabet must contain at least 16 unique characters');
-        
+
         new HasherFactory(null, 10, 'abcdefgh'); // Only 8 unique chars
     }
     
@@ -41,7 +42,7 @@ class HasherFactoryValidationTest extends TestCase
      */
     public function testCountsUniqueCharactersInAlphabet(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Alphabet must contain at least 16 unique characters');
         
         // 30 characters but only 10 unique
@@ -53,7 +54,7 @@ class HasherFactoryValidationTest extends TestCase
      */
     public function testRejectsInvalidCacheSize(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Max cache size must be positive');
         
         new HasherFactory(null, 10, 'abcdefghijklmnopqrstuvwxyz', 0);
@@ -85,7 +86,7 @@ class HasherFactoryValidationTest extends TestCase
     {
         $factory = new HasherFactory();
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Minimum length must be non-negative');
         
         $factory->create('default', ['min_length' => -5]);

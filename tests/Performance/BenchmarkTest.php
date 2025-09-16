@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use ReflectionMethod;
+use PHPUnit\Framework\MockObject\MockObject;
+use ReflectionClass;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
@@ -266,9 +269,9 @@ class BenchmarkTest extends TestCase
     /**
      * Create a mock ReflectionMethod for testing.
      */
-    private function createMockMethod(): \ReflectionMethod|\PHPUnit\Framework\MockObject\MockObject
+    private function createMockMethod(): ReflectionMethod|MockObject
     {
-        $method = $this->getMockBuilder(\ReflectionMethod::class)
+        $method = $this->getMockBuilder(ReflectionMethod::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName', 'getAttributes'])
             ->getMock();
@@ -282,9 +285,9 @@ class BenchmarkTest extends TestCase
     /**
      * Create a mock ReflectionClass for testing.
      */
-    private function createMockReflectionClass(): \ReflectionClass|\PHPUnit\Framework\MockObject\MockObject
+    private function createMockReflectionClass(): ReflectionClass|MockObject
     {
-        $mock = $this->getMockBuilder(\ReflectionClass::class)
+        $mock = $this->getMockBuilder(ReflectionClass::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getName'])
             ->getMock();

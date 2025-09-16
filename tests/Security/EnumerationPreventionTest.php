@@ -156,7 +156,7 @@ class EnumerationPreventionTest extends TestCase
         ];
 
         foreach ($patterns as $patternName => $ids) {
-            $hashes = array_map([$this->converter, 'encode'], $ids);
+            $hashes = array_map($this->converter->encode(...), $ids);
 
             // Check that the pattern is not preserved in hashes
             $this->assertPatternNotPreserved(
@@ -218,7 +218,7 @@ class EnumerationPreventionTest extends TestCase
         ];
 
         foreach ($relatedGroups as $groupName => $ids) {
-            $hashes = array_map([$this->converter, 'encode'], $ids);
+            $hashes = array_map($this->converter->encode(...), $ids);
 
             // Check common prefix length
             // Hashids may produce some common prefixes for related numbers

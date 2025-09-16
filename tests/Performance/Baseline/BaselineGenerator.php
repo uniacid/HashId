@@ -16,7 +16,7 @@ use Hashids\Hashids;
  */
 class BaselineGenerator
 {
-    private BenchmarkRunner $runner;
+    private readonly BenchmarkRunner $runner;
     private array $results = [];
 
     public function __construct()
@@ -119,7 +119,7 @@ class BaselineGenerator
             ->toArray();
 
         // Batch decode
-        $encoded = array_map([$hasher, 'encode'], $ids);
+        $encoded = array_map($hasher->encode(...), $ids);
         $this->results['batch_decode_100'] = $this->runner
             ->benchmark('batch_decode_100', function () use ($hasher, $encoded) {
                 foreach ($encoded as $value) {

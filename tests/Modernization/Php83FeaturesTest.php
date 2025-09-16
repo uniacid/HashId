@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Modernization;
 
+use ReflectionClass;
+use Override;
+use ReflectionMethod;
 use Pgs\HashIdBundle\Annotation\Hash;
 use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Pgs\HashIdBundle\DependencyInjection\Configuration;
@@ -38,7 +41,7 @@ class Php83FeaturesTest extends TestCase
         // - public const string DEFAULT_SALT = '';
 
         if (\interface_exists(HashIdConfigInterface::class)) {
-            $reflection = new \ReflectionClass(HashIdConfigInterface::class);
+            $reflection = new ReflectionClass(HashIdConfigInterface::class);
             $constants = $reflection->getReflectionConstants();
 
             foreach ($constants as $constant) {
@@ -144,7 +147,7 @@ class Php83FeaturesTest extends TestCase
         self::assertSame(['id' => 123, 'name' => 'test'], $fixture->toArray());
 
         // Verify the class is readonly
-        $reflection = new \ReflectionClass($fixture);
+        $reflection = new ReflectionClass($fixture);
         if (\method_exists($reflection, 'isReadOnly')) {
             self::assertTrue($reflection->isReadOnly());
         }
@@ -162,17 +165,17 @@ class Php83FeaturesTest extends TestCase
 
         // Test class using Override attribute
         $testClass = new class('testOverride') extends TestCase {
-            #[\Override]
+            #[Override]
             protected function setUp(): void
             {
                 parent::setUp();
             }
         };
 
-        $reflection = new \ReflectionMethod($testClass, 'setUp');
-        $attributes = $reflection->getAttributes(\Override::class);
+        $reflection = new ReflectionMethod($testClass, 'setUp');
+        $attributes = $reflection->getAttributes(Override::class);
 
-        if (\class_exists(\Override::class)) {
+        if (\class_exists(Override::class)) {
             self::assertCount(1, $attributes, 'Method should have Override attribute');
         }
     }
@@ -195,7 +198,7 @@ class Php83FeaturesTest extends TestCase
 
         foreach ($readonlyClasses as $className) {
             if (\class_exists($className)) {
-                $reflection = new \ReflectionClass($className);
+                $reflection = new ReflectionClass($className);
 
                 // After Rector transformation, these should be readonly
                 if (\method_exists($reflection, 'isReadOnly')) {
@@ -294,7 +297,7 @@ class Php83FeaturesTest extends TestCase
         self::assertSame('456', $mockConverter->decode('encoded_456'));
 
         // Verify readonly nature
-        $reflection = new \ReflectionClass($mockConverter);
+        $reflection = new ReflectionClass($mockConverter);
         if (\method_exists($reflection, 'isReadOnly')) {
             self::assertTrue($reflection->isReadOnly());
         }

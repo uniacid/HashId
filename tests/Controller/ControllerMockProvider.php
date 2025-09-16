@@ -3,7 +3,6 @@
 namespace Pgs\HashIdBundle\Tests\Controller;
 
 use PHPUnit\Framework\MockObject\MockBuilder;
-use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 trait ControllerMockProvider
@@ -12,8 +11,14 @@ trait ControllerMockProvider
     
     public function getTestControllerMock(): AbstractController
     {
-        return $this->getMockBuilder(AbstractController::class)
+        $mock = $this->getMockBuilder(AbstractController::class)
+            ->addMethods(['demo'])  // Add the demo method for testing
             ->getMockForAbstractClass();
+
+        // Make the demo method callable
+        $mock->method('demo')->willReturn(null);
+
+        return $mock;
     }
 
     public function getTestControllerObjectMock(): AbstractController

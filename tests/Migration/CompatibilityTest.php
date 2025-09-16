@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Migration;
 
+use ReflectionClass;
+use Attribute;
+use ReflectionProperty;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Annotation\Hash as AnnotationHash;
 use Pgs\HashIdBundle\Attribute\Hash as AttributeHash;
@@ -28,8 +31,8 @@ class CompatibilityTest extends TestCase
     
     public function testAnnotationPropertiesMatch(): void
     {
-        $annotationReflection = new \ReflectionClass(AnnotationHash::class);
-        $attributeReflection = new \ReflectionClass(AttributeHash::class);
+        $annotationReflection = new ReflectionClass(AnnotationHash::class);
+        $attributeReflection = new ReflectionClass(AttributeHash::class);
         
         // Both should have the same public properties/methods for compatibility
         $annotationProps = $this->getPublicProperties($annotationReflection);
@@ -89,8 +92,8 @@ class CompatibilityTest extends TestCase
     
     public function testAttributeHasCorrectTarget(): void
     {
-        $reflection = new \ReflectionClass(AttributeHash::class);
-        $attributes = $reflection->getAttributes(\Attribute::class);
+        $reflection = new ReflectionClass(AttributeHash::class);
+        $attributes = $reflection->getAttributes(Attribute::class);
         
         $this->assertNotEmpty($attributes, 'Hash attribute should have #[Attribute] declaration');
         
@@ -98,7 +101,7 @@ class CompatibilityTest extends TestCase
             $attributeInstance = $attributes[0]->newInstance();
             // Check that it targets methods (for controller actions)
             $this->assertTrue(
-                ($attributeInstance->flags & \Attribute::TARGET_METHOD) !== 0,
+                ($attributeInstance->flags & Attribute::TARGET_METHOD) !== 0,
                 'Hash attribute should target methods'
             );
         }
@@ -169,10 +172,10 @@ class CompatibilityTest extends TestCase
         );
     }
     
-    private function getPublicProperties(\ReflectionClass $reflection): array
+    private function getPublicProperties(ReflectionClass $reflection): array
     {
         $properties = [];
-        foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $prop) {
+        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $prop) {
             $properties[] = $prop->getName();
         }
         return $properties;

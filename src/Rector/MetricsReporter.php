@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Rector;
 
+use InvalidArgumentException;
+
 final class MetricsReporter
 {
-    private MetricsCollector $collector;
     private string $projectName = 'HashId Bundle';
     private string $projectVersion = 'v4.0';
 
-    public function __construct(MetricsCollector $collector)
+    public function __construct(private readonly MetricsCollector $collector)
     {
-        $this->collector = $collector;
     }
 
     public function generateHtmlDashboard(): string
@@ -103,7 +103,7 @@ final class MetricsReporter
             'json' => $this->generateJsonReport(),
             'csv' => $this->generateCsvReport(),
             'markdown', 'md' => $this->generateMarkdownSummary(),
-            default => throw new \InvalidArgumentException("Unsupported format: $format"),
+            default => throw new InvalidArgumentException("Unsupported format: $format"),
         };
         
         $result = \file_put_contents($outputPath, $content);

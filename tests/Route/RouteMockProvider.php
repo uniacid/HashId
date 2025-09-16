@@ -2,8 +2,7 @@
 
 namespace Pgs\HashIdBundle\Tests\Route;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockBuilder;use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Route;
 
 trait RouteMockProvider
 {

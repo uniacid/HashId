@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Security;
 
+use InvalidArgumentException;
+use Pgs\HashIdBundle\Service\CompatibilityLayer;
+use Pgs\HashIdBundle\Reflection\ReflectionProvider;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Attribute\Hash;
@@ -94,7 +97,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("XSS attempt should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage(),
@@ -145,7 +148,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("Path traversal attempt should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertThat(
                     $e->getMessage(),
                     $this->logicalOr(
@@ -158,8 +161,8 @@ class InputValidationTest extends TestCase
         }
 
         // Test controller path validation
-        $compatibilityLayer = $this->createMock(\Pgs\HashIdBundle\Service\CompatibilityLayer::class);
-        $reflectionProvider = $this->createMock(\Pgs\HashIdBundle\Reflection\ReflectionProvider::class);
+        $compatibilityLayer = $this->createMock(CompatibilityLayer::class);
+        $reflectionProvider = $this->createMock(ReflectionProvider::class);
         $provider = new AttributeProvider($compatibilityLayer, $reflectionProvider);
 
         foreach ($pathTraversalAttempts as $attempt) {
@@ -193,7 +196,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($longString);
                 $this->fail('Long parameter name should be rejected');
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'too long',
                     $e->getMessage(),
@@ -219,7 +222,7 @@ class InputValidationTest extends TestCase
         try {
             new Hash($manyParams);
             $this->fail('Too many parameters should be rejected');
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $this->assertStringContainsString(
                 'Too many parameters',
                 $e->getMessage()
@@ -250,7 +253,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("Command injection attempt should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage()
@@ -262,7 +265,7 @@ class InputValidationTest extends TestCase
             try {
                 $factory->create($attempt);
                 $this->fail("Command injection in hasher type should be rejected");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Unknown hasher type',
                     $e->getMessage()
@@ -289,7 +292,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("Null byte injection should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage()
@@ -297,8 +300,8 @@ class InputValidationTest extends TestCase
             }
 
             // Test controller validation
-            $compatibilityLayer = $this->createMock(\Pgs\HashIdBundle\Service\CompatibilityLayer::class);
-            $reflectionProvider = $this->createMock(\Pgs\HashIdBundle\Reflection\ReflectionProvider::class);
+            $compatibilityLayer = $this->createMock(CompatibilityLayer::class);
+            $reflectionProvider = $this->createMock(ReflectionProvider::class);
             $provider = new AttributeProvider($compatibilityLayer, $reflectionProvider);
 
             try {
@@ -337,7 +340,7 @@ class InputValidationTest extends TestCase
                         'Parameters should be sanitized'
                     );
                 }
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertTrue(true, "Unicode attack prevented");
             }
         }
@@ -360,7 +363,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("LDAP injection attempt should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage()
@@ -394,7 +397,7 @@ class InputValidationTest extends TestCase
                 try {
                     new Hash($attempt);
                     $this->fail("XML content should be rejected as parameter");
-                } catch (\InvalidArgumentException $e) {
+                } catch (InvalidArgumentException $e) {
                     $this->assertTrue(true, "XML injection prevented");
                 }
             }
@@ -469,7 +472,7 @@ class InputValidationTest extends TestCase
             try {
                 new Hash($attempt);
                 $this->fail("Format string should be rejected: $attempt");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage()
@@ -481,7 +484,7 @@ class InputValidationTest extends TestCase
             try {
                 $factory->create($attempt);
                 $this->fail("Format string in hasher type should be rejected");
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertTrue(true, "Format string prevented");
             }
         }
@@ -510,7 +513,7 @@ class InputValidationTest extends TestCase
                 // If accepted, should be treated as literal
                 $params = $hash->getParameters();
                 $this->assertEquals([$attempt], $params);
-            } catch (\InvalidArgumentException $e) {
+            } catch (InvalidArgumentException $e) {
                 $this->assertStringContainsString(
                     'Invalid parameter name',
                     $e->getMessage()

@@ -5,20 +5,13 @@ namespace Pgs\HashIdBundle\Tests\DependencyInjection\Compiler;
 use Hashids\Hashids;
 use Pgs\HashIdBundle\DependencyInjection\Compiler\HashidsConverterCompilerPass;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class HashidsConverterCompilerPassTest extends TestCase
 {
-    /**
-     * @var CompilerPassInterface
-     */
-    private $compilerPass;
+    private HashidsConverterCompilerPass $compilerPass;
 
-    /**
-     * @var ContainerBuilder
-     */
-    private $container;
+    private ContainerBuilder $container;
 
     protected function setUp(): void
     {

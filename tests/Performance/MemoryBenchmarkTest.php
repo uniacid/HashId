@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Routing\RequestContext;
+use Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface;
+use Pgs\HashIdBundle\Service\DecodeControllerParameters;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
-use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Decorator\RouterDecorator;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
 use Hashids\Hashids;
@@ -400,9 +403,9 @@ class MemoryBenchmarkTest extends TestCase
      */
     private function createMockRouter(): object
     {
-        $router = $this->createMock(\Symfony\Component\Routing\RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router->method('generate')->willReturn('/test/123');
-        $router->method('getContext')->willReturn(new \Symfony\Component\Routing\RequestContext());
+        $router->method('getContext')->willReturn(new RequestContext());
         return $router;
     }
 
@@ -411,7 +414,7 @@ class MemoryBenchmarkTest extends TestCase
      */
     private function createMockProcessor(): object
     {
-        $processor = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface::class);
+        $processor = $this->createMock(ParametersProcessorInterface::class);
         $processor->method('encodeParameters')->willReturnArgument(0);
         return $processor;
     }
@@ -421,7 +424,7 @@ class MemoryBenchmarkTest extends TestCase
      */
     private function createMockDecodeService(): object
     {
-        return $this->createMock(\Pgs\HashIdBundle\Service\DecodeControllerParameters::class);
+        return $this->createMock(DecodeControllerParameters::class);
     }
 
     /**

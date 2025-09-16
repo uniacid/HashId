@@ -9,15 +9,13 @@ use Symfony\Component\Filesystem\Filesystem;
 
 final class ReportGenerator
 {
-    private MetricsCollector $metricsCollector;
-    private Filesystem $filesystem;
-    private string $reportDirectory;
+    private readonly Filesystem $filesystem;
+    private readonly string $reportDirectory;
 
     public function __construct(
-        MetricsCollector $metricsCollector,
+        private readonly MetricsCollector $metricsCollector,
         ?string $reportDirectory = null
     ) {
-        $this->metricsCollector = $metricsCollector;
         $this->filesystem = new Filesystem();
         $this->reportDirectory = $reportDirectory ?? __DIR__ . '/../../var/rector-reports';
     }

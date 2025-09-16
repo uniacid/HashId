@@ -18,12 +18,12 @@ class BenchmarkResult
     private float $percentile99;
 
     public function __construct(
-        private string $name,
-        private int $iterations,
+        private readonly string $name,
+        private readonly int $iterations,
         private array $times,
-        private array $memories,
-        private int $totalMemory,
-        private array $context = []
+        private readonly array $memories,
+        private readonly int $totalMemory,
+        private readonly array $context = []
     ) {
         $this->calculateStatistics();
     }

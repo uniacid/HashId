@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Beta;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Rector\MetricsCollector;
 use Symfony\Component\Process\Process;
@@ -588,7 +589,7 @@ class MigrationMetricsCollectorTest extends TestCase
                 file_put_contents($this->betaTestProjectDir . '/' . $path, $content);
             }
             return ['success' => true];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         }
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Functional;
 
+use ReflectionClass;
 use Pgs\HashIdBundle\Attribute\Hash;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
 use PHPUnit\Framework\TestCase;
@@ -30,7 +31,7 @@ class AttributeRoutingTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $compatibilityLayer = new CompatibilityLayer();
 
         // Test single parameter attribute
@@ -67,7 +68,7 @@ class AttributeRoutingTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $compatibilityLayer = new CompatibilityLayer();
 
         // Test single parameter annotation
@@ -111,7 +112,7 @@ class AttributeRoutingTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $compatibilityLayer = new CompatibilityLayer();
 
         // All methods should extract the same parameter
@@ -140,7 +141,7 @@ class AttributeRoutingTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $classAttributes = $reflectionClass->getAttributes(Hash::class);
 
         // Class-level attributes are now supported
@@ -167,7 +168,7 @@ class AttributeRoutingTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('complexRoute');
 
         $compatibilityLayer = new CompatibilityLayer();

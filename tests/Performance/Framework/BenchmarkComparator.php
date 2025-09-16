@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance\Framework;
 
+use RuntimeException;
+
 /**
  * Compares benchmark results against baselines and targets.
  */
@@ -19,12 +21,12 @@ class BenchmarkComparator
     public function loadBaseline(string $file): self
     {
         if (!file_exists($file)) {
-            throw new \RuntimeException("Baseline file not found: $file");
+            throw new RuntimeException("Baseline file not found: $file");
         }
 
         $data = json_decode(file_get_contents($file), true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new \RuntimeException("Invalid baseline JSON: " . json_last_error_msg());
+            throw new RuntimeException("Invalid baseline JSON: " . json_last_error_msg());
         }
 
         $this->baseline = $data;

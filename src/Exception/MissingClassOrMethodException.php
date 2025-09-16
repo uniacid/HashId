@@ -4,7 +4,7 @@ namespace Pgs\HashIdBundle\Exception;
 
 /**
  * Exception thrown when a class or method is missing.
- * 
+ *
  * @deprecated since 4.0, use HashIdException::missingClassOrMethod() instead
  */
 class MissingClassOrMethodException extends HashIdException

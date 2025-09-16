@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use Hashids\Hashids;
+use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkComparator;
@@ -141,11 +143,11 @@ class PhpVersionComparisonTest extends TestCase
         // Test that modern features don't break backward compatibility
         $tests = [
             'basic_encoding' => function () {
-                $hasher = new \Hashids\Hashids('test', 10);
+                $hasher = new Hashids('test', 10);
                 return $hasher->encode(12345);
             },
             'basic_decoding' => function () {
-                $hasher = new \Hashids\Hashids('test', 10);
+                $hasher = new Hashids('test', 10);
                 $encoded = $hasher->encode(12345);
                 return $hasher->decode($encoded);
             },
@@ -205,8 +207,8 @@ class PhpVersionComparisonTest extends TestCase
     private function runCurrentBenchmarks(): array
     {
         $results = [];
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         // Basic operations
@@ -232,13 +234,13 @@ class PhpVersionComparisonTest extends TestCase
 
         // Configuration variations
         $configs = [
-            'minimal' => new \Hashids\Hashids('s', 1),
-            'default' => new \Hashids\Hashids('test-salt', 10),
-            'secure' => new \Hashids\Hashids('very-long-and-secure-salt', 20),
+            'minimal' => new Hashids('s', 1),
+            'default' => new Hashids('test-salt', 10),
+            'secure' => new Hashids('very-long-and-secure-salt', 20),
         ];
 
         foreach ($configs as $name => $hashids) {
-            $converter = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter($hashids);
+            $converter = new HashidsConverter($hashids);
             $results["config_$name"] = $this->runner
                 ->benchmark("config_$name", function () use ($converter) {
                     $converter->encode(12345);

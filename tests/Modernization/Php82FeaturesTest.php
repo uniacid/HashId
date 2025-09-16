@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Modernization;
 
+use ReflectionClass;
+use Exception;
 use Hashids\Hashids;
 use Pgs\HashIdBundle\Annotation\Hash;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
@@ -27,7 +29,7 @@ class Php82FeaturesTest extends TestCase
 
         // After Rector PHP 8.2 transformation, the class should be readonly
         // This test validates the transformation doesn't break functionality
-        $reflection = new \ReflectionClass(Hash::class);
+        $reflection = new ReflectionClass(Hash::class);
 
         // Check if properties could be made readonly (PHP 8.2+)
         if (PHP_VERSION_ID >= 80200) {
@@ -49,7 +51,7 @@ class Php82FeaturesTest extends TestCase
         self::assertSame('Test message', $exception->getMessage());
 
         // Test that readonly transformation doesn't break inheritance
-        self::assertInstanceOf(\Exception::class, $exception);
+        self::assertInstanceOf(Exception::class, $exception);
     }
 
     /**
@@ -71,7 +73,7 @@ class Php82FeaturesTest extends TestCase
         self::assertSame(123, $decoded);
 
         // Verify immutability expectations for readonly transformation
-        $reflection = new \ReflectionClass(HashidsConverter::class);
+        $reflection = new ReflectionClass(HashidsConverter::class);
         $properties = $reflection->getProperties();
 
         // After Rector transformation, these should be readonly
@@ -152,7 +154,7 @@ class Php82FeaturesTest extends TestCase
         $converter = new HashidsConverter($hashids);
 
         // Ensure salt is not accessible directly
-        $reflection = new \ReflectionClass($converter);
+        $reflection = new ReflectionClass($converter);
         $hashidsProperty = $reflection->getProperty('hashids');
 
         self::assertTrue($hashidsProperty->isPrivate());
@@ -171,7 +173,7 @@ class Php82FeaturesTest extends TestCase
         ];
 
         foreach ($candidateClasses as $className) {
-            $reflection = new \ReflectionClass($className);
+            $reflection = new ReflectionClass($className);
 
             // Verify class exists and can be instantiated
             self::assertTrue($reflection->isInstantiable() || $reflection->isAbstract() || $reflection->isInterface());

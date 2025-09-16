@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Modernization;
 
+use ReflectionClass;
 use Pgs\HashIdBundle\Tests\Fixtures\Php83TestFixtures;
 use PHPUnit\Framework\TestCase;
 
@@ -180,7 +181,7 @@ class AnonymousReadonlyClassTest extends TestCase
         }
 
         $converter = Php83TestFixtures::createMockConverter('test_');
-        $reflection = new \ReflectionClass($converter);
+        $reflection = new ReflectionClass($converter);
 
         // Check if class is readonly (PHP 8.3+)
         if (\method_exists($reflection, 'isReadOnly')) {

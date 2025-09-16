@@ -159,14 +159,14 @@ class AutomationTargetTest extends TestCase
     public function testComprehensiveMetricsReport(): void
     {
         $this->simulateDocumentedMetrics();
-        
+
         $markdownReport = $this->collector->exportAsMarkdown();
-        
+
         // Verify report contains key sections
         self::assertStringContainsString('Summary Statistics', $markdownReport);
         self::assertStringContainsString('Automation Target', $markdownReport);
         self::assertStringContainsString('✅ Target Met', $markdownReport);
-        
+
         // Verify specific metrics are present
         self::assertStringContainsString('84', $markdownReport); // Automation rate (approximately)
         self::assertStringContainsString('70%', $markdownReport); // Target

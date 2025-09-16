@@ -21,7 +21,7 @@ abstract class AbstractParametersProcessor implements ParametersProcessorInterfa
 
     /**
      * Constructor with readonly converter for immutability.
-     * 
+     *
      * @param ConverterInterface $converter The converter instance (readonly)
      * @param array<string> $parametersToProcess Parameters to process
      */

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Tests\Performance;
 
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkResult;
-use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkComparator;
 
 /**
  * Generates performance reports in various formats.

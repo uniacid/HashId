@@ -4,7 +4,7 @@ namespace Pgs\HashIdBundle\Exception;
 
 /**
  * Exception thrown when an invalid controller is provided.
- * 
+ *
  * @deprecated since 4.0, use HashIdException::invalidController() instead
  */
 class InvalidControllerException extends HashIdException

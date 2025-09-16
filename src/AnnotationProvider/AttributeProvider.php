@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\AnnotationProvider;
 
+use ReflectionMethod;
+use InvalidArgumentException;
 use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
 use Pgs\HashIdBundle\AnnotationProvider\Dto\HashConfiguration;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
@@ -21,15 +23,8 @@ use Pgs\HashIdBundle\Service\CompatibilityLayer;
  */
 class AttributeProvider implements AnnotationProviderInterface
 {
-    private CompatibilityLayer $compatibilityLayer;
-    private ReflectionProvider $reflectionProvider;
-
-    public function __construct(
-        CompatibilityLayer $compatibilityLayer,
-        ReflectionProvider $reflectionProvider,
-    ) {
-        $this->compatibilityLayer = $compatibilityLayer;
-        $this->reflectionProvider = $reflectionProvider;
+    public function __construct(private readonly CompatibilityLayer $compatibilityLayer, private readonly ReflectionProvider $reflectionProvider)
+    {
     }
 
     /**
@@ -109,12 +104,12 @@ class AttributeProvider implements AnnotationProviderInterface
     /**
      * Extract Hash configuration from a method using the compatibility layer.
      *
-     * @param \ReflectionMethod|null $method The method to extract from
+     * @param ReflectionMethod|null $method The method to extract from
      * @param string $annotationClassName The annotation/attribute class name
      *
      * @return object|null The Hash configuration object or null if not found
      */
-    private function extractHashFromMethod(?\ReflectionMethod $method, string $annotationClassName): ?object
+    private function extractHashFromMethod(?ReflectionMethod $method, string $annotationClassName): ?object
     {
         // Null safety check
         if ($method === null) {
@@ -137,7 +132,7 @@ class AttributeProvider implements AnnotationProviderInterface
         // while providing better type safety and validation
         try {
             return new HashConfiguration($parameters);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             // Log or handle invalid parameter names
             // For now, return null to maintain backward compatibility
             return null;

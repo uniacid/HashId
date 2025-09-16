@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Performance;
 
+use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
+use Hashids\Hashids;
+use Pgs\HashIdBundle\Decorator\RouterDecorator;
+use Symfony\Component\Routing\RouterInterface;
+use Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface;
+use Pgs\HashIdBundle\Service\DecodeControllerParameters;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
-use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkComparator;
 
 /**
  * Validates that all performance benchmarks meet targets.
@@ -39,8 +44,8 @@ class ValidationTest extends TestCase
      */
     public function testEncodingPerformanceTarget(): void
     {
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         $result = $this->runner->benchmark('encoding', function () use ($hasher) {
@@ -65,8 +70,8 @@ class ValidationTest extends TestCase
      */
     public function testDecodingPerformanceTarget(): void
     {
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         $encoded = $hasher->encode(12345);
@@ -93,8 +98,8 @@ class ValidationTest extends TestCase
      */
     public function testBatchPerformanceTarget(): void
     {
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         $ids = range(1, 100);
@@ -127,7 +132,7 @@ class ValidationTest extends TestCase
         $processor = $this->createMockProcessor();
         $decodeService = $this->createMockDecodeService();
 
-        $decoratedRouter = new \Pgs\HashIdBundle\Decorator\RouterDecorator(
+        $decoratedRouter = new RouterDecorator(
             $baseRouter,
             $processor,
             $decodeService
@@ -163,8 +168,8 @@ class ValidationTest extends TestCase
      */
     public function testMemoryUsageTarget(): void
     {
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         $memoryProfile = $this->runner->profileMemory(function () use ($hasher) {
@@ -258,8 +263,8 @@ class ValidationTest extends TestCase
      */
     private function runRepresentativeTests(): void
     {
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         // Simulate various test scenarios
@@ -275,8 +280,8 @@ class ValidationTest extends TestCase
     private function runAllBenchmarks(): array
     {
         $results = [];
-        $hasher = new \Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter(
-            new \Hashids\Hashids('test-salt', 10)
+        $hasher = new HashidsConverter(
+            new Hashids('test-salt', 10)
         );
 
         // Encoding
@@ -354,7 +359,7 @@ class ValidationTest extends TestCase
      */
     private function createMockRouter(): object
     {
-        $router = $this->createMock(\Symfony\Component\Routing\RouterInterface::class);
+        $router = $this->createMock(RouterInterface::class);
         $router->method('generate')->willReturn('/test/123');
         return $router;
     }
@@ -364,7 +369,7 @@ class ValidationTest extends TestCase
      */
     private function createMockProcessor(): object
     {
-        $processor = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface::class);
+        $processor = $this->createMock(ParametersProcessorInterface::class);
         $processor->method('encodeArrayOfParametersForRoute')->willReturnArgument(0);
         return $processor;
     }
@@ -374,6 +379,6 @@ class ValidationTest extends TestCase
      */
     private function createMockDecodeService(): object
     {
-        return $this->createMock(\Pgs\HashIdBundle\Service\DecodeControllerParameters::class);
+        return $this->createMock(DecodeControllerParameters::class);
     }
 }

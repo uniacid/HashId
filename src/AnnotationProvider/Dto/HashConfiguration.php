@@ -30,17 +30,27 @@ final class HashConfiguration
         $this->parameters = [];
         foreach ($parameters as $parameter) {
             if (!\is_string($parameter)) {
+<<<<<<< HEAD
                 throw HashIdException::invalidParameter(
                     'parameter',
                     \sprintf('Must be a string, got %s', \gettype($parameter))
+=======
+                throw new InvalidArgumentException(
+                    \sprintf('Parameter must be a string, got %s', \gettype($parameter))
+>>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
                 );
             }
             
             // Validate parameter name
             if (!$this->isValidParameterName($parameter)) {
+<<<<<<< HEAD
                 throw HashIdException::invalidParameter(
                     $parameter,
                     'Invalid parameter name format'
+=======
+                throw new InvalidArgumentException(
+                    \sprintf('Invalid parameter name: "%s"', $parameter)
+>>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
                 );
             }
             

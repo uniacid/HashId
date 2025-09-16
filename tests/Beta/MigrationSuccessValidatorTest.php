@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Pgs\HashIdBundle\Tests\Beta;
 
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\Process\Process;
 
 class MigrationSuccessValidatorTest extends TestCase
 {

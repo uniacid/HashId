@@ -2,6 +2,8 @@
 
 namespace Pgs\HashIdBundle\Tests\Service;
 
+use InvalidArgumentException;
+use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
 use Pgs\HashIdBundle\Service\HasherFactory;
 use Pgs\HashIdBundle\Service\HasherInterface;
 use Pgs\HashIdBundle\Service\DefaultHasher;
@@ -107,7 +109,7 @@ class HasherFactoryTest extends TestCase
     {
         $factory = new HasherFactory();
         
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown hasher type "invalid"');
         
         $factory->create('invalid');
@@ -119,7 +121,7 @@ class HasherFactoryTest extends TestCase
     public function testFactoryConstructorValidation(): void
     {
         // Test negative min length
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Minimum length must be non-negative');
         
         new HasherFactory(null, -1);
@@ -131,7 +133,7 @@ class HasherFactoryTest extends TestCase
     public function testAlphabetValidation(): void
     {
         // Test too short alphabet
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Alphabet must contain at least 16 unique characters');
         
         new HasherFactory(null, 10, 'abcde');
@@ -217,7 +219,7 @@ class HasherFactoryTest extends TestCase
         
         $converter = $factory->createConverter('default');
         
-        $this->assertInstanceOf(\Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface::class, $converter);
+        $this->assertInstanceOf(ConverterInterface::class, $converter);
         
         // Test it works
         $encoded = $converter->encode(123);
