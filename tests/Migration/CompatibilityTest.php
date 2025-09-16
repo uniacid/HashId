@@ -7,6 +7,7 @@ namespace Pgs\HashIdBundle\Tests\Migration;
 use ReflectionClass;
 use Attribute;
 use ReflectionProperty;
+use ReflectionMethod;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Annotation\Hash as AnnotationHash;
 use Pgs\HashIdBundle\Attribute\Hash as AttributeHash;
@@ -33,24 +34,24 @@ class CompatibilityTest extends TestCase
     {
         $annotationReflection = new ReflectionClass(AnnotationHash::class);
         $attributeReflection = new ReflectionClass(AttributeHash::class);
-        
-        // Both should have the same public properties/methods for compatibility
-        $annotationProps = $this->getPublicProperties($annotationReflection);
-        $attributeProps = $this->getPublicProperties($attributeReflection);
-        
-        // Core properties that must exist in both
-        $coreProperties = ['parameters'];
-        
-        foreach ($coreProperties as $prop) {
+
+        // Both should have the same public methods for compatibility
+        $annotationMethods = $this->getPublicMethods($annotationReflection);
+        $attributeMethods = $this->getPublicMethods($attributeReflection);
+
+        // Core methods that must exist in both
+        $coreMethods = ['getParameters'];
+
+        foreach ($coreMethods as $method) {
             $this->assertContains(
-                $prop,
-                $annotationProps,
-                sprintf('Annotation class should have %s property', $prop)
+                $method,
+                $annotationMethods,
+                sprintf('Annotation class should have %s method', $method)
             );
             $this->assertContains(
-                $prop,
-                $attributeProps,
-                sprintf('Attribute class should have %s property', $prop)
+                $method,
+                $attributeMethods,
+                sprintf('Attribute class should have %s method', $method)
             );
         }
     }
@@ -146,12 +147,17 @@ class CompatibilityTest extends TestCase
         $this->assertStringContainsString('compatibility', $content, 'Configuration should have compatibility section');
         
         // Check for core settings that must be maintained
-        $coreSettings = ['salt', 'min_hash_length', 'alphabet'];
-        foreach ($coreSettings as $setting) {
+        // Note: Configuration uses constant names like NODE_CONVERTER_HASHIDS_SALT
+        $coreSettings = [
+            'SALT' => 'salt',
+            'MIN_HASH_LENGTH' => 'min_hash_length',
+            'ALPHABET' => 'alphabet'
+        ];
+        foreach ($coreSettings as $constantPart => $settingName) {
             $this->assertStringContainsString(
-                $setting,
+                $constantPart,
                 $content,
-                sprintf('Configuration should maintain %s setting', $setting)
+                sprintf('Configuration should maintain %s setting', $settingName)
             );
         }
     }
@@ -179,5 +185,17 @@ class CompatibilityTest extends TestCase
             $properties[] = $prop->getName();
         }
         return $properties;
+    }
+
+    private function getPublicMethods(ReflectionClass $reflection): array
+    {
+        $methods = [];
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC) as $method) {
+            // Skip constructor and inherited methods
+            if (!$method->isConstructor() && $method->class === $reflection->getName()) {
+                $methods[] = $method->getName();
+            }
+        }
+        return $methods;
     }
 }

@@ -171,10 +171,9 @@ class MemoryBenchmarkTest extends TestCase
     public function testRouterDecorationMemory(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor();
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory();
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         $memoryProfile = $this->runner->profileMemory(function () use ($decoratedRouter) {
             for ($i = 0; $i < 1000; $i++) {
@@ -427,6 +426,20 @@ class MemoryBenchmarkTest extends TestCase
     private function createMockDecodeService(): object
     {
         return $this->createMock(DecodeControllerParameters::class);
+    }
+
+    /**
+     * Create a mock factory for RouterDecorator.
+     */
+    private function createMockFactory(): object
+    {
+        $factory = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\Factory\EncodeParametersProcessorFactory::class);
+        $processor = $this->createMockProcessor();
+
+        $factory->method('createRouteEncodeParametersProcessor')
+            ->willReturn($processor);
+
+        return $factory;
     }
 
     /**

@@ -36,10 +36,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testRouterDecorationOverhead(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor();
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory();
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         // Test URL generation without hashing
         $comparison = $this->runner->compare(
@@ -76,10 +75,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testUrlGenerationWithEncoding(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor(true); // Will encode parameters
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory(true); // Will encode parameters
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         $result = $this->runner->benchmark('url_with_encoding', function () use ($decoratedRouter) {
             $decoratedRouter->generate('test_route', ['id' => 12345, 'userId' => 67890]);
@@ -108,10 +106,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testBatchUrlGeneration(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor(true);
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory(true);
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         // Generate 100 different URLs
         $routes = [];
@@ -150,17 +147,26 @@ class RoutingBenchmarkTest extends TestCase
      */
     public function testParameterDecodingPerformance(): void
     {
-        $decodeService = new DecodeControllerParameters($this->createMockProcessor(false));
+        $decodeService = new DecodeControllerParameters($this->createMockDecodeFactory());
 
-        // Create mock request with encoded parameters
-        $request = $this->createMockRequest([
-            'id' => 'encoded123',
-            'userId' => 'encoded456',
-            'page' => '2',
-        ]);
+        // Create real request with encoded parameters
+        $request = new \Symfony\Component\HttpFoundation\Request();
+        $request->attributes->set('id', 'encoded123');
+        $request->attributes->set('userId', 'encoded456');
+        $request->attributes->set('page', '2');
 
-        $result = $this->runner->benchmark('parameter_decoding', function () use ($decodeService, $request) {
-            $decodeService->decodeControllerParameters($request, 'TestController::testAction');
+        // Create a ControllerEvent
+        $kernel = $this->createMock(\Symfony\Component\HttpKernel\HttpKernelInterface::class);
+        $controller = function() { return null; }; // Dummy controller
+        $event = new \Symfony\Component\HttpKernel\Event\ControllerEvent(
+            $kernel,
+            $controller,
+            $request,
+            \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST
+        );
+
+        $result = $this->runner->benchmark('parameter_decoding', function () use ($decodeService, $event) {
+            $decodeService->decodeControllerParameters($event);
         });
 
         // Should decode parameters in under 0.2ms
@@ -186,10 +192,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testComplexRouteGeneration(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor(true);
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory(true);
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         // Complex route with many parameters
         $complexParams = [
@@ -229,10 +234,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testRouteGenerationMemory(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor(true);
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory(true);
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         $memoryProfile = $this->runner->profileMemory(function () use ($decoratedRouter) {
             for ($i = 0; $i < 1000; $i++) {
@@ -264,10 +268,9 @@ class RoutingBenchmarkTest extends TestCase
     public function testRouteCachingImpact(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor(true);
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory(true);
 
-        $decoratedRouter = new RouterDecorator($baseRouter, $processor, $decodeService);
+        $decoratedRouter = new RouterDecorator($baseRouter, $factory);
 
         // First generation (cold cache)
         $coldResult = $this->runner->benchmark('cold_cache', function () use ($decoratedRouter) {
@@ -365,6 +368,34 @@ class RoutingBenchmarkTest extends TestCase
     private function createMockDecodeService(): DecodeControllerParameters
     {
         return $this->createMock(DecodeControllerParameters::class);
+    }
+
+    /**
+     * Create a mock factory for the RouterDecorator.
+     */
+    private function createMockFactory(bool $willEncode = false): object
+    {
+        $factory = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\Factory\EncodeParametersProcessorFactory::class);
+        $processor = $this->createMockProcessor($willEncode);
+
+        $factory->method('createRouteEncodeParametersProcessor')
+            ->willReturn($processor);
+
+        return $factory;
+    }
+
+    /**
+     * Create a mock decode factory.
+     */
+    private function createMockDecodeFactory(): object
+    {
+        $factory = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\Factory\DecodeParametersProcessorFactory::class);
+        $processor = $this->createMockProcessor(false);
+
+        $factory->method('createControllerDecodeParametersProcessor')
+            ->willReturn($processor);
+
+        return $factory;
     }
 
     /**

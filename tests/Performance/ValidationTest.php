@@ -123,13 +123,11 @@ class ValidationTest extends TestCase
     public function testRouterOverheadTarget(): void
     {
         $baseRouter = $this->createMockRouter();
-        $processor = $this->createMockProcessor();
-        $decodeService = $this->createMockDecodeService();
+        $factory = $this->createMockFactory();
 
         $decoratedRouter = new RouterDecorator(
             $baseRouter,
-            $processor,
-            $decodeService
+            $factory
         );
 
         // Measure base router performance
@@ -370,5 +368,19 @@ class ValidationTest extends TestCase
     private function createMockDecodeService(): object
     {
         return $this->createMock(DecodeControllerParameters::class);
+    }
+
+    /**
+     * Create mock factory for RouterDecorator.
+     */
+    private function createMockFactory(): object
+    {
+        $factory = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\Factory\EncodeParametersProcessorFactory::class);
+        $processor = $this->createMockProcessor();
+
+        $factory->method('createRouteEncodeParametersProcessor')
+            ->willReturn($processor);
+
+        return $factory;
     }
 }

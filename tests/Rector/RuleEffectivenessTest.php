@@ -158,12 +158,14 @@ class RuleEffectivenessTest extends TestCase
         $manualTime = $this->measureManualTransformationTime();
         $automatedTime = $this->measureAutomatedTransformationTime();
 
-        $timeReduction = (($manualTime - $automatedTime) / $manualTime) * 100;
+        $timeReduction = $manualTime > 0
+            ? (($manualTime - $automatedTime) / $manualTime) * 100
+            : 0;
 
         $this->assertGreaterThanOrEqual(50.0, $timeReduction,
             'Automated transformation should be at least 50% faster than manual');
 
-        $this->metricsCollector->calculateTimeSavings($manualTime);
+        $this->metricsCollector->calculateTimeSavings((int) $manualTime);
         $savings = $this->metricsCollector->getTimeSavingsMetrics();
 
         $this->assertArrayHasKey('time_saved_seconds', $savings);
@@ -178,7 +180,9 @@ class RuleEffectivenessTest extends TestCase
         $metrics = $this->runRectorWithAllRules();
         $executionTime = microtime(true) - $startTime;
 
-        $filesPerSecond = $metrics['files_processed'] / $executionTime;
+        $filesPerSecond = $executionTime > 0
+            ? $metrics['files_processed'] / $executionTime
+            : 0;
 
         $this->assertGreaterThan(10, $filesPerSecond,
             'Should process at least 10 files per second');
@@ -203,8 +207,10 @@ class RuleEffectivenessTest extends TestCase
             $this->assertArrayHasKey('message', $error);
         }
 
-        $errorRate = ($metrics['transformations_failed'] /
-                     ($metrics['transformations_successful'] + $metrics['transformations_failed'])) * 100;
+        $totalTransformations = $metrics['transformations_successful'] + $metrics['transformations_failed'];
+        $errorRate = $totalTransformations > 0
+            ? ($metrics['transformations_failed'] / $totalTransformations) * 100
+            : 0;
 
         $this->assertLessThan(5.0, $errorRate,
             'Error rate should be less than 5%');
@@ -297,7 +303,9 @@ class RuleEffectivenessTest extends TestCase
         $metrics['transformations_failed'] = $metrics['files_processed'] - $metrics['files_modified'];
 
         if ($metrics['files_processed'] > 0) {
-            $metrics['success_rate'] = ($metrics['transformations_successful'] / $metrics['files_processed']) * 100;
+            $metrics['success_rate'] = $metrics['files_processed'] > 0
+                ? ($metrics['transformations_successful'] / $metrics['files_processed']) * 100
+                : 0;
         } else {
             $metrics['success_rate'] = 0;
         }

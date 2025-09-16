@@ -149,14 +149,14 @@ class HasherFactory
             default => throw new InvalidArgumentException("Invalid hasher type: {$type}")
         };
 
-        // Merge configurations
+        // Merge configurations - defaults first, then type-specific, then user config
         $hasherConfig = \array_merge(
-            self::HASHER_CONFIGS[$type] ?? [],
             [
                 'salt' => $this->defaultSalt,
                 'min_length' => $this->defaultMinLength,
                 'alphabet' => $this->defaultAlphabet,
             ],
+            self::HASHER_CONFIGS[$type] ?? [],
             $config,
         );
         
@@ -349,14 +349,14 @@ class HasherFactory
             ));
         }
         
-        // Merge configurations
+        // Merge configurations - defaults first, then type-specific, then user config
         $hasherConfig = \array_merge(
-            self::HASHER_CONFIGS[$type] ?? [],
             [
                 'salt' => $this->defaultSalt,
                 'min_length' => $this->defaultMinLength,
                 'alphabet' => $this->defaultAlphabet,
             ],
+            self::HASHER_CONFIGS[$type] ?? [],
             $config,
         );
         
