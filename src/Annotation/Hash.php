@@ -34,10 +34,10 @@ namespace Pgs\HashIdBundle\Annotation;
 readonly class Hash
 {
     /** @var array<int, string> */
-    private array $parameters;
-    
+    public readonly array $parameters;
+
     /** @var string The hasher to use for encoding/decoding */
-    private string $hasher;
+    public readonly string $hasher;
 
     /** @param array<string, mixed>|array<int, string> $parameters */
     public function __construct(array $parameters)
@@ -49,18 +49,19 @@ readonly class Hash
             } else {
                 $this->parameters = [$parameters['value']];
             }
-            $this->hasher = isset($parameters['hasher']) ? (string) $parameters['hasher'] : 'default';
+            $hasher = isset($parameters['hasher']) ? (string) $parameters['hasher'] : 'default';
         } else {
             // Handle direct array format
             $this->parameters = array_values(array_filter($parameters, 'is_string'));
-            $this->hasher = 'default';
+            $hasher = 'default';
         }
-        
+
         // Normalize hasher name
-        $this->hasher = trim($this->hasher);
-        if (empty($this->hasher)) {
-            $this->hasher = 'default';
+        $hasher = trim($hasher);
+        if (empty($hasher)) {
+            $hasher = 'default';
         }
+        $this->hasher = $hasher;
     }
 
     /** @return array<int, string> */

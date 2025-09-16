@@ -35,8 +35,8 @@ class HashAttributeTest extends TestCase
         self::assertCount(1, $attributes);
 
         $attributeInstance = $attributes[0]->newInstance();
-        // Hash attribute supports both CLASS and METHOD targets
-        self::assertSame(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD, $attributeInstance->flags);
+        // Hash attribute supports CLASS and METHOD targets and is repeatable
+        self::assertSame(Attribute::TARGET_CLASS | Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE, $attributeInstance->flags);
     }
 
     public function testAttributeOnMethod(): void

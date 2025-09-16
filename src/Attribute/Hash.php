@@ -62,23 +62,15 @@ class Hash
     private const MAX_HASHER_NAME_LENGTH = 50;
 
     /** @var array<string> */
-<<<<<<< HEAD
-    private array $parameters;
-    
+    private readonly array $parameters;
+
     /** @var string The hasher to use for encoding/decoding */
-    private string $hasher;
+    private readonly string $hasher;
 
     /**
      * @param string|array<string> $parameters Parameter name(s) to be encoded/decoded
      * @param string $hasher The hasher name to use (default: 'default')
-     * @throws \InvalidArgumentException If parameters or hasher are invalid
-=======
-    private readonly array $parameters;
-
-    /**
-     * @param string|array<string> $parameters Parameter name(s) to be encoded/decoded
-     * @throws InvalidArgumentException If parameters are invalid
->>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
+     * @throws HashIdException If parameters or hasher are invalid
      */
     public function __construct(string|array $parameters, string $hasher = 'default')
     {
@@ -87,49 +79,27 @@ class Hash
 
         // Validate parameter count
         if (\count($this->parameters) > self::MAX_PARAMETERS) {
-<<<<<<< HEAD
             throw HashIdException::invalidParameter(
                 'parameters',
                 \sprintf('Too many parameters specified (max %d, got %d)', self::MAX_PARAMETERS, \count($this->parameters))
             );
-=======
-            throw new InvalidArgumentException(\sprintf(
-                'Too many parameters specified (max %d, got %d)',
-                self::MAX_PARAMETERS,
-                \count($this->parameters)
-            ));
->>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
         }
 
         // Validate parameter names
         foreach ($this->parameters as $param) {
             if (!\preg_match(self::PARAM_NAME_PATTERN, $param)) {
-<<<<<<< HEAD
                 throw HashIdException::invalidParameter(
                     $param,
                     'Parameter names must contain only letters, numbers, and underscores'
                 );
-=======
-                throw new InvalidArgumentException(\sprintf(
-                    'Invalid parameter name: "%s". Parameter names must contain only letters, numbers, and underscores.',
-                    $param
-                ));
->>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
             }
 
             // Additional length check for parameter names
             if (\strlen($param) > 100) {
-<<<<<<< HEAD
                 throw HashIdException::invalidParameter(
                     $param,
                     'Parameter name too long (max 100 characters)'
                 );
-=======
-                throw new InvalidArgumentException(\sprintf(
-                    'Parameter name too long: "%s" (max 100 characters)',
-                    $param
-                ));
->>>>>>> 9f431ad (refactor: Improve type handling and exception management across the codebase)
             }
         }
     }
