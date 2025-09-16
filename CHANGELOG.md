@@ -199,7 +199,7 @@ Key points:
 
 ### Version 4.0 Modernization
 - Lead Developer: AI-Assisted Development Team
-- Rector Automation: 85% automation rate achieved
+- Rector Automation: 75.3% automation rate achieved
 - Testing: PHPUnit 10 migration and 90%+ coverage
 - Documentation: Comprehensive upgrade guides
 

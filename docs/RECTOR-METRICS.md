@@ -8,8 +8,8 @@ The HashId Bundle v4.0 modernization project successfully leveraged Rector to au
 
 ### Overall Success Rate
 - **Target Automation Rate:** 70%
-- **Achieved Automation Rate:** 85%
-- **Manual Intervention Required:** 15%
+- **Achieved Automation Rate:** 75.3%
+- **Manual Intervention Required:** 24.7%
 
 ### Rector Rules Applied
 
@@ -75,7 +75,7 @@ The HashId Bundle v4.0 modernization project successfully leveraged Rector to au
 
 ## Manual Interventions Required
 
-### Areas Requiring Manual Work (15%)
+### Areas Requiring Manual Work (24.7%)
 1. **Attribute Migration** (40% of manual work)
    - Dual support for annotations and attributes
    - Deprecation layer implementation
@@ -139,6 +139,6 @@ The HashId Bundle v4.0 modernization project successfully leveraged Rector to au
 
 ## Conclusion
 
-The Rector automation achieved an 85% automation rate, exceeding the 70% target. The tool proved invaluable for the PHP 8.3 and Symfony 6.4 modernization, saving approximately 45.5 hours of manual development time while improving code quality and consistency. The remaining 15% manual work was primarily focused on complex business logic and maintaining backward compatibility, which required human judgment and domain knowledge.
+The Rector automation achieved a 75.3% automation rate, exceeding the 70% target. The tool proved invaluable for the PHP 8.3 and Symfony 6.4 modernization, saving approximately 45.5 hours of manual development time while improving code quality and consistency. The remaining 24.7% manual work was primarily focused on complex business logic and maintaining backward compatibility, which required human judgment and domain knowledge.
 
 The successful implementation demonstrates that Rector is a powerful tool for PHP modernization projects, particularly when combined with incremental application, comprehensive testing, and careful planning.

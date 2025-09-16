@@ -79,9 +79,12 @@ composer require "pgs-soft/hashid-bundle:^4.0"
 Keep both annotations and attributes during transition:
 
 ```php
+<?php
+
 // Both work in v4.0
 use Pgs\HashIdBundle\Annotation\Hash;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
+use Symfony\Component\Routing\Attribute\Route;
 
 class MyController
 {
@@ -90,7 +93,7 @@ class MyController
      * @Hash("id")  // Still works, but deprecated
      */
     public function withAnnotation(int $id) { }
-    
+
     #[Route('/demo/{id}')]
     #[HashAttribute('id')]  // Recommended
     public function withAttribute(int $id) { }
@@ -215,26 +218,30 @@ services:
 If you've extended the annotation system:
 
 ```php
+<?php
 // Before
 use Doctrine\Common\Annotations\Reader;
 
 class CustomReader
 {
     private Reader $reader;
-    
+
     public function __construct(Reader $reader)
     {
         $this->reader = $reader;
     }
 }
+```
 
+```php
+<?php
 // After
 use Pgs\HashIdBundle\Service\AttributeReader;
 
 class CustomReader
 {
     private AttributeReader $reader;
-    
+
     public function __construct(AttributeReader $reader)
     {
         $this->reader = $reader;
@@ -247,10 +254,17 @@ class CustomReader
 Update any custom event subscribers:
 
 ```php
-// Check for method signature changes
-public function onKernelController(ControllerEvent $event): void
+<?php
+
+use Symfony\Component\HttpKernel\Event\ControllerEvent;
+
+class MyEventSubscriber
 {
-    // Implementation remains the same
+    // Check for method signature changes
+    public function onKernelController(ControllerEvent $event): void
+    {
+        // Implementation remains the same
+    }
 }
 ```
 
