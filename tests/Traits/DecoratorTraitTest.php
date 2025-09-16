@@ -2,6 +2,7 @@
 
 namespace Pgs\HashIdBundle\Tests\Traits;
 
+use BadMethodCallException;
 use Pgs\HashIdBundle\Tests\Traits\Fixtures\BaseTestClass;
 use Pgs\HashIdBundle\Tests\Traits\Fixtures\DecorateTestClass;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,7 @@ class DecoratorTraitTest extends TestCase
 
     public function testNonExistingMethodCall()
     {
-        $this->expectException(\BadMethodCallException::class);
+        $this->expectException(BadMethodCallException::class);
         $this->decorateClass->nonExistingMethod();
     }
 }

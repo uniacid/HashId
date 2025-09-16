@@ -6,7 +6,7 @@ use Pgs\HashIdBundle\ParametersProcessor\Encode;
 use Pgs\HashIdBundle\ParametersProcessor\Factory\EncodeParametersProcessorFactory;
 use Pgs\HashIdBundle\ParametersProcessor\NoOp;
 
-class EncodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTest
+class EncodeParametersProcessorFactoryTest extends ParametersProcessorFactoryTestCase
 {
     public function testCreateRouteEncodeParametersProcessor(): void
     {

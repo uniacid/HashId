@@ -1,0 +1,28 @@
+FROM php:8.3-cli
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    && docker-php-ext-install \
+    zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Create metrics collection environment
+RUN mkdir -p /metrics /app
+WORKDIR /app
+
+# Copy metrics collection scripts
+COPY scripts/metrics/ /scripts/metrics/
+RUN chmod +x /scripts/metrics/*.php
+
+# Install dependencies for metrics collection
+RUN composer require symfony/yaml symfony/console symfony/finder --no-interaction
+
+# Entry point for metrics collection
+CMD ["php", "/scripts/metrics/collect-all-metrics.php"]

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Service;
 
+use ReflectionClass;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
 use Pgs\HashIdBundle\Rector\DeprecationHandler;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
@@ -34,7 +35,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
 
         $parameters = $this->compatibilityLayer->extractHashConfiguration($method);
@@ -54,7 +55,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
 
         $parameters = $this->compatibilityLayer->extractHashConfiguration($method);
@@ -74,7 +75,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
 
         $parameters = $this->compatibilityLayer->extractHashConfiguration($method);
@@ -95,7 +96,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
 
         // Should prefer attribute when both are present
@@ -115,7 +116,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('index');
 
         $parameters = $this->compatibilityLayer->extractHashConfiguration($method);
@@ -137,7 +138,7 @@ class CompatibilityLayerTest extends TestCase
             }
         };
 
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
 
         $compatibilityLayerNoWarnings->extractHashConfiguration($method);

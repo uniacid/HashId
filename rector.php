@@ -15,37 +15,65 @@ return static function (RectorConfig $rectorConfig): void {
         __DIR__ . '/tests/Fixtures',
         // Skip Rector fixtures
         __DIR__ . '/tests/Rector/Fixtures',
+        // Skip cache directories
+        __DIR__ . '/var',
+        __DIR__ . '/tests/App/cache',
     ]);
 
-    // Import modular configurations
-    // Note: These will be loaded conditionally based on what modernization phase is being applied
-    
-    // Phase 1: PHP 8.1 features (current focus)
-    // Uncomment to apply: $rectorConfig->import(__DIR__ . '/rector-php81.php');
-    
-    // Phase 2: PHP 8.2 features (future)
+    // Import modular configurations based on migration stage
+    // ======================================================
+
+    // Stage 1: PHP 8.1 features (ACTIVE)
+    // Achieves ~30% automation on its own
+    $rectorConfig->import(__DIR__ . '/rector-php81.php');
+
+    // Stage 2: PHP 8.2 features
+    // Uncomment when ready for next stage (~20% additional automation)
     // $rectorConfig->import(__DIR__ . '/rector-php82.php');
-    
-    // Phase 2: PHP 8.3 features (future) 
+
+    // Stage 3: PHP 8.3 features
+    // Uncomment for latest PHP features (~15% additional automation)
     // $rectorConfig->import(__DIR__ . '/rector-php83.php');
-    
-    // Symfony compatibility rules
+
+    // Stage 4: Symfony modernization
+    // Uncomment for Symfony 6.4/7.0 compatibility (~25% additional automation)
     // $rectorConfig->import(__DIR__ . '/rector-symfony.php');
-    
-    // Code quality improvements
+
+    // Stage 5: Code quality improvements
+    // Uncomment for final polish (~10% additional automation)
     // $rectorConfig->import(__DIR__ . '/rector-quality.php');
-    
+
+    // Optional: Compatibility mode for gradual migration
+    // Keeps both annotations and attributes during transition
+    // $rectorConfig->import(__DIR__ . '/rector-compatibility.php');
+
     // Register custom HashId-specific rules
-    require_once __DIR__ . '/rector-rules/HashAnnotationToAttributeRule.php';
-    require_once __DIR__ . '/rector-rules/ConfigurationModernizationRule.php';
-    require_once __DIR__ . '/rector-rules/ServiceDefinitionRule.php';
-    
-    // Enable our custom rules
-    $rectorConfig->rule(\Pgs\HashIdBundle\Rector\HashAnnotationToAttributeRule::class);
-    
-    // Configure parallel processing
+    // These are always active as they're specific to this bundle
+    $customRulesDir = __DIR__ . '/rector-rules';
+    if (is_dir($customRulesDir)) {
+        // Auto-discover custom rules
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($customRulesDir)
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && $file->getExtension() === 'php' && str_contains($file->getBasename(), 'Rule')) {
+                $relativePath = str_replace($customRulesDir . '/', '', $file->getPathname());
+                $className = 'Pgs\\HashIdBundle\\Rector\\' . str_replace(['/', '.php'], ['\\', ''], $relativePath);
+
+                if (class_exists($className)) {
+                    $rectorConfig->rule($className);
+                }
+            }
+        }
+    }
+
+    // Performance optimizations
     $rectorConfig->parallel();
-    
-    // Cache directory
     $rectorConfig->cacheDirectory(__DIR__ . '/var/cache/rector');
+
+    // Import management
+    $rectorConfig->importNames();
+    $rectorConfig->importShortClasses();
+    $rectorConfig->removeUnusedImports();
 };

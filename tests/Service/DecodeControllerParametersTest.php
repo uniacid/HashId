@@ -16,32 +16,35 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 
 class DecodeControllerParametersTest extends TestCase
 {
-    protected $controllerMockProvider;
-
-    protected $parametersProcessorMockProvider;
+    use ControllerMockProvider;
+    use ParametersProcessorMockProvider;
 
     protected function setUp(): void
     {
-        $this->parametersProcessorMockProvider = new ParametersProcessorMockProvider();
+        // No need to instantiate traits
     }
 
-    public function getControllerMockProvider(): ControllerMockProvider
+    public function getControllerMockProvider(): self
     {
-        return $this->controllerMockProvider ?? new ControllerMockProvider();
+        return $this;
     }
 
-    public function getParametersProcessorMockProvider(): ParametersProcessorMockProvider
+    public function getParametersProcessorMockProvider(): self
     {
-        return $this->parametersProcessorMockProvider;
+        return $this;
     }
 
     /**
      * @dataProvider decodeControllerParametersDataProvider
      *
-     * @param mixed $controller
+     * @param mixed $controllerMarker
      */
-    public function testDecodeControllerParameters($controller): void
+    public function testDecodeControllerParameters($controllerMarker): void
     {
+        // Create a callable controller (array format for Symfony)
+        $controllerInstance = $this->getControllerMockProvider()->getTestControllerMock();
+        $controller = [$controllerInstance, 'demo'];
+
         $decodeParametersProcessorFactory = $this->getDecodeParametersProcessorFactoryMock();
         $decodeControllerParameters = new DecodeControllerParameters($decodeParametersProcessorFactory);
         $event = $this->getEventMock(
@@ -61,18 +64,24 @@ class DecodeControllerParametersTest extends TestCase
         self::assertSame(10, $event->getRequest()->attributes->all()['id']);
     }
 
-    public function decodeControllerParametersDataProvider()
+    public static function decodeControllerParametersDataProvider()
     {
+        // Data providers are now static in PHPUnit 10, so we can't use $this
+        // Return a marker that the test method will use to create the actual mock
         return [
-            ['controller as array' => $this->getControllerMockProvider()->getTestControllerMock(), 'demo'],
+            ['controller_mock_marker'],
         ];
     }
 
     /**
      * @dataProvider decodeControllerParametersDataProvider
      */
-    public function testDecodeControllerParametersWithParamConverter($controller): void
+    public function testDecodeControllerParametersWithParamConverter($controllerMarker): void
     {
+        // Create a callable controller (array format for Symfony)
+        $controllerInstance = $this->getControllerMockProvider()->getTestControllerMock();
+        $controller = [$controllerInstance, 'demo'];
+
         $decodeParametersProcessorFactory = $this->getDecodeParametersProcessorFactoryMock();
         $decodeControllerParameters = new DecodeControllerParameters($decodeParametersProcessorFactory);
         $decodeControllerParameters->setParamConverterListener($this->getDoctrineParamConverterListenerMock());
@@ -122,18 +131,14 @@ class DecodeControllerParametersTest extends TestCase
      */
     protected function getEventMock(array $requestConsecutiveCalls, $controller): ControllerEvent
     {
-        $mock = $this->getMockBuilder(ControllerEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getController', 'getRequest'])
-            ->getMock();
+        // ControllerEvent is final in Symfony 6.4/7.0, so we need to create a real instance
+        $kernel = $this->createMock(\Symfony\Component\HttpKernel\HttpKernelInterface::class);
+        $request = $this->getRequestMock($requestConsecutiveCalls);
 
-        $mock->method('getController')
-            ->willReturn($controller);
+        // Create a real ControllerEvent instance
+        $event = new ControllerEvent($kernel, $controller, $request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST);
 
-        $mock->method('getRequest')
-            ->willReturn($this->getRequestMock($requestConsecutiveCalls));
-
-        return $mock;
+        return $event;
     }
 
     /**

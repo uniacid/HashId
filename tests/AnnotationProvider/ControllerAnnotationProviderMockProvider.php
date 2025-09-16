@@ -6,8 +6,6 @@ use Pgs\HashIdBundle\Annotation\Hash;
 use Pgs\HashIdBundle\AnnotationProvider\AnnotationProvider;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Pgs\HashIdBundle\Tests\Controller\ControllerMockProvider;
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockBuilder;
 trait ControllerAnnotationProviderMockProvider
 {
     use ControllerMockProvider;

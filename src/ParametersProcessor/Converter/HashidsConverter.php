@@ -20,19 +20,19 @@ class HashidsConverter implements ConverterInterface
     /**
      * Cache for frequently encoded values to improve performance.
      * Static property for persistence across instances.
-     * 
+     *
      * @var array<int, string>
      */
     private static array $encodeCache = [];
-    
+
     /**
      * Cache for frequently decoded values to improve performance.
      * Static property for persistence across instances.
-     * 
+     *
      * @var array<string, mixed>
      */
     private static array $decodeCache = [];
-    
+
     /**
      * Constructor with readonly property for immutability.
      */

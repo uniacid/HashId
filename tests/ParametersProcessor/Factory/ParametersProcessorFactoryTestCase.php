@@ -8,7 +8,7 @@ use Pgs\HashIdBundle\Tests\ParametersProcessor\ParametersProcessorMockProvider;
 use Pgs\HashIdBundle\Tests\Route\RouteMockProvider;
 use PHPUnit\Framework\TestCase;
 
-abstract class ParametersProcessorFactoryTest extends TestCase
+abstract class ParametersProcessorFactoryTestCase extends TestCase
 {
     use ControllerMockProvider;
     use ControllerAnnotationProviderMockProvider;
@@ -22,21 +22,21 @@ abstract class ParametersProcessorFactoryTest extends TestCase
 
     public function getControllerMockProvider(): self
     {
-        return $this->controllerMockProvider;
+        return $this;
     }
 
-    public function getControllerAnnotationMockProvider(): ControllerAnnotationProviderMockProvider
+    public function getControllerAnnotationMockProvider(): self
     {
-        return $this->controllerAnnotationMockProvider;
+        return $this;
     }
 
-    public function getRouteMockProvider(): RouteMockProvider
+    public function getRouteMockProvider(): self
     {
-        return $this->routeMockProvider;
+        return $this;
     }
 
-    public function getParametersProcessorMockProvider(): ParametersProcessorMockProvider
+    public function getParametersProcessorMockProvider(): self
     {
-        return $this->parametersProcessorMockProvider;
+        return $this;
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Service;
 
+use ReflectionMethod;
+use ReflectionClass;
 use Pgs\HashIdBundle\Attribute\Hash as HashAttribute;
 use Pgs\HashIdBundle\Rector\DeprecationHandler;
 
@@ -44,18 +46,12 @@ class CompatibilityLayer
      * @var array<string, array<string>|null> Static cache for reflection results
      */
     private static array $reflectionCache = [];
-
-    private bool $deprecationWarningsEnabled;
-    private bool $preferAttributes;
     
     public function __construct(
-        bool $deprecationWarningsEnabled = true,
-        bool $preferAttributes = true
+        private bool $deprecationWarningsEnabled = true,
+        private readonly bool $preferAttributes = true
     ) {
-        $this->deprecationWarningsEnabled = $deprecationWarningsEnabled;
-        $this->preferAttributes = $preferAttributes;
-        
-        if (!$deprecationWarningsEnabled) {
+        if (!$this->deprecationWarningsEnabled) {
             DeprecationHandler::suppressWarnings();
         }
     }
@@ -63,10 +59,10 @@ class CompatibilityLayer
     /**
      * Extract Hash configuration from a method using either annotations or attributes.
      *
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return array|null Array of parameter names or null if no Hash found
      */
-    public function extractHashConfiguration(\ReflectionMethod $method): ?array
+    public function extractHashConfiguration(ReflectionMethod $method): ?array
     {
         // Generate cache key
         $cacheKey = $this->generateCacheKey($method);
@@ -97,10 +93,10 @@ class CompatibilityLayer
     /**
      * Extract Hash configuration from PHP 8 attributes.
      *
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return array|null
      */
-    private function extractFromAttributes(\ReflectionMethod $method): ?array
+    private function extractFromAttributes(ReflectionMethod $method): ?array
     {
         $attributes = $method->getAttributes(HashAttribute::class);
         
@@ -117,10 +113,10 @@ class CompatibilityLayer
     /**
      * Extract Hash configuration from annotations.
      *
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return array|null
      */
-    private function extractFromAnnotations(\ReflectionMethod $method): ?array
+    private function extractFromAnnotations(ReflectionMethod $method): ?array
     {
         // This would typically use doctrine/annotations reader
         // For now, we'll parse the docblock manually as a simple implementation
@@ -241,10 +237,10 @@ class CompatibilityLayer
     /**
      * Check if both annotation and attribute are present on a method.
      *
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return bool
      */
-    public function hasDuplicateConfiguration(\ReflectionMethod $method): bool
+    public function hasDuplicateConfiguration(ReflectionMethod $method): bool
     {
         $hasAttribute = false;
         $hasAnnotation = false;
@@ -277,7 +273,7 @@ class CompatibilityLayer
             'has_duplicates' => false,
         ];
         
-        $reflectionClass = new \ReflectionClass($className);
+        $reflectionClass = new ReflectionClass($className);
         
         foreach ($reflectionClass->getMethods() as $method) {
             $hasAttribute = false;
@@ -316,11 +312,11 @@ class CompatibilityLayer
     
     /**
      * Generate a cache key for a reflection method.
-     * 
-     * @param \ReflectionMethod $method
+     *
+     * @param ReflectionMethod $method
      * @return string
      */
-    private function generateCacheKey(\ReflectionMethod $method): string
+    private function generateCacheKey(ReflectionMethod $method): string
     {
         return \sprintf(
             '%s::%s',

@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-abstract class AbstractEventSubscriberTest extends TestCase
+abstract class AbstractEventSubscriberTestCase extends TestCase
 {
     protected function subscribedEventsList(string $eventSubscriberClass): void
     {
@@ -17,18 +17,21 @@ abstract class AbstractEventSubscriberTest extends TestCase
     }
 
     /**
-     * @return ControllerEvent|MockObject
+     * @return ControllerEvent
      */
     protected function getEventMock(): ControllerEvent
     {
-        $mock = $this->getMockBuilder(ControllerEvent::class)
-            ->disableOriginalConstructor()
-            ->onlyMethods(['getRequest'])
-            ->getMock();
+        // ControllerEvent is final in Symfony 6.4/7.0, so we need to create a real instance
+        $kernel = $this->createMock(\Symfony\Component\HttpKernel\HttpKernelInterface::class);
+        $request = $this->getRequestMock();
 
-        $mock->method('getRequest')->willReturn($this->getRequestMock());
+        // Create a simple callable controller for testing
+        $controller = function() { return null; };
 
-        return $mock;
+        // Create a real ControllerEvent instance
+        $event = new ControllerEvent($kernel, $controller, $request, \Symfony\Component\HttpKernel\HttpKernelInterface::MAIN_REQUEST);
+
+        return $event;
     }
 
     /**

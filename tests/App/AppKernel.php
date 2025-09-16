@@ -2,6 +2,8 @@
 
 namespace Pgs\HashIdBundle\Tests\App;
 
+use Symfony\Bundle\FrameworkBundle\FrameworkBundle;
+use Pgs\HashIdBundle\PgsHashIdBundle;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\HttpKernel\Kernel;
 
@@ -10,8 +12,8 @@ class AppKernel extends Kernel
     public function registerBundles(): iterable
     {
         $bundles = [
-            \Symfony\Bundle\FrameworkBundle\FrameworkBundle::class => ['all' => true],
-            \Pgs\HashIdBundle\PgsHashIdBundle::class => ['all' => true],
+            FrameworkBundle::class => ['all' => true],
+            PgsHashIdBundle::class => ['all' => true],
         ];
         foreach ($bundles as $class => $envs) {
             if (isset($envs['all']) || isset($envs[$this->environment])) {

@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  php81:
+    build:
+      context: .
+      dockerfile: Dockerfile.php81
+    container_name: hashid-beta-php81
+    volumes:
+      - ../..:/app
+      - composer-cache:/root/.composer/cache
+    working_dir: /app
+    environment:
+      - PHP_VERSION=8.1
+      - SYMFONY_VERSION=6.4
+      - RECTOR_CACHE_DIR=/tmp/rector
+    networks:
+      - hashid-beta
+
+  php82:
+    build:
+      context: .
+      dockerfile: Dockerfile.php82
+    container_name: hashid-beta-php82
+    volumes:
+      - ../..:/app
+      - composer-cache:/root/.composer/cache
+    working_dir: /app
+    environment:
+      - PHP_VERSION=8.2
+      - SYMFONY_VERSION=6.4
+      - RECTOR_CACHE_DIR=/tmp/rector
+    networks:
+      - hashid-beta
+
+  php83:
+    build:
+      context: .
+      dockerfile: Dockerfile.php83
+    container_name: hashid-beta-php83
+    volumes:
+      - ../..:/app
+      - composer-cache:/root/.composer/cache
+    working_dir: /app
+    environment:
+      - PHP_VERSION=8.3
+      - SYMFONY_VERSION=7.0
+      - RECTOR_CACHE_DIR=/tmp/rector
+    networks:
+      - hashid-beta
+
+  metrics-collector:
+    build:
+      context: .
+      dockerfile: Dockerfile.metrics
+    container_name: hashid-beta-metrics
+    volumes:
+      - ../..:/app
+      - ./metrics:/metrics
+    working_dir: /app
+    environment:
+      - METRICS_OUTPUT_DIR=/metrics
+    networks:
+      - hashid-beta
+    depends_on:
+      - php81
+      - php82
+      - php83
+
+volumes:
+  composer-cache:
+    driver: local
+
+networks:
+  hashid-beta:
+    driver: bridge

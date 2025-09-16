@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\EventSubscriber;
 
+use ReflectionMethod;
+use ReflectionNamedType;
+use ReflectionClass;
 use Pgs\HashIdBundle\EventSubscriber\DecodeControllerParametersSubscriber;
 use Pgs\HashIdBundle\Service\DecodeControllerParameters;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\ControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 class Symfony64EventSubscriberTest extends TestCase
@@ -93,13 +95,13 @@ class Symfony64EventSubscriberTest extends TestCase
             $eventConfig;
 
         // The method should accept ControllerEvent (Symfony 6.4+ naming)
-        $reflection = new \ReflectionMethod($this->subscriber, $methodName);
+        $reflection = new ReflectionMethod($this->subscriber, $methodName);
         $parameters = $reflection->getParameters();
 
         self::assertCount(1, $parameters);
 
         $paramType = $parameters[0]->getType();
-        if ($paramType instanceof \ReflectionNamedType) {
+        if ($paramType instanceof ReflectionNamedType) {
             $typeName = $paramType->getName();
             // Should accept ControllerEvent or its parent classes
             self::assertTrue(
@@ -116,7 +118,7 @@ class Symfony64EventSubscriberTest extends TestCase
     public function testNoDeprecatedEventMethods(): void
     {
         // Ensure we're not using deprecated event handling patterns
-        $reflection = new \ReflectionClass($this->subscriber);
+        $reflection = new ReflectionClass($this->subscriber);
 
         // Check we're not using deprecated onKernelController naming
         // (should use getSubscribedEvents instead)

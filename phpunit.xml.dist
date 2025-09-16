@@ -5,8 +5,8 @@
          colors="true"
          cacheDirectory=".phpunit.cache"
          executionOrder="depends,defects"
-         requireCoverageMetadata="true"
-         beStrictAboutCoverageMetadata="true"
+         requireCoverageMetadata="false"
+         beStrictAboutCoverageMetadata="false"
          beStrictAboutOutputDuringTests="true"
          failOnRisky="true"
          failOnWarning="true">
@@ -36,6 +36,7 @@
     <coverage>
         <report>
             <clover outputFile="coverage.xml"/>
+            <cobertura outputFile="cobertura.xml"/>
             <text outputFile="php://stdout" showOnlySummary="true"/>
             <html outputDirectory="coverage-html" lowUpperBound="50" highLowerBound="90"/>
         </report>

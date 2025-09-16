@@ -2,6 +2,8 @@
 
 namespace Pgs\HashIdBundle\Tests\AnnotationProvider;
 
+use ReflectionMethod;
+use stdClass;
 use Doctrine\Common\Annotations\Reader;
 use Pgs\HashIdBundle\AnnotationProvider\AnnotationProvider;
 use Pgs\HashIdBundle\AnnotationProvider\AnnotationProviderInterface;
@@ -9,7 +11,7 @@ use Pgs\HashIdBundle\Controller\DemoController;
 use Pgs\HashIdBundle\Exception\InvalidControllerException;
 use Pgs\HashIdBundle\Reflection\ReflectionProvider;
 use PHPUnit\Framework\TestCase;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class AnnotationProviderTest extends TestCase
 {
@@ -64,7 +66,7 @@ class AnnotationProviderTest extends TestCase
             ->getMockForAbstractClass();
         $readerMock
             ->method('getMethodAnnotation')
-            ->with($this->createMock(\ReflectionMethod::class))->willReturn(new \stdClass());
+            ->with($this->createMock(ReflectionMethod::class))->willReturn(new stdClass());
 
         return $readerMock;
     }
@@ -79,18 +81,18 @@ class AnnotationProviderTest extends TestCase
             ->getMock();
         $reflectionProviderMock
             ->method('getMethodReflectionFromClassString')
-            ->with(DemoController::class, 'demo')->willReturn($this->createMock(\ReflectionMethod::class));
+            ->with(DemoController::class, 'demo')->willReturn($this->createMock(ReflectionMethod::class));
 
         $reflectionProviderMock
             ->method('getMethodReflectionFromObject')
-            ->with($this->getControllerMock(), 'demo')->willReturn($this->createMock(\ReflectionMethod::class));
+            ->with($this->getControllerMock(), 'demo')->willReturn($this->createMock(ReflectionMethod::class));
 
         return $reflectionProviderMock;
     }
 
     protected function getControllerMock()
     {
-        $mock = $this->getMockBuilder(Controller::class)->onlyMethods(['demo'])->getMockForAbstractClass();
+        $mock = $this->getMockBuilder(AbstractController::class)->addMethods(['demo'])->getMockForAbstractClass();
 
         return $mock;
     }

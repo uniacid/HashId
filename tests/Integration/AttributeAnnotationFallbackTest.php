@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Integration;
 
+use ReflectionClass;
+use Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface;
+use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Annotation\Hash as HashAnnotation;
 use Pgs\HashIdBundle\AnnotationProvider\AttributeProvider;
@@ -61,7 +65,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('show');
         
         // Test extraction through compatibility layer
@@ -88,7 +92,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('edit');
         
         // Test extraction through compatibility layer
@@ -115,7 +119,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('view');
         
         // Compatibility layer should check for attribute first, then fall back to annotation
@@ -148,7 +152,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('update');
         
         // Should prefer attribute over annotation
@@ -181,7 +185,7 @@ class AttributeAnnotationFallbackTest extends TestCase
         $processorFactory = $this->createMock(EncodeParametersProcessorFactory::class);
         
         // Create mock processor
-        $processor = $this->createMock(\Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface::class);
+        $processor = $this->createMock(ParametersProcessorInterface::class);
         $processor->method('needToProcess')->willReturn(true);
         $processor->method('process')->willReturnCallback(function ($params) {
             // Simulate encoding
@@ -225,7 +229,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('cached');
         
         // Clear cache first
@@ -261,7 +265,7 @@ class AttributeAnnotationFallbackTest extends TestCase
             }
         };
         
-        $reflectionClass = new \ReflectionClass($controller);
+        $reflectionClass = new ReflectionClass($controller);
         $method = $reflectionClass->getMethod('invalid');
         
         // Should handle invalid parameters gracefully
@@ -284,8 +288,8 @@ class AttributeAnnotationFallbackTest extends TestCase
         $processorFactory = $this->createMock(EncodeParametersProcessorFactory::class);
         $decorator = new RouterDecorator($router, $processorFactory);
         
-        $this->assertInstanceOf(\Symfony\Component\Routing\RouterInterface::class, $decorator);
-        $this->assertInstanceOf(\Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface::class, $decorator);
+        $this->assertInstanceOf(RouterInterface::class, $decorator);
+        $this->assertInstanceOf(WarmableInterface::class, $decorator);
         
         // Test warmUp method returns empty array when router doesn't implement WarmableInterface
         $result = $decorator->warmUp('/cache/dir');

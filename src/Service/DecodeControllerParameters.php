@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Service;
 
+use Closure;
 use Pgs\HashIdBundle\ParametersProcessor\Factory\DecodeParametersProcessorFactory;
 use Pgs\HashIdBundle\ParametersProcessor\ParametersProcessorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\EventListener\ParamConverterListener;
@@ -25,7 +26,7 @@ class DecodeControllerParameters
         $controller = $event->getController();
         if (\is_array($controller)) {
             list($controllerObject, $method) = $controller;
-        } elseif (\is_object($controller) && !$controller instanceof \Closure) {
+        } elseif (\is_object($controller) && !$controller instanceof Closure) {
             $controllerObject = $controller;
             $method = '__invoke';
         } else {

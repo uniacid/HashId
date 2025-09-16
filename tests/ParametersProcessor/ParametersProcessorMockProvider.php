@@ -2,8 +2,6 @@
 
 namespace Pgs\HashIdBundle\Tests\ParametersProcessor;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockBuilder;
 trait ParametersProcessorMockProvider
 {
     public function getParametersProcessorMock($class)

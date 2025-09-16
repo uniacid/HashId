@@ -1,0 +1,229 @@
+name: Rector Automation Report
+description: Report Rector automation success rates and improvement suggestions
+title: "[RECTOR] "
+labels: ["rector", "automation", "metrics", "v4.0"]
+assignees:
+  - rector-team
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Help us improve Rector automation by reporting your metrics and suggestions.
+
+  - type: input
+    id: project-name
+    attributes:
+      label: Project Name/Type
+      description: Optional project identifier or type
+      placeholder: "e.g., E-commerce platform, API service"
+    validations:
+      required: false
+
+  - type: input
+    id: files-processed
+    attributes:
+      label: Total Files Processed
+      description: Number of files Rector analyzed
+      placeholder: "e.g., 150"
+    validations:
+      required: true
+
+  - type: input
+    id: files-modified
+    attributes:
+      label: Files Successfully Modified
+      description: Number of files Rector successfully updated
+      placeholder: "e.g., 120"
+    validations:
+      required: true
+
+  - type: input
+    id: files-failed
+    attributes:
+      label: Files Failed/Skipped
+      description: Number of files Rector couldn't process
+      placeholder: "e.g., 30"
+    validations:
+      required: true
+
+  - type: input
+    id: automation-rate
+    attributes:
+      label: Automation Success Rate
+      description: Percentage of successful automation
+      placeholder: "e.g., 80%"
+    validations:
+      required: true
+
+  - type: textarea
+    id: successful-rules
+    attributes:
+      label: Most Successful Rules
+      description: Which Rector rules worked best?
+      placeholder: |
+        - AnnotationToAttributeRector: 100% success
+        - PropertyPromotionRector: 95% success
+        - ReadonlyPropertyRector: 90% success
+    validations:
+      required: false
+
+  - type: textarea
+    id: problematic-rules
+    attributes:
+      label: Problematic Rules
+      description: Which rules had issues?
+      placeholder: |
+        - ComplexAnnotationRector: Failed on nested annotations
+        - CustomProcessorRector: Couldn't handle edge cases
+    validations:
+      required: false
+
+  - type: textarea
+    id: conversion-failures
+    attributes:
+      label: Conversion Failure Examples
+      description: Provide examples of code Rector couldn't convert
+      render: php
+      placeholder: |
+        // Example 1: Complex annotation
+        /**
+         * @Hash({"id", "userId"})
+         * @ParamConverter("user", class="App\Entity\User")
+         */
+
+        // Example 2: Custom extension
+        /**
+         * @CustomHash(encoder="custom")
+         */
+    validations:
+      required: false
+
+  - type: textarea
+    id: manual-fixes
+    attributes:
+      label: Manual Fixes Required
+      description: What types of manual fixes were needed?
+      placeholder: |
+        - Doctrine ParamConverter adjustments
+        - Custom annotation reader updates
+        - Complex route configurations
+    validations:
+      required: false
+
+  - type: dropdown
+    id: rector-performance
+    attributes:
+      label: Rector Performance
+      description: How was Rector's processing speed?
+      options:
+        - Very fast (<1 minute)
+        - Fast (1-5 minutes)
+        - Acceptable (5-15 minutes)
+        - Slow (15-30 minutes)
+        - Very slow (>30 minutes)
+    validations:
+      required: true
+
+  - type: input
+    id: processing-time
+    attributes:
+      label: Total Processing Time
+      description: How long did Rector take to run?
+      placeholder: "e.g., 3 minutes 45 seconds"
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-rules
+    attributes:
+      label: Suggested New Rules
+      description: What additional Rector rules would help?
+      placeholder: |
+        - Rule for converting custom HashId extensions
+        - Rule for updating Twig templates
+        - Rule for Doctrine integration patterns
+    validations:
+      required: false
+
+  - type: dropdown
+    id: target-achievement
+    attributes:
+      label: 70% Automation Target
+      description: Did you achieve the 70% automation target?
+      options:
+        - Yes, exceeded (>70%)
+        - Yes, exactly met (70%)
+        - Close (60-69%)
+        - Not quite (50-59%)
+        - Far from target (<50%)
+    validations:
+      required: true
+
+  - type: textarea
+    id: rule-effectiveness
+    attributes:
+      label: Individual Rule Effectiveness
+      description: Rate effectiveness of specific rules (optional)
+      render: yaml
+      placeholder: |
+        AnnotationToAttributeRector:
+          success: 45
+          failure: 5
+          effectiveness: 90%
+
+        PropertyPromotionRector:
+          success: 30
+          failure: 2
+          effectiveness: 94%
+    validations:
+      required: false
+
+  - type: textarea
+    id: error-patterns
+    attributes:
+      label: Common Error Patterns
+      description: Patterns in conversion failures
+      placeholder: |
+        - Multi-line annotations often fail
+        - Nested arrays in annotations problematic
+        - Custom validation constraints need manual work
+    validations:
+      required: false
+
+  - type: dropdown
+    id: comparison-manual
+    attributes:
+      label: vs Manual Migration
+      description: How does Rector compare to manual migration?
+      options:
+        - Much faster and more accurate
+        - Faster with similar accuracy
+        - Similar speed but more accurate
+        - Slower but more accurate
+        - Would prefer manual migration
+    validations:
+      required: true
+
+  - type: textarea
+    id: improvement-suggestions
+    attributes:
+      label: Improvement Suggestions
+      description: How can we improve the Rector automation?
+      placeholder: |
+        - Better handling of edge cases
+        - More detailed error messages
+        - Preview mode improvements
+        - Documentation enhancements
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: metrics-details
+    attributes:
+      label: Metrics Collection
+      description: Additional metrics to share
+      options:
+        - label: I've attached detailed metrics file
+        - label: I've run the metrics collection script
+        - label: I consent to share anonymized data

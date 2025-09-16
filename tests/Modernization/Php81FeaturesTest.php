@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Modernization;
 
+use ReflectionClass;
+use ReflectionMethod;
+use TypeError;
 use Pgs\HashIdBundle\Tests\Fixtures\Rector\ExampleServiceAfter;
 use Pgs\HashIdBundle\Tests\Fixtures\Rector\ExampleServiceBefore;
 use PHPUnit\Framework\TestCase;
@@ -103,11 +106,11 @@ class Php81FeaturesTest extends TestCase
         self::assertSame($serviceBefore->getOptions(), $serviceAfter->getOptions());
 
         // Verify method signatures are compatible
-        $beforeReflection = new \ReflectionClass(ExampleServiceBefore::class);
-        $afterReflection = new \ReflectionClass(ExampleServiceAfter::class);
+        $beforeReflection = new ReflectionClass(ExampleServiceBefore::class);
+        $afterReflection = new ReflectionClass(ExampleServiceAfter::class);
 
-        $beforeMethods = $beforeReflection->getMethods(\ReflectionMethod::IS_PUBLIC);
-        $afterMethods = $afterReflection->getMethods(\ReflectionMethod::IS_PUBLIC);
+        $beforeMethods = $beforeReflection->getMethods(ReflectionMethod::IS_PUBLIC);
+        $afterMethods = $afterReflection->getMethods(ReflectionMethod::IS_PUBLIC);
 
         self::assertCount(\count($beforeMethods), $afterMethods);
 
@@ -125,7 +128,7 @@ class Php81FeaturesTest extends TestCase
     public function testConstructorTypeSafety(): void
     {
         // Test that type hints are preserved and enforced
-        $this->expectException(\TypeError::class);
+        $this->expectException(TypeError::class);
 
         // This should fail because we're passing wrong type for name parameter
         new ExampleServiceAfter(42, 42);

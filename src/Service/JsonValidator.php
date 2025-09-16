@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Service;
 
+use InvalidArgumentException;
+use JsonException;
+
 /**
  * JSON validation service using PHP 8.3's json_validate() function.
  *
@@ -27,7 +30,7 @@ class JsonValidator
     /**
      * Maximum allowed JSON size for this instance.
      */
-    private int $maxJsonSize;
+    private readonly int $maxJsonSize;
     
     /**
      * Constructor with configurable limits.
@@ -42,7 +45,7 @@ class JsonValidator
         
         // Validate the configured size
         if ($this->maxJsonSize < 1) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 \sprintf('Maximum JSON size must be positive, got %d', $this->maxJsonSize)
             );
         }
@@ -91,7 +94,7 @@ class JsonValidator
             return [
                 'valid' => true,
                 'error' => null,
-                'error_code' => null,
+                'error_code' => 0,  // JSON_ERROR_NONE
             ];
         }
 
@@ -159,7 +162,7 @@ class JsonValidator
             }
 
             return $json;
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             return false;
         }
     }

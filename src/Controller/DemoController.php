@@ -8,16 +8,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
-/**
- * @Route('/hash-id/demo')
- */
+#[Route('/hash-id/demo')]
 class DemoController extends AbstractController
 {
-    /**
-     * @Route("/encode", requirements={"id"="\d+"})
-     */
+    #[Route('/encode', requirements: ['id' => '\d+'])]
     public function encode(int $id): Response
     {
         $other = 30;
@@ -38,20 +34,18 @@ EOT;
     }
 
     /**
-     * @Route("/decode/{id}/{other}")
-     *
      * @Hash("id")
      */
+    #[Route('/decode/{id}/{other}')]
     public function decode(Request $request, int $id, int $other): Response
     {
         return new Response($this->getDecodeResponse($request, $id, $other));
     }
 
     /**
-     * @Route("/decode_more/{id}/{other}")
-     *
      * @Hash({"id", "other"})
      */
+    #[Route('/decode_more/{id}/{other}')]
     public function decodeMore(Request $request, int $id, int $other): Response
     {
         return new Response($this->getDecodeResponse($request, $id, $other));
@@ -103,10 +97,9 @@ EOT;
     }
 
     /**
-     * @Route("/api/validate", methods={"POST"})
-     *
      * Example API endpoint demonstrating json_validate() usage (PHP 8.3+).
      */
+    #[Route('/api/validate', methods: ['POST'])]
     public function validateJson(Request $request): JsonResponse
     {
         $content = $request->getContent();
@@ -134,12 +127,11 @@ EOT;
     }
 
     /**
-     * @Route("/api/hash/{id}", methods={"GET"})
-     *
      * @Hash("id")
      *
      * API endpoint returning JSON response with hashed ID.
      */
+    #[Route('/api/hash/{id}', methods: ['GET'])]
     public function apiHash(int $id): JsonResponse
     {
         $validator = new JsonValidator();

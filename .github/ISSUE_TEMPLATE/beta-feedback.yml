@@ -1,0 +1,212 @@
+name: Beta Testing Feedback
+description: Provide feedback on HashId v4.0 beta testing experience
+title: "[BETA] "
+labels: ["beta", "feedback", "v4.0"]
+assignees:
+  - beta-team
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for testing HashId v4.0 beta! Your feedback helps us ensure a smooth release.
+
+  - type: dropdown
+    id: php-version
+    attributes:
+      label: PHP Version
+      description: Which PHP version are you using?
+      options:
+        - PHP 8.1
+        - PHP 8.2
+        - PHP 8.3
+        - PHP 8.4 (RC)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: symfony-version
+    attributes:
+      label: Symfony Version
+      description: Which Symfony version are you using?
+      options:
+        - Symfony 6.4 LTS
+        - Symfony 7.0
+        - Symfony 7.1
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: project-size
+    attributes:
+      label: Project Size
+      description: Approximate number of files/controllers using HashId
+      placeholder: "e.g., 50 controllers, 200 routes"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: migration-method
+    attributes:
+      label: Migration Method Used
+      description: How did you migrate to v4.0?
+      options:
+        - Fully automated with Rector
+        - Mostly automated with some manual fixes
+        - Half automated, half manual
+        - Mostly manual with some Rector help
+        - Fully manual migration
+    validations:
+      required: true
+
+  - type: input
+    id: automation-percentage
+    attributes:
+      label: Automation Percentage
+      description: What percentage of changes were automated by Rector?
+      placeholder: "e.g., 75%"
+    validations:
+      required: true
+
+  - type: input
+    id: migration-time
+    attributes:
+      label: Total Migration Time
+      description: How long did the complete migration take?
+      placeholder: "e.g., 30 minutes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: issues-encountered
+    attributes:
+      label: Issues Encountered
+      description: Describe any problems during migration
+      placeholder: |
+        - Rector couldn't convert complex annotations
+        - Had to manually update custom parameter processors
+        - Performance regression in route generation
+    validations:
+      required: false
+
+  - type: textarea
+    id: manual-interventions
+    attributes:
+      label: Manual Interventions Required
+      description: What couldn't be automated and required manual work?
+      placeholder: |
+        - Custom annotation extensions
+        - Complex route configurations
+        - Doctrine integration adjustments
+    validations:
+      required: false
+
+  - type: dropdown
+    id: performance-impact
+    attributes:
+      label: Performance Impact
+      description: How did v4.0 affect performance?
+      options:
+        - Significant improvement (>30%)
+        - Moderate improvement (10-30%)
+        - No noticeable change
+        - Slight degradation (<10%)
+        - Significant degradation (>10%)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: features-tested
+    attributes:
+      label: Features Tested
+      description: Which features have you tested?
+      options:
+        - label: Basic encoding/decoding
+        - label: Route generation
+        - label: Twig integration
+        - label: Doctrine ParamConverter
+        - label: Multiple parameter encoding
+        - label: Custom parameter processors
+        - label: API endpoints
+        - label: Console commands
+
+  - type: dropdown
+    id: backward-compatibility
+    attributes:
+      label: Backward Compatibility
+      description: Did you experience any breaking changes?
+      options:
+        - No breaking changes
+        - Minor breaking changes (easily fixed)
+        - Major breaking changes (significant rework)
+    validations:
+      required: true
+
+  - type: textarea
+    id: rector-feedback
+    attributes:
+      label: Rector Rules Feedback
+      description: Specific feedback about the Rector automation
+      placeholder: |
+        - Which rules worked well?
+        - Which rules need improvement?
+        - Suggestions for new rules?
+    validations:
+      required: false
+
+  - type: dropdown
+    id: overall-experience
+    attributes:
+      label: Overall Migration Experience
+      description: How would you rate the migration experience?
+      options:
+        - Excellent - Smooth and automated
+        - Good - Minor issues but manageable
+        - Fair - Some challenges but completed
+        - Poor - Significant difficulties
+        - Very Poor - Could not complete
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestions
+    attributes:
+      label: Suggestions for Improvement
+      description: How can we improve the migration process?
+      placeholder: |
+        - Better documentation for edge cases
+        - More comprehensive Rector rules
+        - Additional migration tools
+    validations:
+      required: false
+
+  - type: dropdown
+    id: recommendation
+    attributes:
+      label: Would you recommend v4.0?
+      description: Would you recommend others upgrade to v4.0?
+      options:
+        - Yes, definitely
+        - Yes, with reservations
+        - Not sure yet
+        - No, needs more work
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Additional Comments
+      description: Any other feedback you'd like to share?
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: metrics-consent
+    attributes:
+      label: Metrics Sharing
+      description: Help us improve by sharing anonymized metrics
+      options:
+        - label: I consent to share my migration metrics for analysis
+          required: false

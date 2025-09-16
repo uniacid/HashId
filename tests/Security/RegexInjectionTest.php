@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\Security;
 
+use ReflectionClass;
+use ReflectionMethod;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Service\CompatibilityLayer;
 
@@ -19,6 +22,11 @@ class RegexInjectionTest extends TestCase
     protected function setUp(): void
     {
         $this->compatibilityLayer = new CompatibilityLayer();
+        // Clear the reflection cache to prevent test interference
+        $reflectionClass = new ReflectionClass(CompatibilityLayer::class);
+        $cacheProperty = $reflectionClass->getProperty('reflectionCache');
+        $cacheProperty->setAccessible(true);
+        $cacheProperty->setValue([]);
     }
     
     /**
@@ -143,8 +151,8 @@ class RegexInjectionTest extends TestCase
         
         // Create annotation with more than 20 parameters
         $params = array_map(fn($i) => "\"param$i\"", range(1, 25));
-        $paramString = implode(', ', $params);
-        $docblock = "/**\n * @Hash({$paramString})\n */";
+        $paramString = '{' . implode(', ', $params) . '}';
+        $docblock = "/**\n * @Hash($paramString)\n */";
         
         $method->method('getDocComment')->willReturn($docblock);
         
@@ -236,9 +244,9 @@ class RegexInjectionTest extends TestCase
     /**
      * Create a mock ReflectionMethod for testing.
      */
-    private function createMockMethod(): \ReflectionMethod|\PHPUnit\Framework\MockObject\MockObject
+    private function createMockMethod(): ReflectionMethod|MockObject
     {
-        $method = $this->getMockBuilder(\ReflectionMethod::class)
+        $method = $this->getMockBuilder(ReflectionMethod::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getDocComment', 'getDeclaringClass', 'getName', 'getAttributes'])
             ->getMock();
@@ -252,9 +260,9 @@ class RegexInjectionTest extends TestCase
     /**
      * Create a mock ReflectionClass for testing.
      */
-    private function createMockReflectionClass(): \ReflectionClass|\PHPUnit\Framework\MockObject\MockObject
+    private function createMockReflectionClass(): ReflectionClass|MockObject
     {
-        $mock = $this->getMockBuilder(\ReflectionClass::class)
+        $mock = $this->getMockBuilder(ReflectionClass::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['getName'])
             ->getMock();

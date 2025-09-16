@@ -5,7 +5,7 @@ namespace Pgs\HashIdBundle\Tests\EventSubscriber;
 use Pgs\HashIdBundle\EventSubscriber\DecodeControllerParametersSubscriber;
 use Pgs\HashIdBundle\Service\DecodeControllerParameters;
 
-class DecodeControllerParametersSubscriberTest extends AbstractEventSubscriberTest
+class DecodeControllerParametersSubscriberTest extends AbstractEventSubscriberTestCase
 {
     public function testSubscribedEvents(): void
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Pgs\HashIdBundle\Tests\CI;
 
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 
@@ -33,7 +34,7 @@ final class WorkflowValidationTest extends TestCase
         try {
             $parsed = Yaml::parse($content);
             self::assertIsArray($parsed, 'Workflow should be valid YAML');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             self::fail('Workflow YAML syntax error: ' . $e->getMessage());
         }
     }
@@ -116,7 +117,7 @@ final class WorkflowValidationTest extends TestCase
         try {
             $parsed = Yaml::parse($content);
             self::assertIsArray($parsed, 'Rector workflow should be valid YAML');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             self::fail('Rector workflow YAML syntax error: ' . $e->getMessage());
         }
     }
@@ -195,7 +196,7 @@ final class WorkflowValidationTest extends TestCase
 
         try {
             return Yaml::parse($content);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return null;
         }
     }

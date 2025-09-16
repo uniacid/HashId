@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Orders - HashId Demo{% endblock %}
+
+{% block body %}
+    <h2>Order List</h2>
+
+    <div class="url-demo">
+        <strong>HashId Feature Demo:</strong> Click on any order below and observe the URL.
+        The integer ID is automatically encoded (e.g., <code>/order/4w9aA11avM</code> instead of <code>/order/1</code>).
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Order Number</th>
+                <th>Customer</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+                <tr>
+                    <td>{{ order.orderNumber }}</td>
+                    <td>{{ order.customerName }}</td>
+                    <td>${{ order.totalAmount }}</td>
+                    <td>{{ order.status }}</td>
+                    <td>{{ order.createdAt|date('Y-m-d H:i') }}</td>
+                    <td>
+                        <a href="{{ url('order_show', {'id': order.id}) }}" class="btn">View</a>
+                        <a href="{{ path('order_edit', {'id': order.id}) }}" class="btn">Edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No orders found. <a href="{{ path('order_new') }}">Create your first order</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ path('order_new') }}" class="btn btn-success">Create New Order</a>
+    </div>
+{% endblock %}
