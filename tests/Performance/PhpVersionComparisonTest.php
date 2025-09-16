@@ -8,6 +8,23 @@ use PHPUnit\Framework\TestCase;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkRunner;
 use Pgs\HashIdBundle\Tests\Performance\Framework\BenchmarkComparator;
 
+// PHP 8.1+ Enum declaration (must be outside class)
+if (PHP_VERSION_ID >= 80100) {
+    enum TestEnum: string {
+        case DEFAULT = 'default';
+        case SECURE = 'secure';
+        case CUSTOM = 'custom';
+    }
+}
+
+// PHP 8.3+ Typed constants interface and class (must be outside class)
+if (PHP_VERSION_ID >= 80300) {
+    interface TypedConstantsInterface {
+        public const string SALT = 'test-salt';
+        public const int MIN_LENGTH = 10;
+    }
+}
+
 /**
  * Compare performance between PHP versions.
  *
@@ -293,12 +310,6 @@ class PhpVersionComparisonTest extends TestCase
             return ['time' => 0, 'speedup' => 1];
         }
 
-        enum TestEnum: string {
-            case DEFAULT = 'default';
-            case SECURE = 'secure';
-            case CUSTOM = 'custom';
-        }
-
         $enumBenchmark = $this->runner->benchmark('enum_access', function () {
             $value = TestEnum::DEFAULT->value;
         });
@@ -364,26 +375,22 @@ class PhpVersionComparisonTest extends TestCase
             return ['time' => 0, 'speedup' => 1];
         }
 
-        interface TypedConstants {
-            public const string SALT = 'test-salt';
-            public const int MIN_LENGTH = 10;
-        }
-
-        class UntypedConstants {
+        // Create an anonymous class for untyped constants comparison
+        $untypedClass = new class {
             public const SALT = 'test-salt';
             public const MIN_LENGTH = 10;
-        }
+        };
 
         $comparison = $this->runner->compare(
             'untyped_constants',
-            function () {
-                $salt = UntypedConstants::SALT;
-                $minLength = UntypedConstants::MIN_LENGTH;
+            function () use ($untypedClass) {
+                $salt = $untypedClass::SALT;
+                $minLength = $untypedClass::MIN_LENGTH;
             },
             'typed_constants',
             function () {
-                $salt = TypedConstants::SALT;
-                $minLength = TypedConstants::MIN_LENGTH;
+                $salt = TypedConstantsInterface::SALT;
+                $minLength = TypedConstantsInterface::MIN_LENGTH;
             }
         );
 

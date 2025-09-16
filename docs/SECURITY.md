@@ -146,6 +146,41 @@ framework:
         Content-Security-Policy: "default-src 'self'"
 ```
 
+## Enhanced Security Testing Suite
+
+The bundle includes comprehensive security test coverage:
+
+### URL Obfuscation Tests
+- Tests that encoded IDs cannot be reverse-engineered without salt
+- Validates URL uniqueness and collision prevention
+- Ensures consistent encoding/decoding across requests
+- Tests obfuscation strength with different alphabets
+
+### Enumeration Prevention Tests
+- Verifies sequential IDs produce non-sequential hashes
+- Tests entropy and randomness of generated hashes
+- Validates resistance to pattern analysis
+- Ensures minimum hash length enforcement
+
+### Sequential Attack Tests
+- Simulates enumeration attacks with sequential IDs
+- Tests rate limiting considerations
+- Validates unpredictability of hash patterns
+- Tests protection against automated scanning
+
+### Salt Configuration Tests
+- Tests salt configuration from environment variables
+- Validates salt uniqueness requirements
+- Tests salt rotation scenarios
+- Verifies secure salt generation
+
+### Input Validation Tests
+- Tests SQL injection prevention
+- Validates XSS prevention in route parameters
+- Tests path traversal protection
+- Validates buffer overflow prevention
+- Tests command injection prevention
+
 ## Vulnerability Reporting
 
 If you discover a security vulnerability, please follow responsible disclosure:
@@ -163,14 +198,26 @@ If you discover a security vulnerability, please follow responsible disclosure:
 The bundle includes comprehensive security tests:
 
 ```bash
-# Run security tests
+# Run all security tests
 vendor/bin/phpunit tests/Security/
+
+# Run specific security test suites
+vendor/bin/phpunit tests/Security/UrlObfuscationTest.php
+vendor/bin/phpunit tests/Security/EnumerationPreventionTest.php
+vendor/bin/phpunit tests/Security/SequentialAttackTest.php
+vendor/bin/phpunit tests/Security/SaltConfigurationTest.php
+vendor/bin/phpunit tests/Security/InputValidationTest.php
+vendor/bin/phpunit tests/Security/ComprehensiveSecurityTest.php
+vendor/bin/phpunit tests/Security/RegexInjectionTest.php
 
 # Run static analysis for security issues
 vendor/bin/phpstan analyse --level=9 src/
 
 # Check for known vulnerabilities in dependencies
 composer audit
+
+# Generate security test coverage report
+vendor/bin/phpunit tests/Security/ --coverage-html coverage/security/
 ```
 
 ## Regular Security Audits
@@ -287,5 +334,6 @@ Before deploying to production, ensure:
 
 ---
 
-*Last updated: 2025-09-14*
+*Last updated: 2025-09-15*
 *Version: 4.0.0*
+*Security Test Coverage: Comprehensive*
