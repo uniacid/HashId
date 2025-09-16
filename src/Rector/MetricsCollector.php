@@ -78,14 +78,100 @@ final class MetricsCollector
         }
     }
 
-    public function trackError(string $filePath, string $message): void
+    public function trackError(string $filePath, string $message, ?string $ruleName = null, ?string $category = null): void
     {
         $this->errors[] = [
             'file' => $filePath,
             'message' => $message,
+            'rule_name' => $ruleName,
+            'category' => $category ?? $this->categorizeError($message),
             'timestamp' => \microtime(true),
+            'stack_trace' => $this->captureStackTrace(),
+            'context' => $this->gatherErrorContext($filePath, $message),
         ];
         ++$this->errorsCount;
+    }
+
+    /**
+     * Capture a condensed stack trace for debugging.
+     *
+     * @return array<int, string> Stack trace lines
+     */
+    private function captureStackTrace(): array
+    {
+        $trace = \debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10);
+        $stackTrace = [];
+
+        foreach ($trace as $frame) {
+            if (isset($frame['file'], $frame['line'])) {
+                $file = \basename($frame['file']);
+                $stackTrace[] = \sprintf('%s:%d %s',
+                    $file,
+                    $frame['line'],
+                    $frame['function'] ?? 'unknown'
+                );
+            }
+        }
+
+        return $stackTrace;
+    }
+
+    /**
+     * Categorize error based on message content.
+     *
+     * @param string $message Error message
+     * @return string Error category
+     */
+    private function categorizeError(string $message): string
+    {
+        $message = \strtolower($message);
+
+        if (\str_contains($message, 'syntax') || \str_contains($message, 'parse')) {
+            return 'syntax';
+        }
+
+        if (\str_contains($message, 'config') || \str_contains($message, 'configuration')) {
+            return 'configuration';
+        }
+
+        if (\str_contains($message, 'annotation') || \str_contains($message, 'attribute')) {
+            return 'annotation';
+        }
+
+        if (\str_contains($message, 'class') || \str_contains($message, 'method') || \str_contains($message, 'property')) {
+            return 'reflection';
+        }
+
+        if (\str_contains($message, 'type') || \str_contains($message, 'argument')) {
+            return 'type_error';
+        }
+
+        return 'unknown';
+    }
+
+    /**
+     * Gather additional context for the error.
+     *
+     * @param string $filePath File where error occurred
+     * @param string $message Error message
+     * @return array<string, mixed> Error context
+     */
+    private function gatherErrorContext(string $filePath, string $message): array
+    {
+        $context = [
+            'file_size' => \file_exists($filePath) ? \filesize($filePath) : null,
+            'file_extension' => \pathinfo($filePath, PATHINFO_EXTENSION),
+            'memory_usage' => \memory_get_usage(true),
+            'peak_memory' => \memory_get_peak_usage(true),
+        ];
+
+        // Add PHP version info for compatibility issues
+        if (\str_contains($message, 'php') || \str_contains($message, 'version')) {
+            $context['php_version'] = PHP_VERSION;
+            $context['php_major_version'] = PHP_MAJOR_VERSION;
+        }
+
+        return $context;
     }
 
     public function startTiming(): void
@@ -234,12 +320,195 @@ final class MetricsCollector
         $this->executionTime = 0;
     }
 
+    /**
+     * Get error statistics grouped by category.
+     *
+     * @return array<string, array<string, mixed>> Error statistics by category
+     */
+    public function getErrorsByCategory(): array
+    {
+        $categories = [];
+
+        foreach ($this->errors as $error) {
+            $category = $error['category'];
+            if (!isset($categories[$category])) {
+                $categories[$category] = [
+                    'count' => 0,
+                    'files' => [],
+                    'rules' => [],
+                    'examples' => [],
+                ];
+            }
+
+            ++$categories[$category]['count'];
+            $categories[$category]['files'][] = $error['file'];
+
+            if (!empty($error['rule_name'])) {
+                $categories[$category]['rules'][] = $error['rule_name'];
+            }
+
+            // Keep first 3 examples for each category
+            if (\count($categories[$category]['examples']) < 3) {
+                $categories[$category]['examples'][] = [
+                    'file' => \basename($error['file']),
+                    'message' => $error['message'],
+                    'rule' => $error['rule_name'],
+                ];
+            }
+        }
+
+        // Remove duplicates and add statistics
+        foreach ($categories as $category => &$data) {
+            $data['unique_files'] = \count(\array_unique($data['files']));
+            $data['unique_rules'] = \count(\array_unique(\array_filter($data['rules'])));
+            unset($data['files'], $data['rules']);
+        }
+
+        return $categories;
+    }
+
+    /**
+     * Get error statistics grouped by rule name.
+     *
+     * @return array<string, array<string, mixed>> Error statistics by rule
+     */
+    public function getErrorsByRule(): array
+    {
+        $rules = [];
+
+        foreach ($this->errors as $error) {
+            $ruleName = $error['rule_name'] ?? 'unknown';
+            if (!isset($rules[$ruleName])) {
+                $rules[$ruleName] = [
+                    'count' => 0,
+                    'categories' => [],
+                    'files' => [],
+                    'latest_error' => null,
+                ];
+            }
+
+            ++$rules[$ruleName]['count'];
+            $rules[$ruleName]['categories'][] = $error['category'];
+            $rules[$ruleName]['files'][] = $error['file'];
+            $rules[$ruleName]['latest_error'] = [
+                'message' => $error['message'],
+                'file' => \basename($error['file']),
+                'timestamp' => $error['timestamp'],
+            ];
+        }
+
+        // Add statistics
+        foreach ($rules as $ruleName => &$data) {
+            $data['unique_files'] = \count(\array_unique($data['files']));
+            $data['unique_categories'] = \count(\array_unique($data['categories']));
+            $data['most_common_category'] = !empty($data['categories'])
+                ? \array_count_values($data['categories'])
+                : [];
+
+            if (!empty($data['most_common_category'])) {
+                \arsort($data['most_common_category']);
+                $data['most_common_category'] = \array_key_first($data['most_common_category']);
+            } else {
+                $data['most_common_category'] = 'unknown';
+            }
+
+            unset($data['categories'], $data['files']);
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Get enhanced error report with detailed context.
+     *
+     * @return array<string, mixed> Detailed error analysis
+     */
+    public function getDetailedErrorReport(): array
+    {
+        return [
+            'total_errors' => $this->errorsCount,
+            'by_category' => $this->getErrorsByCategory(),
+            'by_rule' => $this->getErrorsByRule(),
+            'most_problematic_files' => $this->getMostProblematicFiles(),
+            'error_trends' => $this->getErrorTrends(),
+        ];
+    }
+
+    /**
+     * Get files with the most errors.
+     *
+     * @return array<string, mixed> Files sorted by error count
+     */
+    private function getMostProblematicFiles(): array
+    {
+        $fileErrors = [];
+
+        foreach ($this->errors as $error) {
+            $file = $error['file'];
+            if (!isset($fileErrors[$file])) {
+                $fileErrors[$file] = [
+                    'count' => 0,
+                    'categories' => [],
+                    'rules' => [],
+                ];
+            }
+
+            ++$fileErrors[$file]['count'];
+            $fileErrors[$file]['categories'][] = $error['category'];
+            if (!empty($error['rule_name'])) {
+                $fileErrors[$file]['rules'][] = $error['rule_name'];
+            }
+        }
+
+        // Sort by error count and take top 10
+        \uasort($fileErrors, fn($a, $b) => $b['count'] <=> $a['count']);
+        $fileErrors = \array_slice($fileErrors, 0, 10, true);
+
+        // Add statistics
+        foreach ($fileErrors as $file => &$data) {
+            $data['unique_categories'] = \count(\array_unique($data['categories']));
+            $data['unique_rules'] = \count(\array_unique(\array_filter($data['rules'])));
+            $data['basename'] = \basename($file);
+            unset($data['categories'], $data['rules']);
+        }
+
+        return $fileErrors;
+    }
+
+    /**
+     * Get error trends over time.
+     *
+     * @return array<string, mixed> Error trend analysis
+     */
+    private function getErrorTrends(): array
+    {
+        if (empty($this->errors)) {
+            return ['trend' => 'no_data'];
+        }
+
+        $timestamps = \array_column($this->errors, 'timestamp');
+        \sort($timestamps);
+
+        $firstError = $timestamps[0];
+        $lastError = $timestamps[\count($timestamps) - 1];
+        $duration = $lastError - $firstError;
+
+        return [
+            'first_error_time' => $firstError,
+            'last_error_time' => $lastError,
+            'duration_seconds' => $duration,
+            'errors_per_second' => $duration > 0 ? $this->errorsCount / $duration : 0,
+            'trend' => $this->errorsCount > 10 ? 'high_volume' : 'manageable',
+        ];
+    }
+
     public function exportAsJson(): string
     {
         $metrics = $this->getMetrics();
         $metrics['summary'] = $this->getSummaryStatistics();
         $metrics['rule_effectiveness'] = $this->getRuleEffectivenessReport();
         $metrics['time_savings'] = $this->getTimeSavingsMetrics();
+        $metrics['detailed_errors'] = $this->getDetailedErrorReport();
         $metrics['timestamp'] = \date('Y-m-d H:i:s');
 
         return \json_encode($metrics, JSON_PRETTY_PRINT);

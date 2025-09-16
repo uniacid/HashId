@@ -7,6 +7,8 @@ namespace Pgs\HashIdBundle\Service;
 use InvalidArgumentException;
 use ReflectionClass;
 use Hashids\Hashids;
+use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Pgs\HashIdBundle\Config\HashIdConfigInterface;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\ConverterInterface;
 use Pgs\HashIdBundle\ParametersProcessor\Converter\HashidsConverter;
@@ -62,11 +64,23 @@ class HasherFactory
      * @var array<string, HasherInterface> Cached hasher instances
      */
     private array $instanceCache = [];
-    
+
+    /**
+     * @var array<string, float> Cache access timestamps for LRU eviction
+     */
+    private array $cacheAccessTimes = [];
+
     /**
      * @var array<string, array<string, mixed>> Lazy configuration cache
      */
     private array $lazyConfigCache = [];
+
+    /**
+     * Cache hit/miss metrics.
+     */
+    private int $cacheHits = 0;
+    private int $cacheMisses = 0;
+    private int $cacheEvictions = 0;
 
     /**
      * Default maximum number of cached hasher instances.
@@ -83,11 +97,17 @@ class HasherFactory
      */
     private readonly int $maxCacheSize;
 
+    /**
+     * Logger for debugging and performance monitoring.
+     */
+    private readonly LoggerInterface $logger;
+
     public function __construct(
         ?string $salt = null,
         int $minLength = HashIdConfigInterface::DEFAULT_MIN_LENGTH,
         string $alphabet = HashIdConfigInterface::DEFAULT_ALPHABET,
         int $maxCacheSize = self::DEFAULT_MAX_CACHE_SIZE,
+        ?LoggerInterface $logger = null,
     ) {
         // Validate min_length
         if ($minLength < 0) {
@@ -119,6 +139,14 @@ class HasherFactory
         $this->defaultMinLength = $minLength;
         $this->defaultAlphabet = $alphabet;
         $this->maxCacheSize = $maxCacheSize;
+        $this->logger = $logger ?? new NullLogger();
+
+        $this->logger->debug('HasherFactory initialized', [
+            'salt_length' => \strlen($this->defaultSalt),
+            'min_length' => $this->defaultMinLength,
+            'alphabet_length' => \strlen($this->defaultAlphabet),
+            'max_cache_size' => $this->maxCacheSize,
+        ]);
     }
 
     /**
@@ -131,9 +159,21 @@ class HasherFactory
      */
     public function create(string $type = 'default', array $config = []): HasherInterface
     {
+        $startTime = \microtime(true);
+
+        $this->logger->debug('Creating hasher', [
+            'type' => $type,
+            'config_keys' => \array_keys($config),
+            'cache_size' => \count($this->instanceCache),
+        ]);
+
         // Security: Validate type against whitelist to prevent injection
         $allowedTypes = ['default', 'secure', 'custom'];
         if (!\in_array($type, $allowedTypes, true)) {
+            $this->logger->error('Invalid hasher type requested', [
+                'type' => $type,
+                'allowed_types' => $allowedTypes,
+            ]);
             throw new InvalidArgumentException(\sprintf(
                 'Unknown hasher type "%s". Available types: %s',
                 $type,
@@ -190,19 +230,41 @@ class HasherFactory
         
         // Check instance cache for already created instances
         if (isset($this->instanceCache[$cacheKey])) {
+            // Cache hit - update access time for LRU
+            $this->cacheAccessTimes[$cacheKey] = \microtime(true);
+            ++$this->cacheHits;
+
+            $duration = \microtime(true) - $startTime;
+            $this->logger->debug('Cache hit', [
+                'type' => $type,
+                'cache_key' => \substr($cacheKey, 0, 16) . '...',
+                'duration_ms' => \round($duration * 1000, 3),
+                'cache_hit_rate' => $this->getCacheHitRate(),
+            ]);
+
             return $this->instanceCache[$cacheKey];
         }
+
+        // Cache miss
+        ++$this->cacheMisses;
+
+        $this->logger->debug('Cache miss', [
+            'type' => $type,
+            'cache_key' => \substr($cacheKey, 0, 16) . '...',
+            'cache_size' => \count($this->instanceCache),
+            'cache_hit_rate' => $this->getCacheHitRate(),
+        ]);
         
         // Check if we have lazy config stored but not instantiated yet
         if (isset($this->lazyConfigCache[$cacheKey])) {
-            return $this->createLazyInstance($cacheKey, $hasherClass, $this->lazyConfigCache[$cacheKey]);
+            return $this->createLazyInstance($cacheKey, $hasherClass, $this->lazyConfigCache[$cacheKey], $type, $startTime);
         }
 
         // Store configuration for lazy loading
         $this->lazyConfigCache[$cacheKey] = $hasherConfig;
-        
+
         // Create and cache the instance
-        return $this->createLazyInstance($cacheKey, $hasherClass, $hasherConfig);
+        return $this->createLazyInstance($cacheKey, $hasherClass, $hasherConfig, $type, $startTime);
     }
 
     /**
@@ -294,12 +356,50 @@ class HasherFactory
      */
     private function cacheInstance(string $key, HasherInterface $hasher): void
     {
-        // If cache is full, remove the oldest entry (FIFO)
+        // If cache is full, remove the least recently used entry (LRU)
         if (\count($this->instanceCache) >= $this->maxCacheSize) {
-            \array_shift($this->instanceCache);
+            $this->evictLeastRecentlyUsed();
         }
-        
+
+        // Add new entry with current timestamp
         $this->instanceCache[$key] = $hasher;
+        $this->cacheAccessTimes[$key] = \microtime(true);
+    }
+
+    /**
+     * Evict the least recently used cache entry.
+     */
+    private function evictLeastRecentlyUsed(): void
+    {
+        if (empty($this->cacheAccessTimes)) {
+            $this->logger->warning('Attempted to evict from empty cache');
+            return;
+        }
+
+        // Find the entry with the oldest access time
+        $oldestKey = \array_key_first($this->cacheAccessTimes);
+        $oldestTime = $this->cacheAccessTimes[$oldestKey];
+
+        foreach ($this->cacheAccessTimes as $key => $accessTime) {
+            if ($accessTime < $oldestTime) {
+                $oldestKey = $key;
+                $oldestTime = $accessTime;
+            }
+        }
+
+        // Calculate age of evicted entry
+        $ageSeconds = \microtime(true) - $oldestTime;
+
+        $this->logger->debug('Evicting LRU cache entry', [
+            'evicted_key' => \substr($oldestKey, 0, 16) . '...',
+            'age_seconds' => \round($ageSeconds, 3),
+            'cache_size_before' => \count($this->instanceCache),
+            'total_evictions' => $this->cacheEvictions + 1,
+        ]);
+
+        // Remove the least recently used entry
+        unset($this->instanceCache[$oldestKey], $this->cacheAccessTimes[$oldestKey]);
+        ++$this->cacheEvictions;
     }
 
     /**
@@ -307,26 +407,99 @@ class HasherFactory
      */
     public function clearInstanceCache(): void
     {
+        $clearedEntries = \count($this->instanceCache);
+
+        $this->logger->info('Clearing instance cache', [
+            'cleared_entries' => $clearedEntries,
+            'cache_hit_rate' => $this->getCacheHitRate(),
+            'total_evictions' => $this->cacheEvictions,
+        ]);
+
         $this->instanceCache = [];
+        $this->cacheAccessTimes = [];
         $this->lazyConfigCache = [];
+    }
+
+    /**
+     * Get cache performance statistics.
+     *
+     * @return array<string, mixed> Cache metrics
+     */
+    public function getCacheStatistics(): array
+    {
+        $totalRequests = $this->cacheHits + $this->cacheMisses;
+        $hitRate = $totalRequests > 0 ? \round(($this->cacheHits / $totalRequests) * 100, 2) : 0.0;
+
+        return [
+            'cache_hits' => $this->cacheHits,
+            'cache_misses' => $this->cacheMisses,
+            'cache_evictions' => $this->cacheEvictions,
+            'hit_rate_percentage' => $hitRate,
+            'current_cache_size' => \count($this->instanceCache),
+            'max_cache_size' => $this->maxCacheSize,
+            'cache_usage_percentage' => \round((\count($this->instanceCache) / $this->maxCacheSize) * 100, 1),
+        ];
+    }
+
+    /**
+     * Reset cache performance counters.
+     */
+    public function resetCacheStatistics(): void
+    {
+        $this->cacheHits = 0;
+        $this->cacheMisses = 0;
+        $this->cacheEvictions = 0;
+    }
+
+    /**
+     * Get current cache hit rate as a percentage.
+     *
+     * @return float Hit rate percentage
+     */
+    private function getCacheHitRate(): float
+    {
+        $totalRequests = $this->cacheHits + $this->cacheMisses;
+        return $totalRequests > 0 ? \round(($this->cacheHits / $totalRequests) * 100, 2) : 0.0;
     }
     
     /**
      * Create a lazy instance and cache it.
-     * 
+     *
      * @param string $cacheKey The cache key
      * @param class-string<HasherInterface> $hasherClass The hasher class
      * @param array<string, mixed> $config The configuration
+     * @param string $type The hasher type for logging
+     * @param float $startTime Creation start time for performance logging
      * @return HasherInterface
      */
-    private function createLazyInstance(string $cacheKey, string $hasherClass, array $config): HasherInterface
+    private function createLazyInstance(string $cacheKey, string $hasherClass, array $config, string $type, float $startTime): HasherInterface
     {
+        $creationStart = \microtime(true);
+
         // Create the instance only when needed
         $hasher = new $hasherClass($config);
-        
+
+        $creationTime = \microtime(true) - $creationStart;
+        $totalTime = \microtime(true) - $startTime;
+
+        $this->logger->debug('Created new hasher instance', [
+            'type' => $type,
+            'class' => \basename($hasherClass),
+            'creation_time_ms' => \round($creationTime * 1000, 3),
+            'total_time_ms' => \round($totalTime * 1000, 3),
+            'cache_key' => \substr($cacheKey, 0, 16) . '...',
+        ]);
+
         // Cache the instance with LRU eviction
         $this->cacheInstance($cacheKey, $hasher);
-        
+
+        $this->logger->debug('Hasher creation complete', [
+            'type' => $type,
+            'cache_size' => \count($this->instanceCache),
+            'cache_hit_rate' => $this->getCacheHitRate(),
+            'total_requests' => $this->cacheHits + $this->cacheMisses,
+        ]);
+
         return $hasher;
     }
     
