@@ -69,8 +69,10 @@ Before starting the migration, ensure you have:
 ### Step 1: Update Dependencies
 
 ```bash
-composer require "pgs-soft/hashid-bundle:^4.0"
+composer require "uniacid/hashid-bundle:^4.0"
 ```
+
+> **Note**: This is a modernized fork of the original `pgs-soft/hashid-bundle`. If you're using the original bundle, you'll need to update your package reference.
 
 ### Step 2: Choose Your Migration Strategy
 

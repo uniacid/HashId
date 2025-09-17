@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+> **Note**: This is a modernized fork of the original [PGSSoft/HashId](https://github.com/PGSSoft/HashId) bundle. Version 4.0+ represents the modernization effort by [uniacid](https://github.com/uniacid).
+
 ## [4.0.0] - 2025-09-14
 
 ### Added
@@ -212,5 +214,6 @@ Key points:
 - [Documentation](README.md)
 - [Upgrade Guide](UPGRADE-4.0.md)
 - [Rector Metrics](docs/RECTOR-METRICS.md)
-- [GitHub Repository](https://github.com/PGSSoft/HashId)
-- [Packagist](https://packagist.org/packages/pgs/hashid-bundle)
+- [GitHub Repository](https://github.com/uniacid/HashId)
+- [Packagist](https://packagist.org/packages/uniacid/hashid-bundle)
+- [Original Bundle](https://github.com/PGSSoft/HashId)

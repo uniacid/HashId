@@ -2,7 +2,9 @@
 
 ## 🎉 Major Release: PHP 8.3 & Symfony 6.4/7.0 Modernization
 
-We're excited to announce the release of HashId Bundle v4.0.0, a major modernization that brings full PHP 8.3 and Symfony 6.4/7.0 support while maintaining backward compatibility for smooth migration.
+We're excited to announce the release of HashId Bundle v4.0.0, a modernized fork of the original [PGSSoft/HashId](https://github.com/PGSSoft/HashId) bundle. This major release brings full PHP 8.3 and Symfony 6.4/7.0 support while maintaining backward compatibility for smooth migration.
+
+> **Note**: This is a modernized fork maintained by [uniacid](https://github.com/uniacid). The original bundle by PGS Software laid the excellent foundation that this work builds upon.
 
 ## 🚀 Key Highlights
 
@@ -49,7 +51,7 @@ Our Rector-powered migration automation achieved impressive results:
 
 ### Installation
 ```bash
-composer require pgs-soft/hashid-bundle:^4.0
+composer require uniacid/hashid-bundle:^4.0
 ```
 
 ### Quick Migration
@@ -103,15 +105,17 @@ class OrderController
 
 ## 🙏 Acknowledgments
 
-### Version 4.0 Modernization Team
-- Modernization Lead: AI-Assisted Development Team
+### Original Work
+This bundle is based on the excellent [HashId Bundle](https://github.com/PGSSoft/HashId) created by:
+- PGS Software Team
+- Karol Jonski (Original Author)
+- Symfony Community Contributors
+
+### Version 4.0 Modernization
+- Modernization Lead: uniacid with AI-Assisted Development
 - Rector Automation: 75.3% automation rate achieved
 - Testing: PHPUnit 10 migration with 90%+ coverage
 - Documentation: Comprehensive guides and API docs
-
-### Original Contributors
-- PGS Software Team
-- Symfony Community Contributors
 
 ## 🔮 Looking Ahead
 
@@ -125,9 +129,12 @@ class OrderController
 ## 🐛 Bug Reports & Contributions
 
 Found an issue or want to contribute? We welcome your input!
-- [Report Issues](https://github.com/PGSSoft/HashId/issues)
-- [Submit Pull Requests](https://github.com/PGSSoft/HashId/pulls)
-- [View on Packagist](https://packagist.org/packages/pgs-soft/hashid-bundle)
+- [Report Issues](https://github.com/uniacid/HashId/issues)
+- [Submit Pull Requests](https://github.com/uniacid/HashId/pulls)
+- [View on Packagist](https://packagist.org/packages/uniacid/hashid-bundle)
+
+For issues with the original v3.x bundle:
+- [Original Repository](https://github.com/PGSSoft/HashId)
 
 ## 📄 License
 

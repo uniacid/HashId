@@ -2,9 +2,9 @@
 
 ## GitHub Release Announcement
 
-### Title: HashId Bundle v4.0.0 - PHP 8.3 & Symfony 6.4/7.0 Support
+### Title: HashId Bundle v4.0.0 - PHP 8.3 & Symfony 6.4/7.0 Support (Modernized Fork)
 
-We're thrilled to announce HashId Bundle v4.0.0! This major release brings modern PHP 8.3 features, Symfony 6.4/7.0 compatibility, and automated migration tools.
+We're thrilled to announce HashId Bundle v4.0.0! This is a modernized fork of the popular PGSSoft/HashId bundle, bringing modern PHP 8.3 features, Symfony 6.4/7.0 compatibility, and automated migration tools.
 
 ### ✨ Highlights
 
@@ -17,8 +17,10 @@ We're thrilled to announce HashId Bundle v4.0.0! This major release brings moder
 ### 🔧 Quick Start
 
 ```bash
-composer require pgs-soft/hashid-bundle:^4.0
+composer require uniacid/hashid-bundle:^4.0
 ```
+
+> **Note**: This is a modernized fork of the original `pgs-soft/hashid-bundle`
 
 ### 📖 Documentation
 - [Release Notes](RELEASE_NOTES.md)
@@ -29,9 +31,9 @@ composer require pgs-soft/hashid-bundle:^4.0
 
 ## Symfony Slack Announcement
 
-**🎉 HashId Bundle v4.0.0 Released!**
+**🎉 HashId Bundle v4.0.0 Released! (Modernized Fork)**
 
-Hey Symfony community! We've just released HashId Bundle v4.0 with full PHP 8.3 and Symfony 6.4/7.0 support.
+Hey Symfony community! We've just released HashId Bundle v4.0 - a modernized fork of PGSSoft/HashId with full PHP 8.3 and Symfony 6.4/7.0 support.
 
 **What's new:**
 • Native PHP attributes support
@@ -39,8 +41,8 @@ Hey Symfony community! We've just released HashId Bundle v4.0 with full PHP 8.3 
 • 30%+ performance improvements
 • PHPStan level 9 compliance
 
-**Upgrade:** `composer require pgs-soft/hashid-bundle:^4.0`
-**Docs:** https://github.com/PGSSoft/HashId
+**Upgrade:** `composer require uniacid/hashid-bundle:^4.0`
+**Docs:** https://github.com/uniacid/HashId
 
 Feedback welcome! 🚀
 
@@ -56,7 +58,7 @@ Feedback welcome! 🚀
 ✅ 30% faster performance
 ✅ Native attributes
 
-Upgrade today: composer require pgs-soft/hashid-bundle:^4.0
+Upgrade today: composer require uniacid/hashid-bundle:^4.0
 
 #PHP #Symfony #OpenSource
 
@@ -64,11 +66,11 @@ Upgrade today: composer require pgs-soft/hashid-bundle:^4.0
 
 ## Reddit r/PHP Announcement
 
-### Title: HashId Bundle v4.0 Released - PHP 8.3 & Symfony 6.4/7.0 Support with 75% Automated Migration
+### Title: [Fork] HashId Bundle v4.0 Released - PHP 8.3 & Symfony 6.4/7.0 Support with 75% Automated Migration
 
 Hey r/PHP!
 
-We're excited to share the release of HashId Bundle v4.0, a major modernization of the popular Symfony bundle for URL parameter obfuscation.
+We're excited to share the release of HashId Bundle v4.0, a modernized fork of the popular PGSSoft/HashId Symfony bundle for URL parameter obfuscation.
 
 **Key Features:**
 - Full PHP 8.1, 8.2, and 8.3 support with modern features
@@ -82,9 +84,10 @@ We're excited to share the release of HashId Bundle v4.0, a major modernization 
 We've achieved a 75.3% automation rate with Rector, saving developers ~82% of migration time. The bundle maintains backward compatibility, allowing gradual migration from annotations to attributes.
 
 **Links:**
-- [GitHub Repository](https://github.com/PGSSoft/HashId)
-- [Packagist](https://packagist.org/packages/pgs-soft/hashid-bundle)
-- [Upgrade Guide](https://github.com/PGSSoft/HashId/blob/master/UPGRADE-4.0.md)
+- [GitHub Repository](https://github.com/uniacid/HashId)
+- [Packagist](https://packagist.org/packages/uniacid/hashid-bundle)
+- [Upgrade Guide](https://github.com/uniacid/HashId/blob/master/UPGRADE-4.0.md)
+- [Original Bundle](https://github.com/PGSSoft/HashId)
 
 Would love to hear your feedback and experiences with the migration!
 
@@ -92,11 +95,11 @@ Would love to hear your feedback and experiences with the migration!
 
 ## Dev.to Article Template
 
-# HashId Bundle v4.0: Modernizing for PHP 8.3 and Symfony 6.4 with 75% Automation
+# HashId Bundle v4.0: A Modernized Fork for PHP 8.3 and Symfony 6.4 with 75% Automation
 
 ## Introduction
 
-We're excited to announce the release of HashId Bundle v4.0, representing a complete modernization for PHP 8.3 and Symfony 6.4/7.0. This release showcases how Rector can automate 75% of a major version migration.
+We're excited to announce the release of HashId Bundle v4.0, a modernized fork of the original PGSSoft/HashId bundle. This release brings complete modernization for PHP 8.3 and Symfony 6.4/7.0, showcasing how Rector can automate 75% of a major version migration.
 
 ## What is HashId Bundle?
 
@@ -152,10 +155,14 @@ The bundle supports both annotations and attributes, allowing teams to migrate a
 ## Get Started
 
 ```bash
-composer require pgs-soft/hashid-bundle:^4.0
+composer require uniacid/hashid-bundle:^4.0
 ```
 
-Check out our [comprehensive upgrade guide](https://github.com/PGSSoft/HashId/blob/master/UPGRADE-4.0.md) for detailed migration instructions.
+Check out our [comprehensive upgrade guide](https://github.com/uniacid/HashId/blob/master/UPGRADE-4.0.md) for detailed migration instructions.
+
+## Attribution
+
+This is a modernized fork of the original [HashId Bundle](https://github.com/PGSSoft/HashId) by PGS Software.
 
 ## Conclusion
 
@@ -197,8 +204,10 @@ We're pleased to announce the release of HashId Bundle v4.0, a major update that
 
 Update your composer.json:
 ```
-composer require pgs-soft/hashid-bundle:^4.0
+composer require uniacid/hashid-bundle:^4.0
 ```
+
+**Note**: This is a modernized fork of the original `pgs-soft/hashid-bundle`.
 
 Run automated migration:
 ```
@@ -206,9 +215,10 @@ vendor/bin/rector process --config=rector.php
 ```
 
 **Resources:**
-- [Release Notes](https://github.com/PGSSoft/HashId/blob/master/RELEASE_NOTES.md)
-- [Upgrade Guide](https://github.com/PGSSoft/HashId/blob/master/UPGRADE-4.0.md)
-- [Documentation](https://github.com/PGSSoft/HashId)
+- [Release Notes](https://github.com/uniacid/HashId/blob/master/RELEASE_NOTES.md)
+- [Upgrade Guide](https://github.com/uniacid/HashId/blob/master/UPGRADE-4.0.md)
+- [Documentation](https://github.com/uniacid/HashId)
+- [Original Bundle](https://github.com/PGSSoft/HashId)
 
 We value your feedback! Please report any issues or suggestions on our GitHub repository.
 

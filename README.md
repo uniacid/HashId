@@ -1,9 +1,11 @@
-# [![PGS Software](https://www.pgs-soft.com/pgssoft-logo.png)](https://www.pgs-soft.com) / HashId Bundle
+# HashId Bundle - Modernized Fork
+
+> **A modernized fork of [PGSSoft/HashId](https://github.com/PGSSoft/HashId) bundle, updated for PHP 8.3 and Symfony 6.4/7.0**
 
 ![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-blue.svg)
 ![Symfony 6.4/7.0](https://img.shields.io/badge/Symfony-6.4%20%7C%207.0-green.svg)
-[![Latest Stable Version](https://poser.pugx.org/pgs-soft/hashid-bundle/v/stable)](https://packagist.org/packages/pgs-soft/hashid-bundle)
-[![License](https://poser.pugx.org/pgs-soft/hashid-bundle/license)](https://packagist.org/packages/pgs-soft/hashid-bundle)
+[![Latest Stable Version](https://poser.pugx.org/uniacid/hashid-bundle/v/stable)](https://packagist.org/packages/uniacid/hashid-bundle)
+[![License](https://poser.pugx.org/uniacid/hashid-bundle/license)](https://packagist.org/packages/uniacid/hashid-bundle)
 
 Symfony bundle for automatically encoding integer route parameters and decoding request parameters using [Hashids](http://www.hashids.org/)
 
@@ -33,7 +35,7 @@ Transform predictable integer URL parameters into obfuscated strings automatical
 ## Installation
 
 ```bash
-composer require pgs-soft/hashid-bundle:^4.0
+composer require uniacid/hashid-bundle:^4.0
 ```
 
 ### Requirements
@@ -213,14 +215,21 @@ vendor/bin/phpunit tests/Documentation/
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at [https://github.com/PGSSoft/HashId](https://github.com/PGSSoft/HashId).
+Bug reports and pull requests are welcome on GitHub at [https://github.com/uniacid/HashId](https://github.com/uniacid/HashId).
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 
 ## About
 
-The project is maintained by [software development agency](https://www.pgs-soft.com/) [PGS Software](https://www.pgs-soft.com/).
-See our other [open-source projects](https://github.com/PGSSoft) or [contact us](https://www.pgs-soft.com/contact-us/) to develop your product.
+### Original Work
+This bundle is a fork of the excellent [HashId Bundle](https://github.com/PGSSoft/HashId) originally created by [PGS Software](https://www.pgs-soft.com/).
+
+### This Fork
+This modernized fork is maintained by [uniacid](https://github.com/uniacid) and focuses on:
+- PHP 8.3 compatibility and modern features
+- Symfony 6.4 LTS and 7.0 support
+- Automated migration tools with Rector
+- Enhanced performance and type safety
 
 ### Version 4.0 Modernization
 

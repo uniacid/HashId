@@ -1,13 +1,20 @@
 {
-    "name": "pgs-soft/hashid-bundle",
+    "name": "uniacid/hashid-bundle",
     "type": "symfony-bundle",
-    "description": "Symfony bundle for automatic encoding/decoding of route parameters using Hashids - prevents resource enumeration",
-    "keywords": ["symfony", "bundle", "hashids", "security", "obfuscation", "url", "routing", "parameter"],
+    "description": "Modernized Symfony bundle for automatic encoding/decoding of route parameters using Hashids - PHP 8.3 & Symfony 6.4/7.0 ready fork of pgs-soft/hashid-bundle",
+    "keywords": ["symfony", "bundle", "hashids", "security", "obfuscation", "url", "routing", "parameter", "php8", "modernized"],
     "license": "MIT",
+    "homepage": "https://github.com/uniacid/HashId",
     "authors": [
         {
             "name": "Karol Jonski",
-            "email": "kjonski@pgs-soft.com"
+            "email": "kjonski@pgs-soft.com",
+            "role": "Original Author"
+        },
+        {
+            "name": "uniacid",
+            "homepage": "https://github.com/uniacid",
+            "role": "Modernization Lead (v4.0+)"
         }
     ],
     "require": {
