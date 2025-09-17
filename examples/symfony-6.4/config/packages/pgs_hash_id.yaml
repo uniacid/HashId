@@ -1,4 +1,6 @@
 pgs_hash_id:
-    salt: 'symfony64-example-salt-2024'
-    min_hash_length: 8
-    alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
+    hashers:
+        default:
+            salt: 'symfony64-example-salt-2024'
+            min_hash_length: 8
+            alphabet: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'

@@ -90,7 +90,10 @@ class RouterDecorator implements RouterInterface, WarmableInterface
         array $parameters = [],
         int $referenceType = RouterInterface::ABSOLUTE_PATH,
     ): string {
-        $this->processParameters($this->getRoute($name, $parameters), $parameters);
+        // Skip processing for system routes (profiler, assets, etc.)
+        if (!str_starts_with($name, '_')) {
+            $this->processParameters($this->getRoute($name, $parameters), $parameters);
+        }
 
         return $this->getRouter()->generate($name, $parameters, $referenceType);
     }
